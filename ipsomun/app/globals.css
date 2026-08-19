@@ -1,3 +1,15 @@
+
+
+/* ---------- Top notice bar (쿠팡파트너스 고지) ---------- */
+.notice-bar {
+  background: var(--brand-soft);
+  color: #9a6a45;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  padding: 6px 16px;
+  letter-spacing: -0.2px;
+}
 :root {
   --bg: #faf9f7;
   --surface: #ffffff;
