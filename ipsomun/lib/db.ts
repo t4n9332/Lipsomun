@@ -50,6 +50,7 @@ export interface ProductInput {
   review?: string;
   pros?: string;
   cons?: string;
+  source?: string;
   links?: { platform: string; url: string }[];
 }
 
@@ -88,9 +89,11 @@ CREATE TABLE IF NOT EXISTS products (
   cons TEXT NOT NULL DEFAULT '',
   clicks INTEGER NOT NULL DEFAULT 0,
   views INTEGER NOT NULL DEFAULT 0,
+  source TEXT NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE products ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT '';
 CREATE TABLE IF NOT EXISTS affiliate_links (
   id TEXT PRIMARY KEY,
   platform TEXT NOT NULL DEFAULT 'etc',
@@ -350,8 +353,8 @@ export async function createProduct(input: ProductInput): Promise<Product> {
   const rows = await q(
     `INSERT INTO products
        (id, title, slug, description, image_url, category, price, original_price,
-        is_deal, is_published, priority, review, pros, cons)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+        is_deal, is_published, priority, review, pros, cons, source)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
      RETURNING *`,
     [
       id,
@@ -368,10 +371,44 @@ export async function createProduct(input: ProductInput): Promise<Product> {
       input.review || "",
       input.pros || "",
       input.cons || "",
+      input.source || "",
     ]
   );
   await insertLinks(id, cleanLinks(input.links));
   return rowToProduct(rows[0]);
+}
+
+/* ---------- 골드박스 자동 등록 지원 ---------- */
+
+/** 특정 source로 등록된 제품들의 '오늘의 딜' 표시를 일괄 해제 */
+export async function unsetDealsBySource(source: string): Promise<number> {
+  const rows = await q(
+    `UPDATE products SET is_deal = FALSE, updated_at = now()
+     WHERE source = $1 AND is_deal = TRUE RETURNING id`,
+    [source]
+  );
+  return rows.length;
+}
+
+/** source+제목으로 기존 제품 찾기 (중복 등록 방지용) */
+export async function findBySourceTitle(
+  source: string,
+  title: string
+): Promise<Product | null> {
+  const rows = await q(
+    `SELECT * FROM products WHERE source = $1 AND title = $2 LIMIT 1`,
+    [source, title]
+  );
+  return rows.length ? rowToProduct(rows[0]) : null;
+}
+
+/** 기존 제품을 다시 오늘의 딜로 올리고 가격 갱신 */
+export async function reviveDeal(id: string, price: number | null): Promise<void> {
+  await q(
+    `UPDATE products SET is_deal = TRUE, price = COALESCE($2, price), updated_at = now()
+     WHERE id = $1`,
+    [id, price]
+  );
 }
 
 export async function updateProduct(input: ProductInput): Promise<Product | null> {
