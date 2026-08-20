@@ -147,6 +147,7 @@ button { font-family: inherit; }
 }
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
 .card .thumb {
+  position: relative;
   aspect-ratio: 1;
   background: #f3f1ee;
   overflow: hidden;
@@ -200,7 +201,7 @@ button { font-family: inherit; }
 }
 .rank-item:hover { box-shadow: var(--shadow); }
 .rank-num { font-size: 20px; font-weight: 900; color: var(--brand); width: 30px; text-align: center; flex-shrink: 0; }
-.rank-item .thumb { width: 64px; height: 64px; border-radius: 10px; overflow: hidden; background: #f3f1ee; flex-shrink: 0; }
+.rank-item .thumb { position: relative; width: 64px; height: 64px; border-radius: 10px; overflow: hidden; background: #f3f1ee; flex-shrink: 0; }
 .rank-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
 .rank-item .info { min-width: 0; }
 .rank-item .title { font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -211,6 +212,7 @@ button { font-family: inherit; }
 .detail { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 32px; }
 @media (max-width: 760px) { .detail { grid-template-columns: 1fr; } }
 .detail .photo {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -523,3 +525,111 @@ button { font-family: inherit; }
   flex-shrink: 0;
   line-height: 1;
 }
+
+/* ---------- 역대 최저가 뱃지 ---------- */
+.low-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #1c7ed6;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: -0.3px;
+  vertical-align: middle;
+}
+
+/* ---------- 가격 추이 차트 ---------- */
+.price-history {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px 14px;
+  margin-top: 28px;
+}
+.price-history .ph-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.price-history .ph-head h2 { font-size: 17px; margin: 0; }
+.price-history .ph-head .sub { font-size: 12.5px; color: var(--ink-faint); }
+.ph-svg { width: 100%; height: 150px; display: block; }
+.ph-label { font-size: 12px; font-weight: 700; fill: var(--ink-soft); }
+.ph-label.muted { fill: var(--ink-faint); font-weight: 600; }
+.ph-range {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+/* ---------- 기획전 ---------- */
+.pick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+.pick-card {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.pick-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.pick-thumbs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f1ee;
+}
+.pick-thumbs .pt { position: relative; overflow: hidden; background: #ece8e2; }
+.pick-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pick-info b { font-size: 15px; letter-spacing: -0.3px; }
+.pick-info .d {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pick-info .n { font-size: 12px; color: var(--ink-faint); }
+.pick-hero h1 { font-size: 26px; }
+@media (max-width: 640px) {
+  .pick-grid { grid-template-columns: 1fr; }
+  .price-history { padding: 14px 14px 10px; }
+}
+
+/* ---------- 어드민: 대시보드/기획전 ---------- */
+.dash-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 860px) { .dash-2col { grid-template-columns: 1fr; } }
+.col-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.col-form input[type="text"], .col-form input:not([type]) {
+  flex: 1;
+  min-width: 220px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.price-block .low-badge { margin-left: 10px; }

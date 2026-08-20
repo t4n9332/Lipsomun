@@ -5,13 +5,22 @@ import { CATEGORIES } from "@/lib/util";
 import UserMenu from "@/components/UserMenu";
 import InstallPrompt from "@/components/InstallPrompt";
 
+const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE),
   title: {
     default: "입소문 — 진짜 써본 사람들의 쇼핑 추천",
     template: "%s | 입소문",
   },
   description:
     "오늘의 특가부터 카테고리별 인기 랭킹, 솔직 리뷰까지. 입소문에서 확인하고 최저가로 구매하세요.",
+  openGraph: {
+    siteName: "입소문",
+    type: "website",
+    locale: "ko_KR",
+    images: ["/og-default.png"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -62,6 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <nav className="header-links">
               <Link href="/deals">오늘의 딜</Link>
               <Link href="/ranking">랭킹</Link>
+              <Link href="/pick">기획전</Link>
               <Link href="/favorites">찜 ♥</Link>
               <UserMenu />
             </nav>
