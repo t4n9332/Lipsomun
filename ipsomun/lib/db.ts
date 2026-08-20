@@ -122,6 +122,34 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
   data TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE push_subscriptions ADD COLUMN IF NOT EXISTS user_id TEXT;
+CREATE TABLE IF NOT EXISTS price_history (
+  product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  day DATE NOT NULL,
+  price INTEGER NOT NULL,
+  PRIMARY KEY (product_id, day)
+);
+CREATE TABLE IF NOT EXISTS favorites (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, product_id)
+);
+CREATE TABLE IF NOT EXISTS collections (
+  id TEXT PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  is_published BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS collection_items (
+  collection_id TEXT NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  position INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (collection_id, product_id)
+);
 `;
 
 async function ready(): Promise<void> {
@@ -551,14 +579,28 @@ export async function getAttendanceStats(userId: string): Promise<AttendanceStat
   return { total: days.length, streak, todayDone };
 }
 
-export async function savePushSubscription(sub: {
-  endpoint: string;
-  [k: string]: unknown;
-}): Promise<void> {
+export async function savePushSubscription(
+  sub: {
+    endpoint: string;
+    [k: string]: unknown;
+  },
+  userId?: string | null
+): Promise<void> {
   await q(
-    `INSERT INTO push_subscriptions (endpoint, data) VALUES ($1, $2)
-     ON CONFLICT (endpoint) DO UPDATE SET data = $2`,
-    [sub.endpoint, JSON.stringify(sub)]
+    `INSERT INTO push_subscriptions (endpoint, data, user_id) VALUES ($1, $2, $3)
+     ON CONFLICT (endpoint) DO UPDATE SET data = $2,
+       user_id = COALESCE($3, push_subscriptions.user_id)`,
+    [sub.endpoint, JSON.stringify(sub), userId ?? null]
+  );
+}
+
+export async function getPushSubscriptionsByUsers(
+  userIds: string[]
+): Promise<{ endpoint: string; data: string; user_id: string }[]> {
+  if (userIds.length === 0) return [];
+  return q(
+    `SELECT endpoint, data, user_id FROM push_subscriptions WHERE user_id = ANY($1) LIMIT 5000`,
+    [userIds]
   );
 }
 
@@ -570,4 +612,329 @@ export async function getPushSubscriptions(): Promise<
 
 export async function deletePushSubscription(endpoint: string): Promise<void> {
   await q(`DELETE FROM push_subscriptions WHERE endpoint = $1`, [endpoint]);
+}
+
+/* ---------- 가격 히스토리 ---------- */
+
+/** 오늘(KST) 기준 전 상품 가격 스냅샷 저장. 저장된 행 수 반환 */
+export async function snapshotPrices(): Promise<number> {
+  const rows = await q(
+    `INSERT INTO price_history (product_id, day, price)
+     SELECT id, $1::date, price FROM products WHERE price IS NOT NULL
+     ON CONFLICT (product_id, day) DO UPDATE SET price = EXCLUDED.price
+     RETURNING product_id`,
+    [kstToday()]
+  );
+  return rows.length;
+}
+
+export interface PricePoint {
+  day: string;
+  price: number;
+}
+
+export async function getPriceHistory(
+  productId: string,
+  limit = 120
+): Promise<PricePoint[]> {
+  const rows = await q(
+    `SELECT to_char(day, 'YYYY-MM-DD') AS day, price
+     FROM price_history WHERE product_id = $1
+     ORDER BY day DESC LIMIT $2`,
+    [productId, limit]
+  );
+  return rows.reverse();
+}
+
+export interface PriceStats {
+  minPrice: number;
+  maxPrice: number;
+  days: number;
+}
+
+export async function getPriceStats(productId: string): Promise<PriceStats | null> {
+  const rows = await q(
+    `SELECT MIN(price)::int AS min, MAX(price)::int AS max, COUNT(*)::int AS days
+     FROM price_history WHERE product_id = $1`,
+    [productId]
+  );
+  if (!rows.length || !rows[0].days) return null;
+  return { minPrice: rows[0].min, maxPrice: rows[0].max, days: rows[0].days };
+}
+
+/** 찜한 상품 중 직전 스냅샷보다 가격이 내려간 것 (푸시용) */
+export interface FavoriteDrop {
+  userId: string;
+  title: string;
+  slug: string;
+  price: number;
+  prevPrice: number;
+}
+
+export async function getFavoritePriceDrops(): Promise<FavoriteDrop[]> {
+  const rows = await q(
+    `WITH prev AS (
+       SELECT DISTINCT ON (product_id) product_id, price
+       FROM price_history WHERE day < $1::date
+       ORDER BY product_id, day DESC
+     )
+     SELECT f.user_id, p.title, p.slug, p.price, prev.price AS prev_price
+     FROM favorites f
+     JOIN products p ON p.id = f.product_id AND p.is_published AND p.price IS NOT NULL
+     JOIN prev ON prev.product_id = p.id
+     WHERE p.price < prev.price
+     LIMIT 2000`,
+    [kstToday()]
+  );
+  return rows
+    .map((r) => ({
+      userId: r.user_id,
+      title: r.title,
+      slug: r.slug,
+      price: r.price,
+      prevPrice: r.prev_price,
+    }))
+    // 소액 변동 스팸 방지: 3% 이상 또는 1,000원 이상 하락만
+    .filter((d) => d.prevPrice - d.price >= Math.min(Math.max(500, d.prevPrice * 0.03), 30000) || d.prevPrice - d.price >= 1000);
+}
+
+/* ---------- 찜 (서버 저장) ---------- */
+
+export async function getFavoriteSlugs(userId: string): Promise<string[]> {
+  const rows = await q(
+    `SELECT p.slug FROM favorites f JOIN products p ON p.id = f.product_id
+     WHERE f.user_id = $1 ORDER BY f.created_at DESC LIMIT 500`,
+    [userId]
+  );
+  return rows.map((r) => r.slug);
+}
+
+export async function setFavorite(
+  userId: string,
+  slug: string,
+  on: boolean
+): Promise<void> {
+  if (on) {
+    await q(
+      `INSERT INTO favorites (user_id, product_id)
+       SELECT $1, id FROM products WHERE slug = $2
+       ON CONFLICT DO NOTHING`,
+      [userId, slug]
+    );
+  } else {
+    await q(
+      `DELETE FROM favorites WHERE user_id = $1
+       AND product_id IN (SELECT id FROM products WHERE slug = $2)`,
+      [userId, slug]
+    );
+  }
+}
+
+/** 로컬 찜 목록을 계정에 병합 (기기→계정 동기화) */
+export async function mergeFavorites(userId: string, slugs: string[]): Promise<void> {
+  const clean = slugs.filter((s) => typeof s === "string" && s.length < 200).slice(0, 300);
+  if (clean.length === 0) return;
+  await q(
+    `INSERT INTO favorites (user_id, product_id)
+     SELECT $1, id FROM products WHERE slug = ANY($2)
+     ON CONFLICT DO NOTHING`,
+    [userId, clean]
+  );
+}
+
+/* ---------- 기획전 (컬렉션) ---------- */
+
+export interface Collection {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  isPublished: boolean;
+  updatedAt: Date;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function rowToCollection(r: any): Collection {
+  return {
+    id: r.id,
+    slug: r.slug,
+    title: r.title,
+    description: r.description,
+    isPublished: r.is_published,
+    updatedAt: r.updated_at,
+  };
+}
+
+async function uniqueCollectionSlug(title: string, excludeId?: string): Promise<string> {
+  const base =
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9가-힣]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "pick";
+  let slug = base;
+  let i = 1;
+  while (i < 50) {
+    const rows = await q(`SELECT id FROM collections WHERE slug = $1`, [slug]);
+    if (rows.length === 0 || rows[0].id === excludeId) return slug;
+    slug = `${base}-${++i}`;
+  }
+  return `${base}-${crypto.randomUUID().slice(0, 6)}`;
+}
+
+export async function createCollection(
+  title: string,
+  description: string
+): Promise<Collection> {
+  const id = crypto.randomUUID();
+  const slug = await uniqueCollectionSlug(title);
+  const rows = await q(
+    `INSERT INTO collections (id, slug, title, description) VALUES ($1,$2,$3,$4) RETURNING *`,
+    [id, slug, title.trim(), description]
+  );
+  return rowToCollection(rows[0]);
+}
+
+export async function updateCollection(input: {
+  id: string;
+  title: string;
+  description: string;
+  isPublished: boolean;
+  productIds: string[];
+}): Promise<void> {
+  const existing = await q(`SELECT * FROM collections WHERE id = $1`, [input.id]);
+  if (!existing.length) return;
+  const slug =
+    existing[0].title === input.title.trim()
+      ? existing[0].slug
+      : await uniqueCollectionSlug(input.title, input.id);
+  await q(
+    `UPDATE collections SET title=$2, slug=$3, description=$4, is_published=$5, updated_at=now() WHERE id=$1`,
+    [input.id, input.title.trim(), slug, input.description, input.isPublished]
+  );
+  await q(`DELETE FROM collection_items WHERE collection_id = $1`, [input.id]);
+  for (let i = 0; i < input.productIds.length && i < 100; i++) {
+    await q(
+      `INSERT INTO collection_items (collection_id, product_id, position) VALUES ($1,$2,$3)
+       ON CONFLICT DO NOTHING`,
+      [input.id, input.productIds[i], i]
+    );
+  }
+}
+
+export async function deleteCollection(id: string): Promise<void> {
+  await q(`DELETE FROM collections WHERE id = $1`, [id]);
+}
+
+export async function adminListCollections(): Promise<
+  (Collection & { itemCount: number })[]
+> {
+  const rows = await q(
+    `SELECT c.*, COALESCE(ci.n, 0)::int AS item_count
+     FROM collections c
+     LEFT JOIN (SELECT collection_id, COUNT(*) AS n FROM collection_items GROUP BY collection_id) ci
+       ON ci.collection_id = c.id
+     ORDER BY c.updated_at DESC LIMIT 100`
+  );
+  return rows.map((r) => ({ ...rowToCollection(r), itemCount: r.item_count }));
+}
+
+export async function getCollectionById(
+  id: string
+): Promise<(Collection & { productIds: string[] }) | null> {
+  const rows = await q(`SELECT * FROM collections WHERE id = $1`, [id]);
+  if (!rows.length) return null;
+  const items = await q(
+    `SELECT product_id FROM collection_items WHERE collection_id = $1 ORDER BY position`,
+    [id]
+  );
+  return { ...rowToCollection(rows[0]), productIds: items.map((r) => r.product_id) };
+}
+
+export async function getPublishedCollections(
+  limit = 30
+): Promise<(Collection & { itemCount: number; images: string[] })[]> {
+  const rows = await q(
+    `SELECT c.*, COALESCE(ci.n, 0)::int AS item_count
+     FROM collections c
+     LEFT JOIN (SELECT collection_id, COUNT(*) AS n FROM collection_items GROUP BY collection_id) ci
+       ON ci.collection_id = c.id
+     WHERE c.is_published
+     ORDER BY c.updated_at DESC LIMIT $1`,
+    [limit]
+  );
+  const cols = rows.map((r) => ({ ...rowToCollection(r), itemCount: r.item_count as number, images: [] as string[] }));
+  if (cols.length) {
+    const imgs = await q(
+      `SELECT DISTINCT ON (ci.collection_id, ci.position) ci.collection_id, p.image_url
+       FROM collection_items ci JOIN products p ON p.id = ci.product_id AND p.is_published
+       WHERE ci.collection_id = ANY($1) AND p.image_url <> ''
+       ORDER BY ci.collection_id, ci.position LIMIT 400`,
+      [cols.map((c) => c.id)]
+    );
+    for (const c of cols) {
+      c.images = imgs
+        .filter((r) => r.collection_id === c.id)
+        .slice(0, 4)
+        .map((r) => r.image_url);
+    }
+  }
+  return cols;
+}
+
+export async function getCollectionBySlug(
+  slug: string
+): Promise<(Collection & { products: Product[] }) | null> {
+  const rows = await q(
+    `SELECT * FROM collections WHERE slug = $1 AND is_published`,
+    [slug]
+  );
+  if (!rows.length) return null;
+  const prods = await q(
+    `SELECT p.* FROM collection_items ci JOIN products p ON p.id = ci.product_id
+     WHERE ci.collection_id = $1 AND p.is_published
+     ORDER BY ci.position LIMIT 100`,
+    [rows[0].id]
+  );
+  return { ...rowToCollection(rows[0]), products: prods.map(rowToProduct) };
+}
+
+export async function getAllCollectionSlugs(): Promise<
+  { slug: string; updatedAt: Date }[]
+> {
+  const rows = await q(
+    `SELECT slug, updated_at FROM collections WHERE is_published LIMIT 500`
+  );
+  return rows.map((r) => ({ slug: r.slug, updatedAt: r.updated_at }));
+}
+
+/* ---------- 어드민 클릭 대시보드 ---------- */
+
+export interface CategoryStat {
+  category: string;
+  products: number;
+  views: number;
+  clicks: number;
+}
+
+export async function adminCategoryStats(): Promise<CategoryStat[]> {
+  const rows = await q(
+    `SELECT category, COUNT(*)::int AS products,
+            COALESCE(SUM(views),0)::int AS views, COALESCE(SUM(clicks),0)::int AS clicks
+     FROM products GROUP BY category ORDER BY clicks DESC, views DESC`
+  );
+  return rows.map((r) => ({
+    category: r.category,
+    products: r.products,
+    views: r.views,
+    clicks: r.clicks,
+  }));
+}
+
+export async function adminTopProducts(limit = 10): Promise<Product[]> {
+  const rows = await q(
+    `SELECT * FROM products WHERE clicks > 0 ORDER BY clicks DESC, views DESC LIMIT $1`,
+    [limit]
+  );
+  return rows.map(rowToProduct);
 }
