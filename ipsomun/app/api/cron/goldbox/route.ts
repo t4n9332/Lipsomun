@@ -5,9 +5,10 @@ import {
   findBySourceTitle,
   reviveDeal,
   unsetDealsBySource,
+  snapshotPrices,
 } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
-import { sendPushToAll } from "@/lib/push";
+import { sendPushToAll, sendFavoritePriceDropPush } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -64,6 +65,18 @@ export async function GET(req: Request) {
       }
     }
 
+    // 찜 상품 가격 인하 알림 (어제 스냅샷과 비교 — 오늘 스냅샷 저장 전에 계산)
+    let dropPush = { users: 0, sent: 0 };
+    try {
+      dropPush = await sendFavoritePriceDropPush();
+    } catch {}
+
+    // 전 상품 가격 스냅샷 저장 (역대 최저가 뱃지/그래프용)
+    let snapshots = 0;
+    try {
+      snapshots = await snapshotPrices();
+    } catch {}
+
     // 구독자에게 웹푸시 발송 (실패해도 갱신 결과에는 영향 없음)
     let push = { sent: 0, removed: 0 };
     try {
@@ -76,10 +89,12 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       ok: true,
-      message: `골드박스 갱신 완료 — 신규 ${created}개, 재등록 ${revived}개, 딜 해제 ${cleared}개, 푸시 ${push.sent}명 발송`,
+      message: `골드박스 갱신 완료 — 신규 ${created}개, 재등록 ${revived}개, 딜 해제 ${cleared}개, 가격 스냅샷 ${snapshots}개, 가격인하 푸시 ${dropPush.sent}건, 전체 푸시 ${push.sent}명 발송`,
       created,
       revived,
       cleared,
+      snapshots,
+      dropPush,
       push,
     });
   } catch (e) {
