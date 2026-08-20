@@ -18,7 +18,7 @@ export default async function AdminPage() {
   if (!(await isAdmin())) redirect("/admin/login");
 
   const [products, stats, catStats, topProducts] = await Promise.all([
-    adminListProducts(200),
+    adminListProducts(600),
     adminStats(),
     adminCategoryStats(),
     adminTopProducts(10),
