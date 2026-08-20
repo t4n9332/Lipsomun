@@ -35,11 +35,16 @@ export default function FavButton({
     e.preventDefault();
     e.stopPropagation();
     const favs = getFavs();
-    const next = favs.includes(slug)
-      ? favs.filter((s) => s !== slug)
-      : [...favs, slug];
+    const on = !favs.includes(slug);
+    const next = on ? [...favs, slug] : favs.filter((s) => s !== slug);
     setFavs(next);
-    setFav(next.includes(slug));
+    setFav(on);
+    // 로그인 상태면 계정에도 저장 (비로그인이면 서버가 무시)
+    fetch("/api/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, on }),
+    }).catch(() => {});
   }
 
   return (
