@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 import { CATEGORIES } from "@/lib/util";
 import UserMenu from "@/components/UserMenu";
+import InstallPrompt from "@/components/InstallPrompt";
 
 export const metadata: Metadata = {
   title: {
@@ -21,6 +22,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           name="naver-site-verification"
           content="58d80a68ed81e9188787cf42dc0b0b97eb858264"
         />
+        {/* PWA — 홈 화면 추가 지원 */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#e8590c" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="입소문" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
@@ -87,6 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <p>© {new Date().getFullYear()} 입소문</p>
           </div>
         </footer>
+        <InstallPrompt />
       </body>
     </html>
   );
