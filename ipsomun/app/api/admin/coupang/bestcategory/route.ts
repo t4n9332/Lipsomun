@@ -18,7 +18,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const categoryId = Number(url.searchParams.get("categoryId"));
   const category = (url.searchParams.get("category") || "기타").trim();
-  const limit = Math.min(Number(url.searchParams.get("limit") || 10), 20);
+  const limit = Math.min(Number(url.searchParams.get("limit") || 10), 50);
   if (!categoryId) {
     return NextResponse.json(
       { error: "categoryId가 필요합니다 (예: 1016)" },
