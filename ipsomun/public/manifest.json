@@ -1,0 +1,33 @@
+{
+  "name": "입소문 — 진짜 써본 사람들의 쇼핑 추천",
+  "short_name": "입소문",
+  "description": "오늘의 특가부터 카테고리별 인기 랭킹, 솔직 리뷰까지. 입소문에서 확인하고 최저가로 구매하세요.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf9f7",
+  "theme_color": "#e8590c",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
