@@ -104,6 +104,24 @@ CREATE TABLE IF NOT EXISTS affiliate_links (
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_deal ON products(is_deal);
 CREATE INDEX IF NOT EXISTS idx_links_product ON affiliate_links(product_id);
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL DEFAULT '',
+  picture TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS attendance (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day DATE NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, day)
+);
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  endpoint TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 `;
 
 async function ready(): Promise<void> {
@@ -457,4 +475,99 @@ export async function toggleProductField(
 ): Promise<void> {
   const col = field === "isDeal" ? "is_deal" : "is_published";
   await q(`UPDATE products SET ${col} = NOT ${col}, updated_at = now() WHERE id = $1`, [id]);
+}
+
+/* ---------- 회원 / 출석 / 푸시 ---------- */
+
+export interface SiteUser {
+  id: string;
+  email: string;
+  name: string;
+  picture: string;
+}
+
+export async function upsertUser(
+  email: string,
+  name: string,
+  picture: string
+): Promise<SiteUser> {
+  const rows = await q(
+    `INSERT INTO users (id, email, name, picture) VALUES ($1,$2,$3,$4)
+     ON CONFLICT (email) DO UPDATE SET name = $3, picture = $4
+     RETURNING id, email, name, picture`,
+    [crypto.randomUUID(), email, name, picture]
+  );
+  return rows[0];
+}
+
+export async function getUser(id: string): Promise<SiteUser | null> {
+  const rows = await q(
+    `SELECT id, email, name, picture FROM users WHERE id = $1`,
+    [id]
+  );
+  return rows.length ? rows[0] : null;
+}
+
+/** 한국시간 기준 오늘 날짜 (YYYY-MM-DD) */
+export function kstToday(): string {
+  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+/** 출석 도장 찍기. 이미 찍었으면 false */
+export async function stampAttendance(userId: string): Promise<boolean> {
+  const rows = await q(
+    `INSERT INTO attendance (user_id, day) VALUES ($1, $2)
+     ON CONFLICT DO NOTHING RETURNING user_id`,
+    [userId, kstToday()]
+  );
+  return rows.length > 0;
+}
+
+export interface AttendanceStats {
+  total: number;
+  streak: number;
+  todayDone: boolean;
+}
+
+export async function getAttendanceStats(userId: string): Promise<AttendanceStats> {
+  const rows = await q(
+    `SELECT to_char(day, 'YYYY-MM-DD') AS d FROM attendance WHERE user_id = $1 ORDER BY day DESC LIMIT 400`,
+    [userId]
+  );
+  const days: string[] = rows.map((r) => r.d);
+  const today = kstToday();
+  const todayDone = days.includes(today);
+
+  // 연속 출석: 오늘(또는 어제)부터 거꾸로 연속된 날 수
+  let streak = 0;
+  const cursor = new Date(today + "T00:00:00Z");
+  if (!todayDone) cursor.setUTCDate(cursor.getUTCDate() - 1);
+  const set = new Set(days);
+  while (set.has(cursor.toISOString().slice(0, 10))) {
+    streak++;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+
+  return { total: days.length, streak, todayDone };
+}
+
+export async function savePushSubscription(sub: {
+  endpoint: string;
+  [k: string]: unknown;
+}): Promise<void> {
+  await q(
+    `INSERT INTO push_subscriptions (endpoint, data) VALUES ($1, $2)
+     ON CONFLICT (endpoint) DO UPDATE SET data = $2`,
+    [sub.endpoint, JSON.stringify(sub)]
+  );
+}
+
+export async function getPushSubscriptions(): Promise<
+  { endpoint: string; data: string }[]
+> {
+  return q(`SELECT endpoint, data FROM push_subscriptions LIMIT 5000`);
+}
+
+export async function deletePushSubscription(endpoint: string): Promise<void> {
+  await q(`DELETE FROM push_subscriptions WHERE endpoint = $1`, [endpoint]);
 }

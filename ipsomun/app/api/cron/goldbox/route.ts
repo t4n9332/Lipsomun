@@ -7,6 +7,7 @@ import {
   unsetDealsBySource,
 } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
+import { sendPushToAll } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -63,12 +64,23 @@ export async function GET(req: Request) {
       }
     }
 
+    // 구독자에게 웹푸시 발송 (실패해도 갱신 결과에는 영향 없음)
+    let push = { sent: 0, removed: 0 };
+    try {
+      push = await sendPushToAll({
+        title: "🔥 오늘의 특가 도착!",
+        body: `쿠팡 골드박스 새 딜 ${created + revived}개가 올라왔어요. 놓치기 전에 확인하세요!`,
+        url: "/deals",
+      });
+    } catch {}
+
     return NextResponse.json({
       ok: true,
-      message: `골드박스 갱신 완료 — 신규 ${created}개, 재등록 ${revived}개, 딜 해제 ${cleared}개`,
+      message: `골드박스 갱신 완료 — 신규 ${created}개, 재등록 ${revived}개, 딜 해제 ${cleared}개, 푸시 ${push.sent}명 발송`,
       created,
       revived,
       cleared,
+      push,
     });
   } catch (e) {
     return NextResponse.json(

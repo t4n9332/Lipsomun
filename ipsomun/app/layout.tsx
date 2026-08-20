@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { CATEGORIES } from "@/lib/util";
+import UserMenu from "@/components/UserMenu";
 
 export const metadata: Metadata = {
   title: {
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/deals">오늘의 딜</Link>
               <Link href="/ranking">랭킹</Link>
               <Link href="/favorites">찜 ♥</Link>
+              <UserMenu />
             </nav>
           </div>
           <div className="container">
