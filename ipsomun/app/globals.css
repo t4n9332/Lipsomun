@@ -633,3 +633,8 @@ button { font-family: inherit; }
   font-family: inherit;
 }
 .price-block .low-badge { margin-left: 10px; }
+
+/* ---------- 푸터 링크 ---------- */
+.footer-links { font-size: 13px; }
+.footer-links a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+.footer-links a:hover { color: var(--brand); }

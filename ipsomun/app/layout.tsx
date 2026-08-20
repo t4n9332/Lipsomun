@@ -103,6 +103,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               제휴 링크를 통한 구매 시 수수료를 받을 수 있습니다. 구매자에게
               추가 비용은 발생하지 않습니다.
             </p>
+            <p className="footer-links">
+              <Link href="/privacy">개인정보처리방침</Link>
+              <span aria-hidden> · </span>
+              <a href="mailto:t4n9332@gmail.com">문의·제휴 t4n9332@gmail.com</a>
+            </p>
             <p>© {new Date().getFullYear()} 입소문</p>
           </div>
         </footer>
