@@ -20,10 +20,11 @@ const { chromium } = await import("playwright").catch(() => {
   process.exit(1);
 });
 
-console.log("\n브라우저를 엽니다 — 토스쇼핑에 로그인하세요.");
-console.log("  1) toss.shopping 우측 상단(또는 상품 페이지)에서 로그인");
-console.log("  2) 쉐어링크 미가입이면 sharelink.toss.im 에서 가입");
-console.log("  3) 로그인 확인 후 브라우저 창을 닫으면 저장 완료\n");
+console.log("\n브라우저를 엽니다 — 로그인은 sharelink.toss.im 에서 합니다.");
+console.log("  ※ toss.shopping 사이트에는 로그인 버튼이 없습니다 (공식 구조)");
+console.log("  1) 첫 번째 탭(sharelink.toss.im)에서 로그인/가입");
+console.log("  2) 두 번째 탭(토스쇼핑 상품 페이지)을 새로고침해 공유 아이콘이 보이는지 확인");
+console.log("  3) 확인되면 브라우저 창을 닫으면 저장 완료\n");
 
 const context = await chromium.launchPersistentContext(PROFILE_DIR, {
   headless: false,
@@ -32,7 +33,13 @@ const context = await chromium.launchPersistentContext(PROFILE_DIR, {
 });
 
 const page = context.pages()[0] || (await context.newPage());
-await page.goto("https://toss.shopping/", { waitUntil: "domcontentloaded" });
+await page.goto("https://sharelink.toss.im/", { waitUntil: "domcontentloaded" });
+// 로그인 확인용: 토스쇼핑 상품 페이지 탭 (로그인 후 새로고침하면 공유 아이콘·가격이 보여야 함)
+const checkPage = await context.newPage();
+await checkPage
+  .goto("https://toss.shopping/t/130651143", { waitUntil: "domcontentloaded" })
+  .catch(() => {});
+await page.bringToFront().catch(() => {});
 
 await new Promise((resolve) => context.on("close", resolve));
 console.log("✔ 로그인 세션이 저장되었습니다 (scripts/.toss-profile).");
