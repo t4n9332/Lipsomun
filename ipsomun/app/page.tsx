@@ -5,18 +5,25 @@ import {
   getPopular,
   getRecentReviewed,
   getPublishedCollections,
+  getPriceCompareProducts,
 } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
+import CompareCard, { comparePrices } from "@/components/CompareCard";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [deals, popular, recent, picks] = await Promise.all([
+  const [deals, popular, recent, picks, compareRaw] = await Promise.all([
     getDeals(8),
     getPopular(5),
     getRecentReviewed(4),
     getPublishedCollections(4).catch(() => []),
+    getPriceCompareProducts(40).catch(() => []),
   ]);
+  // 절약액(두 플랫폼 가격차) 큰 순으로 상단 노출
+  const compare = compareRaw
+    .sort((a, b) => comparePrices(b).savings - comparePrices(a).savings)
+    .slice(0, 8);
 
   return (
     <>
@@ -29,6 +36,23 @@ export default async function Home() {
           먼저 확인하세요.
         </p>
       </section>
+
+      {compare.length > 0 && (
+        <section className="vs-section">
+          <div className="section-head">
+            <h2>🆚 쿠팡 vs 토스 가격비교</h2>
+            <span className="sub">같은 상품, 어디가 더 쌀까? 매일 자동 비교</span>
+            <Link className="more" href="/compare">
+              전체보기 →
+            </Link>
+          </div>
+          <div className="vs-grid">
+            {compare.map((p) => (
+              <CompareCard key={p.id} p={p} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section">
         <div className="section-head">

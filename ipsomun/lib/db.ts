@@ -275,6 +275,19 @@ export async function getRecentReviewed(limit = 4): Promise<Product[]> {
   return rows.map(rowToProduct);
 }
 
+/** 쿠팡·토스 링크가 모두 있는 상품 (가격비교 기획전용) */
+export async function getPriceCompareProducts(limit = 40): Promise<ProductWithLinks[]> {
+  const rows = await q(
+    `SELECT p.* FROM products p
+     WHERE p.is_published
+       AND EXISTS (SELECT 1 FROM affiliate_links l WHERE l.product_id = p.id AND l.platform = 'coupang')
+       AND EXISTS (SELECT 1 FROM affiliate_links l WHERE l.product_id = p.id AND l.platform = 'toss')
+     ORDER BY p.updated_at DESC LIMIT $1`,
+    [limit]
+  );
+  return attachLinks(rows.map(rowToProduct));
+}
+
 export async function getByCategory(category: string, limit = 60): Promise<Product[]> {
   const rows = await q(
     `SELECT * FROM products WHERE is_published AND category = $1

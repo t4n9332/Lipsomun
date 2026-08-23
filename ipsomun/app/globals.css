@@ -539,6 +539,94 @@ button { font-family: inherit; }
 }
 .cat-filter a.active { background: var(--brand-soft); color: var(--brand); font-weight: 700; }
 
+/* ---------- 가격비교 기획전 (쿠팡 vs 토스) ---------- */
+.vs-section {
+  margin: 28px 0 44px;
+  background: linear-gradient(120deg, #eef4ff, #e8f0ff 55%, #eaf6ff);
+  border: 1px solid #d8e4f8;
+  border-radius: 20px;
+  padding: 24px 26px 26px;
+}
+.vs-section .section-head { margin-bottom: 14px; }
+.vs-section .section-head h2 { font-size: 20px; }
+.vs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+.vs-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.vs-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.vs-thumb {
+  position: relative;
+  aspect-ratio: 1;
+  background: #f3f1ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.vs-thumb .noimg { font-size: 30px; opacity: 0.25; }
+.vs-save {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: 999px;
+  z-index: 2;
+}
+.vs-save.toss { background: #3182f6; }
+.vs-save.coupang { background: #c9302c; }
+.vs-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 5px; }
+.vs-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 35px;
+}
+.vs-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+.vs-price.win { color: var(--ink); }
+.vs-price em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  border-radius: 5px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+}
+.vs-price.coupang em { background: #c9302c; }
+.vs-price.toss em { background: #3182f6; }
+.vs-price .chip {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
 /* ---------- 리뷰 바로가기 & 공유 ---------- */
 .review-jump {
   display: inline-block;

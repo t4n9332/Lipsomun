@@ -235,7 +235,8 @@ async function crawlCatalog(page) {
 
 /* ---------- 모드 1: 쿠팡 상품 매칭 (핵심) ---------- */
 
-async function runMatch(config, page) {
+async function runMatch(config, page, opts = {}) {
+  const auto = !!opts.auto;
   console.log("\n사이트에서 상품 목록을 가져오는 중...");
   const { products } = await siteApi(config, "GET", "/api/admin/products?limit=1000");
   const targets = products.filter(
@@ -245,14 +246,17 @@ async function runMatch(config, page) {
       !p.links.some((l) => l.platform === "toss")
   );
   console.log(`전체 ${products.length}개 중 매칭 대상(쿠팡 O, 토스 X): ${targets.length}개`);
+
+  let catalog = opts.catalog;
+  if (!catalog) {
+    console.log("\n쉐어링크 어드민 카탈로그를 수집하는 중...");
+    catalog = await crawlCatalog(page);
+  }
+  console.log(`카탈로그 상품 총 ${catalog.length}개\n`);
   if (targets.length === 0) {
     console.log("매칭할 상품이 없습니다.");
-    return;
+    return { products, catalog, added: 0 };
   }
-
-  console.log("\n쉐어링크 어드민 카탈로그를 수집하는 중...");
-  const catalog = await crawlCatalog(page);
-  console.log(`카탈로그 상품 총 ${catalog.length}개\n`);
 
   // 상품별 최적 후보 계산
   const matches = [];
@@ -271,7 +275,7 @@ async function runMatch(config, page) {
   console.log(`제목 유사도 45% 이상 일치: ${matches.length}쌍`);
   if (matches.length === 0) {
     console.log("일치하는 상품이 없습니다. (토스 카탈로그는 프로모션/베스트 위주라 겹치는 상품이 적을 수 있어요)");
-    return;
+    return { products, catalog, added: 0 };
   }
   for (const m of matches) {
     console.log(
@@ -279,10 +283,14 @@ async function runMatch(config, page) {
         `      ↔ ${m.cat.title.slice(0, 40)} (${m.cat.pageName})`
     );
   }
-  const go = (await rl.question(`\n위 ${matches.length}쌍에 대해 링크 발급 + 사이트 등록을 진행할까요? (Y/n): `))
-    .trim()
-    .toLowerCase();
-  if (go === "n") return;
+  if (!auto) {
+    const go = (
+      await rl.question(`\n위 ${matches.length}쌍에 대해 링크 발급 + 사이트 등록을 진행할까요? (Y/n): `)
+    )
+      .trim()
+      .toLowerCase();
+    if (go === "n") return { products, catalog, added: 0 };
+  }
 
   // 페이지별로 묶어서 발급 (버튼 인덱스는 페이지 로드 기준이므로 같은 페이지에서 처리)
   const byPage = new Map();
@@ -343,6 +351,108 @@ async function runMatch(config, page) {
     }
   }
   console.log(`\n===== 매칭 결과: 토스 링크 추가 ${done}개, 실패 ${failed}개 =====`);
+  return { products, catalog, added: done };
+}
+
+/* ---------- 자동 모드 2단계: 토스 인기상품 → 쿠팡 역매칭 신규 등록 ---------- */
+
+/**
+ * 토스 카탈로그 중 사이트에 아직 없는 상품을 쿠팡 검색 API로 역매칭.
+ * 양쪽에서 모두 팔리는 상품이면 쿠팡+토스 링크를 모두 가진 신규 상품으로 등록
+ * → 홈 '가격비교' 섹션에 노출됨.
+ * ⚠️ 쿠팡 검색 API는 시간당 약 10회 제한 → 한 번에 최대 maxSearches개만 시도.
+ */
+async function runDiscover(config, page, catalog, products, maxSearches = 5) {
+  // 이미 사이트에 있는(비슷한 제목) 카탈로그 상품 제외
+  const fresh = catalog
+    .filter((c) => c.price != null)
+    .filter((c) => !products.some((p) => similarity(p.title, c.title) >= 0.6))
+    .sort((a, b) => (b.ratingCount ?? 0) - (a.ratingCount ?? 0));
+
+  console.log(
+    `\n[역매칭] 사이트에 없는 토스 인기상품 ${fresh.length}개 중 상위 ${Math.min(maxSearches, fresh.length)}개를 쿠팡에서 검색합니다.`
+  );
+
+  let created = 0;
+  let tried = 0;
+  for (const c of fresh) {
+    if (tried >= maxSearches) break;
+    tried++;
+    const keyword = tokenize(c.title).slice(0, 6).join(" ");
+    try {
+      const { products: found } = await siteApi(
+        config,
+        "GET",
+        `/api/admin/coupang/search?keyword=${encodeURIComponent(keyword)}&limit=5`
+      );
+      let best = null;
+      let bestScore = 0;
+      for (const f of found || []) {
+        const s = similarity(c.title, f.productName);
+        if (s > bestScore) {
+          bestScore = s;
+          best = f;
+        }
+      }
+      if (!best || bestScore < 0.45) {
+        console.log(`  ↷ [${c.title.slice(0, 34)}] 쿠팡에서 동일 상품 못 찾음 (${(bestScore * 100).toFixed(0)}%)`);
+        continue;
+      }
+      // 토스 쉐어링크 발급
+      await page.goto(c.pageUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
+      await page.waitForTimeout(3500);
+      for (let i = 0; i < 3; i++) {
+        await page.mouse.wheel(0, 4000);
+        await page.waitForTimeout(500);
+      }
+      const rows = await collectRows(page);
+      const row = rows.find((r) => r.title === c.title);
+      const link = row ? await issueLinkByIndex(page, row.btnIndex) : null;
+      if (!link) {
+        console.log(`  ✘ [${c.title.slice(0, 34)}] 쉐어링크 발급 실패`);
+        continue;
+      }
+      await siteApi(config, "POST", "/api/admin/products", [
+        {
+          title: c.title,
+          imageUrl: c.imageUrl || best.productImage || "",
+          price: best.productPrice ?? null,
+          category: "기타",
+          isDeal: false,
+          isPublished: true,
+          source: "toss-match",
+          description: "쿠팡·토스 가격비교 상품",
+          rating: c.rating,
+          ratingCount: c.ratingCount,
+          links: [
+            { platform: "coupang", url: best.productUrl, price: best.productPrice ?? null },
+            { platform: "toss", url: link, price: c.price },
+          ],
+        },
+      ]);
+      created++;
+      const diff =
+        best.productPrice && c.price
+          ? c.price < best.productPrice
+            ? `토스가 ${(best.productPrice - c.price).toLocaleString("ko-KR")}원 저렴 🔵`
+            : c.price > best.productPrice
+              ? `쿠팡이 ${(c.price - best.productPrice).toLocaleString("ko-KR")}원 저렴 🔴`
+              : "동일 가격"
+          : "";
+      console.log(
+        `  ✔ 신규 등록: ${c.title.slice(0, 34)} [쿠팡 ${best.productPrice?.toLocaleString("ko-KR")}원 vs 토스 ${c.price?.toLocaleString("ko-KR")}원] ${diff}`
+      );
+      await page.waitForTimeout(800);
+    } catch (e) {
+      console.log(`  ✘ [${c.title.slice(0, 30)}] ${e.message}`);
+      if (String(e.message).includes("429") || String(e.message).includes("제한")) {
+        console.log("  쿠팡 API 호출 제한으로 역매칭을 중단합니다.");
+        break;
+      }
+    }
+  }
+  console.log(`[역매칭] 신규 가격비교 상품 ${created}개 등록 (검색 ${tried}회 사용)`);
+  return created;
 }
 
 /* ---------- 모드 2: 카탈로그 신규 등록 ---------- */
@@ -455,9 +565,17 @@ async function main() {
   }
 
   const crawlTest = process.argv.includes("--crawl-test");
+  const auto = process.argv.includes("--auto");
+
+  if (auto && !existsSync(CONFIG_PATH)) {
+    console.error(
+      "자동 모드는 설정 파일(.toss-config.json)이 필요합니다. 먼저 대화형으로 1회 실행해 비밀번호를 저장하세요."
+    );
+    process.exit(1);
+  }
 
   const context = await chromium.launchPersistentContext(PROFILE_DIR, {
-    headless: crawlTest, // 카탈로그 테스트는 헤드리스, 실제 실행은 창 표시
+    headless: crawlTest || auto, // 테스트·자동 모드는 헤드리스, 대화형은 창 표시
     viewport: { width: 1280, height: 900 },
     args: ["--lang=ko-KR"],
     permissions: ["clipboard-read", "clipboard-write"],
@@ -478,6 +596,16 @@ async function main() {
             ` [${c.pageName}]`
         )
       );
+      return;
+    }
+
+    if (auto) {
+      // 완전 자동: ① 기존 쿠팡 상품 매칭 → ② 토스 인기상품 쿠팡 역매칭 신규 등록
+      console.log(`\n[자동 실행] ${new Date().toLocaleString("ko-KR")}`);
+      const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+      const r = await runMatch(config, page, { auto: true });
+      if (r) await runDiscover(config, page, r.catalog, r.products, 5);
+      console.log("[자동 실행] 완료\n");
       return;
     }
 
