@@ -161,31 +161,34 @@ export default async function ProductPage({
           </div>
           <div className="buy-buttons">
             {(() => {
-              const priced = product.links.filter((l) => l.price != null);
-              const lowest =
-                priced.length >= 2
-                  ? Math.min(...priced.map((l) => l.price as number))
-                  : null;
-              return product.links.map((l) => (
-                <a
-                  key={l.id}
-                  href={`/go/${l.id}`}
-                  className="buy-btn"
-                  style={{ background: platformColor(l.platform) }}
-                  rel="nofollow sponsored"
-                >
-                  {l.platform === "etc"
-                    ? "판매처에서 보기"
-                    : `${platformName(l.platform)}에서 구매`}
-                  {l.price != null && (
-                    <span className="link-price">{won(l.price)}</span>
-                  )}
-                  {lowest != null && l.price === lowest && (
-                    <span className="lowest-chip">최저가</span>
-                  )}
-                  <small>→</small>
-                </a>
-              ));
+              // 쿠팡 링크에 개별 가격이 없으면 상품 가격(쿠팡에서 가져온 값)을 사용해 비교
+              const effPrice = (l: (typeof product.links)[number]) =>
+                l.price ?? (l.platform === "coupang" ? product.price : null);
+              const priced = product.links
+                .map(effPrice)
+                .filter((p): p is number => p != null);
+              const lowest = priced.length >= 2 ? Math.min(...priced) : null;
+              return product.links.map((l) => {
+                const p = effPrice(l);
+                return (
+                  <a
+                    key={l.id}
+                    href={`/go/${l.id}`}
+                    className="buy-btn"
+                    style={{ background: platformColor(l.platform) }}
+                    rel="nofollow sponsored"
+                  >
+                    {l.platform === "etc"
+                      ? "판매처에서 보기"
+                      : `${platformName(l.platform)}에서 구매`}
+                    {p != null && <span className="link-price">{won(p)}</span>}
+                    {lowest != null && p === lowest && (
+                      <span className="lowest-chip">최저가</span>
+                    )}
+                    <small>→</small>
+                  </a>
+                );
+              });
             })()}
             {product.links.length === 0 && (
               <div className="empty" style={{ padding: "20px 0" }}>
