@@ -38,9 +38,15 @@ export default async function EditPage({
           review: product.review,
           pros: product.pros,
           cons: product.cons,
+          rating: product.rating?.toString() ?? "",
+          ratingCount: product.ratingCount?.toString() ?? "",
           links:
             product.links.length > 0
-              ? product.links.map((l) => ({ platform: l.platform, url: l.url }))
+              ? product.links.map((l) => ({
+                  platform: l.platform,
+                  url: l.url,
+                  price: l.price?.toString() ?? "",
+                }))
               : [{ platform: "coupang", url: "" }],
         }}
       />

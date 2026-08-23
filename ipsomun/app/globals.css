@@ -31,6 +31,17 @@ button { font-family: inherit; }
 
 .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
 
+/* ---------- Top notice bar (쿠팡파트너스 고지) ---------- */
+.notice-bar {
+  background: var(--brand-soft);
+  color: #9a6a45;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  padding: 6px 16px;
+  letter-spacing: -0.2px;
+}
+
 /* ---------- Header ---------- */
 .site-header {
   background: var(--surface);
@@ -231,6 +242,16 @@ button { font-family: inherit; }
 }
 .buy-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
 .buy-btn small { font-weight: 500; opacity: 0.85; }
+.buy-btn .link-price { font-weight: 800; font-size: 16px; margin-left: 2px; }
+.buy-btn .lowest-chip {
+  background: #fff;
+  color: #c9302c;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 2px;
+}
 .review-box {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -276,6 +297,92 @@ button { font-family: inherit; }
   justify-content: center;
 }
 .fav-btn.big { position: static; width: auto; height: 52px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); font-size: 15px; font-weight: 600; gap: 8px; padding: 0 20px; }
+
+/* ---------- 출석/레벨 (my 페이지) ---------- */
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  position: relative;
+  white-space: nowrap;
+}
+.user-chip .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand);
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+.my-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px 28px;
+  margin-bottom: 16px;
+}
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto;
+  object-fit: cover;
+}
+.level-badge {
+  display: inline-block;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin: 6px 0 16px;
+}
+.stamp-btn { width: 100%; justify-content: center; height: 50px; font-size: 15.5px; }
+.google-btn {
+  background: #fff;
+  color: #1a1a1a;
+  border: 1.5px solid var(--line);
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+  margin: 14px 0 10px;
+}
+.stat-mini {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  margin-top: 16px;
+}
+.stat-mini b { display: block; font-size: 22px; }
+.stat-mini span { font-size: 12.5px; color: var(--ink-faint); }
+.progress {
+  height: 10px;
+  background: #f1efec;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress .bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), #ff922b);
+  border-radius: 999px;
+  transition: width 0.4s;
+}
+.level-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+.level-row:last-child { border-bottom: none; }
 
 /* ---------- Footer ---------- */
 .site-footer {
@@ -350,6 +457,130 @@ button { font-family: inherit; }
 }
 .stat .num { font-size: 24px; font-weight: 900; }
 .stat .label { font-size: 12.5px; color: var(--ink-faint); }
+/* ---------- 별점 ---------- */
+.stars { display: inline-flex; align-items: center; gap: 5px; line-height: 1; }
+.stars-track { position: relative; display: inline-block; color: #dcd8d1; letter-spacing: 1px; }
+.stars-base { display: inline-block; }
+.stars-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #f59f00;
+}
+.stars-num { font-weight: 700; font-size: 0.95em; color: var(--ink-soft); }
+.stars-count { font-size: 0.88em; color: var(--ink-faint); }
+
+/* ---------- 검색 자동완성 드롭다운 ---------- */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 6px;
+  z-index: 60;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.sd-label { font-size: 11.5px; color: var(--ink-faint); font-weight: 700; padding: 6px 10px 2px; }
+.sd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.sd-item.active, .sd-item:hover { background: var(--brand-soft); }
+.sd-icon { flex-shrink: 0; font-size: 12px; opacity: 0.7; }
+.sd-text { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sd-text em { font-style: normal; font-size: 11.5px; color: var(--brand); font-weight: 600; }
+.sd-del {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.sd-del:hover { color: var(--brand); }
+
+/* ---------- 검색 정렬/필터 ---------- */
+.search-tools { margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px; }
+.sort-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.sort-tabs a {
+  font-size: 13px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-soft);
+  transition: all 0.15s;
+}
+.sort-tabs a.active { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 700; }
+.sort-tabs a:hover:not(.active) { border-color: var(--brand); color: var(--brand); }
+.cat-filter { display: flex; gap: 4px; flex-wrap: wrap; }
+.cat-filter a {
+  font-size: 12.5px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: #f1efec;
+  color: var(--ink-soft);
+  transition: all 0.15s;
+}
+.cat-filter a.active { background: var(--brand-soft); color: var(--brand); font-weight: 700; }
+
+/* ---------- 리뷰 바로가기 & 공유 ---------- */
+.review-jump {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.review-jump:hover { text-decoration: underline; }
+.share-btn { flex: 1; justify-content: center; display: flex; align-items: center; }
+html { scroll-behavior: smooth; }
+
+/* ---------- PWA 설치 배너 ---------- */
+.install-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 100;
+  max-width: 520px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 6px 30px rgba(20, 15, 5, 0.18);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ib-icon { font-size: 26px; flex-shrink: 0; }
+.ib-text { flex: 1; font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; }
+.ib-text b { display: block; font-size: 13.5px; color: var(--ink); margin-bottom: 1px; }
+.ib-close {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  font-size: 20px;
+  color: var(--ink-faint);
+  cursor: pointer;
+  padding: 0 2px;
+  align-self: flex-start;
+}
+
 .search-result-item {
   display: flex;
   gap: 12px;

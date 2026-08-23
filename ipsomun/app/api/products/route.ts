@@ -21,6 +21,8 @@ export async function GET(req: Request) {
     originalPrice: p.originalPrice,
     isDeal: p.isDeal,
     category: p.category,
+    rating: p.rating,
+    ratingCount: p.ratingCount,
   }));
   return NextResponse.json({ products });
 }

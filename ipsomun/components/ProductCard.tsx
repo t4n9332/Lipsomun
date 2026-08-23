@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { won, discountRate } from "@/lib/util";
 import FavButton from "./FavButton";
+import Stars from "./Stars";
 
 export interface CardProduct {
   slug: string;
@@ -10,6 +11,8 @@ export interface CardProduct {
   originalPrice: number | null;
   isDeal: boolean;
   category: string;
+  rating?: number | null;
+  ratingCount?: number | null;
 }
 
 export default function ProductCard({
@@ -39,6 +42,9 @@ export default function ProductCard({
       <div className="body">
         <div className="title">{p.title}</div>
         <div className="meta">{p.category}</div>
+        {p.rating != null && p.rating > 0 && (
+          <Stars rating={p.rating} count={p.ratingCount} />
+        )}
         <div className="price-row">
           {dc && <span className="discount">{dc}%</span>}
           {p.price != null && <span className="price">{won(p.price)}</span>}

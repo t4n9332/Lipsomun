@@ -20,6 +20,8 @@ export interface Product {
   cons: string;
   clicks: number;
   views: number;
+  rating: number | null;
+  ratingCount: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +31,7 @@ export interface AffiliateLink {
   platform: string;
   url: string;
   clicks: number;
+  price: number | null;
   productId: string;
 }
 
@@ -50,7 +53,10 @@ export interface ProductInput {
   review?: string;
   pros?: string;
   cons?: string;
-  links?: { platform: string; url: string }[];
+  source?: string;
+  rating?: number | null;
+  ratingCount?: number | null;
+  links?: { platform: string; url: string; price?: number | null }[];
 }
 
 /* ---------- 커넥션 & 스키마 ---------- */
@@ -88,9 +94,13 @@ CREATE TABLE IF NOT EXISTS products (
   cons TEXT NOT NULL DEFAULT '',
   clicks INTEGER NOT NULL DEFAULT 0,
   views INTEGER NOT NULL DEFAULT 0,
+  source TEXT NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE products ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS rating NUMERIC(2,1);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS rating_count INTEGER;
 CREATE TABLE IF NOT EXISTS affiliate_links (
   id TEXT PRIMARY KEY,
   platform TEXT NOT NULL DEFAULT 'etc',
@@ -98,9 +108,28 @@ CREATE TABLE IF NOT EXISTS affiliate_links (
   clicks INTEGER NOT NULL DEFAULT 0,
   product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE
 );
+ALTER TABLE affiliate_links ADD COLUMN IF NOT EXISTS price INTEGER;
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_deal ON products(is_deal);
 CREATE INDEX IF NOT EXISTS idx_links_product ON affiliate_links(product_id);
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL DEFAULT '',
+  picture TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS attendance (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day DATE NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, day)
+);
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  endpoint TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 `;
 
 async function ready(): Promise<void> {
@@ -144,6 +173,8 @@ function rowToProduct(r: any): Product {
     cons: r.cons,
     clicks: r.clicks,
     views: r.views,
+    rating: r.rating != null ? Number(r.rating) : null,
+    ratingCount: r.rating_count != null ? Number(r.rating_count) : null,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -156,8 +187,18 @@ function rowToLink(r: any): AffiliateLink {
     platform: r.platform,
     url: r.url,
     clicks: r.clicks,
+    price: r.price != null ? Number(r.price) : null,
     productId: r.product_id,
   };
+}
+
+/** 구매 버튼 표시 순서: 쿠팡 → 토스 → 나머지 (가격비교 배치용) */
+const PLATFORM_ORDER: Record<string, number> = { coupang: 0, toss: 1 };
+
+function sortLinks(links: AffiliateLink[]): AffiliateLink[] {
+  return [...links].sort(
+    (a, b) => (PLATFORM_ORDER[a.platform] ?? 9) - (PLATFORM_ORDER[b.platform] ?? 9)
+  );
 }
 
 async function attachLinks(products: Product[]): Promise<ProductWithLinks[]> {
@@ -174,7 +215,7 @@ async function attachLinks(products: Product[]): Promise<ProductWithLinks[]> {
     arr.push(l);
     map.set(l.productId, arr);
   }
-  return products.map((p) => ({ ...p, links: map.get(p.id) || [] }));
+  return products.map((p) => ({ ...p, links: sortLinks(map.get(p.id) || []) }));
 }
 
 /* ---------- 공개 조회 ---------- */
@@ -215,14 +256,52 @@ export async function getByCategory(category: string, limit = 60): Promise<Produ
   return rows.map(rowToProduct);
 }
 
-export async function searchProductsDb(query: string, limit = 60): Promise<Product[]> {
+export type SearchSort =
+  | "relevance"
+  | "price_asc"
+  | "price_desc"
+  | "discount"
+  | "rating";
+
+const SORT_SQL: Record<SearchSort, string> = {
+  relevance: "clicks DESC, views DESC",
+  price_asc: "price ASC NULLS LAST",
+  price_desc: "price DESC NULLS LAST",
+  discount:
+    "(CASE WHEN original_price > price THEN (original_price - price)::float / original_price ELSE 0 END) DESC",
+  rating: "rating DESC NULLS LAST, rating_count DESC NULLS LAST",
+};
+
+export async function searchProductsDb(
+  query: string,
+  limit = 60,
+  sort: SearchSort = "relevance",
+  category?: string
+): Promise<Product[]> {
+  const orderBy = SORT_SQL[sort] || SORT_SQL.relevance;
+  const params: unknown[] = [`%${query}%`];
+  let where = `is_published AND (title ILIKE $1 OR description ILIKE $1 OR category ILIKE $1)`;
+  if (category) {
+    params.push(category);
+    where += ` AND category = $${params.length}`;
+  }
+  params.push(limit);
   const rows = await q(
-    `SELECT * FROM products WHERE is_published AND
-       (title ILIKE $1 OR description ILIKE $1 OR category ILIKE $1)
-     ORDER BY clicks DESC LIMIT $2`,
-    [`%${query}%`, limit]
+    `SELECT * FROM products WHERE ${where} ORDER BY ${orderBy} LIMIT $${params.length}`,
+    params
   );
   return rows.map(rowToProduct);
+}
+
+/** 검색 자동완성 제안 (제목 위주, 클릭수 순) */
+export async function suggestTitles(query: string, limit = 8): Promise<string[]> {
+  if (!query) return [];
+  const rows = await q<{ title: string }>(
+    `SELECT title FROM products WHERE is_published AND title ILIKE $1
+     ORDER BY clicks DESC, views DESC LIMIT $2`,
+    [`%${query}%`, limit]
+  );
+  return rows.map((r) => r.title);
 }
 
 export async function getBySlug(slug: string): Promise<ProductWithLinks | null> {
@@ -325,23 +404,48 @@ async function uniqueSlug(title: string, excludeId?: string): Promise<string> {
   return `${base}-${crypto.randomUUID().slice(0, 6)}`;
 }
 
-function cleanLinks(links?: { platform: string; url: string }[]) {
+function cleanLinks(links?: { platform: string; url: string; price?: number | null }[]) {
   return (links || [])
     .filter((l) => l && typeof l.url === "string" && l.url.trim().startsWith("http"))
-    .map((l) => ({ platform: l.platform || "etc", url: l.url.trim() }))
+    .map((l) => ({
+      platform: l.platform || "etc",
+      url: l.url.trim(),
+      price: typeof l.price === "number" && l.price > 0 ? Math.round(l.price) : null,
+    }))
     .slice(0, 10);
 }
 
 async function insertLinks(
   productId: string,
-  links: { platform: string; url: string }[]
+  links: { platform: string; url: string; price?: number | null }[]
 ) {
   for (const l of links) {
     await q(
-      `INSERT INTO affiliate_links (id, platform, url, product_id) VALUES ($1,$2,$3,$4)`,
-      [crypto.randomUUID(), l.platform, l.url, productId]
+      `INSERT INTO affiliate_links (id, platform, url, price, product_id) VALUES ($1,$2,$3,$4,$5)`,
+      [crypto.randomUUID(), l.platform, l.url, l.price ?? null, productId]
     );
   }
+}
+
+/**
+ * 특정 플랫폼 링크를 상품에 추가/갱신 (같은 플랫폼 링크가 있으면 교체).
+ * 토스 가격비교 매칭 도구에서 사용.
+ */
+export async function upsertLink(
+  productId: string,
+  platform: string,
+  url: string,
+  price?: number | null
+): Promise<void> {
+  await q(`DELETE FROM affiliate_links WHERE product_id = $1 AND platform = $2`, [
+    productId,
+    platform,
+  ]);
+  await q(
+    `INSERT INTO affiliate_links (id, platform, url, price, product_id) VALUES ($1,$2,$3,$4,$5)`,
+    [crypto.randomUUID(), platform, url.trim(), price ?? null, productId]
+  );
+  await q(`UPDATE products SET updated_at = now() WHERE id = $1`, [productId]);
 }
 
 export async function createProduct(input: ProductInput): Promise<Product> {
@@ -350,8 +454,8 @@ export async function createProduct(input: ProductInput): Promise<Product> {
   const rows = await q(
     `INSERT INTO products
        (id, title, slug, description, image_url, category, price, original_price,
-        is_deal, is_published, priority, review, pros, cons)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+        is_deal, is_published, priority, review, pros, cons, source, rating, rating_count)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
      RETURNING *`,
     [
       id,
@@ -368,10 +472,59 @@ export async function createProduct(input: ProductInput): Promise<Product> {
       input.review || "",
       input.pros || "",
       input.cons || "",
+      input.source || "",
+      input.rating ?? null,
+      input.ratingCount ?? null,
     ]
   );
   await insertLinks(id, cleanLinks(input.links));
   return rowToProduct(rows[0]);
+}
+
+/* ---------- 골드박스 자동 등록 지원 ---------- */
+
+/** 특정 source로 등록된 제품들의 '오늘의 딜' 표시를 일괄 해제 */
+export async function unsetDealsBySource(source: string): Promise<number> {
+  const rows = await q(
+    `UPDATE products SET is_deal = FALSE, updated_at = now()
+     WHERE source = $1 AND is_deal = TRUE RETURNING id`,
+    [source]
+  );
+  return rows.length;
+}
+
+/** source+제목으로 기존 제품 찾기 (중복 등록 방지용) */
+export async function findBySourceTitle(
+  source: string,
+  title: string
+): Promise<Product | null> {
+  const rows = await q(
+    `SELECT * FROM products WHERE source = $1 AND title = $2 LIMIT 1`,
+    [source, title]
+  );
+  return rows.length ? rowToProduct(rows[0]) : null;
+}
+
+/** 기존 제품을 다시 오늘의 딜로 올리고 가격·평점 갱신 */
+export async function reviveDeal(
+  id: string,
+  price: number | null,
+  extra?: {
+    originalPrice?: number | null;
+    rating?: number | null;
+    ratingCount?: number | null;
+  }
+): Promise<void> {
+  await q(
+    `UPDATE products SET is_deal = TRUE,
+       price = COALESCE($2, price),
+       original_price = COALESCE($3, original_price),
+       rating = COALESCE($4, rating),
+       rating_count = COALESCE($5, rating_count),
+       updated_at = now()
+     WHERE id = $1`,
+    [id, price, extra?.originalPrice ?? null, extra?.rating ?? null, extra?.ratingCount ?? null]
+  );
 }
 
 export async function updateProduct(input: ProductInput): Promise<Product | null> {
@@ -386,7 +539,8 @@ export async function updateProduct(input: ProductInput): Promise<Product | null
     `UPDATE products SET
        title=$2, slug=$3, description=$4, image_url=$5, category=$6,
        price=$7, original_price=$8, is_deal=$9, is_published=$10,
-       priority=$11, review=$12, pros=$13, cons=$14, updated_at=now()
+       priority=$11, review=$12, pros=$13, cons=$14,
+       rating=$15, rating_count=$16, updated_at=now()
      WHERE id=$1 RETURNING *`,
     [
       input.id,
@@ -403,6 +557,8 @@ export async function updateProduct(input: ProductInput): Promise<Product | null
       input.review || "",
       input.pros || "",
       input.cons || "",
+      input.rating ?? null,
+      input.ratingCount ?? null,
     ]
   );
   await q(`DELETE FROM affiliate_links WHERE product_id = $1`, [input.id]);
@@ -420,4 +576,99 @@ export async function toggleProductField(
 ): Promise<void> {
   const col = field === "isDeal" ? "is_deal" : "is_published";
   await q(`UPDATE products SET ${col} = NOT ${col}, updated_at = now() WHERE id = $1`, [id]);
+}
+
+/* ---------- 회원 / 출석 / 푸시 ---------- */
+
+export interface SiteUser {
+  id: string;
+  email: string;
+  name: string;
+  picture: string;
+}
+
+export async function upsertUser(
+  email: string,
+  name: string,
+  picture: string
+): Promise<SiteUser> {
+  const rows = await q(
+    `INSERT INTO users (id, email, name, picture) VALUES ($1,$2,$3,$4)
+     ON CONFLICT (email) DO UPDATE SET name = $3, picture = $4
+     RETURNING id, email, name, picture`,
+    [crypto.randomUUID(), email, name, picture]
+  );
+  return rows[0];
+}
+
+export async function getUser(id: string): Promise<SiteUser | null> {
+  const rows = await q(
+    `SELECT id, email, name, picture FROM users WHERE id = $1`,
+    [id]
+  );
+  return rows.length ? rows[0] : null;
+}
+
+/** 한국시간 기준 오늘 날짜 (YYYY-MM-DD) */
+export function kstToday(): string {
+  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+/** 출석 도장 찍기. 이미 찍었으면 false */
+export async function stampAttendance(userId: string): Promise<boolean> {
+  const rows = await q(
+    `INSERT INTO attendance (user_id, day) VALUES ($1, $2)
+     ON CONFLICT DO NOTHING RETURNING user_id`,
+    [userId, kstToday()]
+  );
+  return rows.length > 0;
+}
+
+export interface AttendanceStats {
+  total: number;
+  streak: number;
+  todayDone: boolean;
+}
+
+export async function getAttendanceStats(userId: string): Promise<AttendanceStats> {
+  const rows = await q(
+    `SELECT to_char(day, 'YYYY-MM-DD') AS d FROM attendance WHERE user_id = $1 ORDER BY day DESC LIMIT 400`,
+    [userId]
+  );
+  const days: string[] = rows.map((r) => r.d);
+  const today = kstToday();
+  const todayDone = days.includes(today);
+
+  // 연속 출석: 오늘(또는 어제)부터 거꾸로 연속된 날 수
+  let streak = 0;
+  const cursor = new Date(today + "T00:00:00Z");
+  if (!todayDone) cursor.setUTCDate(cursor.getUTCDate() - 1);
+  const set = new Set(days);
+  while (set.has(cursor.toISOString().slice(0, 10))) {
+    streak++;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+
+  return { total: days.length, streak, todayDone };
+}
+
+export async function savePushSubscription(sub: {
+  endpoint: string;
+  [k: string]: unknown;
+}): Promise<void> {
+  await q(
+    `INSERT INTO push_subscriptions (endpoint, data) VALUES ($1, $2)
+     ON CONFLICT (endpoint) DO UPDATE SET data = $2`,
+    [sub.endpoint, JSON.stringify(sub)]
+  );
+}
+
+export async function getPushSubscriptions(): Promise<
+  { endpoint: string; data: string }[]
+> {
+  return q(`SELECT endpoint, data FROM push_subscriptions LIMIT 5000`);
+}
+
+export async function deletePushSubscription(endpoint: string): Promise<void> {
+  await q(`DELETE FROM push_subscriptions WHERE endpoint = $1`, [endpoint]);
 }

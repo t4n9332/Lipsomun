@@ -1,0 +1,13 @@
+{
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/goldbox",
+      "schedule": "0 22 * * *"
+    },
+    {
+      "path": "/api/cron/tossdeals",
+      "schedule": "10 22 * * *"
+    }
+  ]
+}

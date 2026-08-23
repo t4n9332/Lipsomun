@@ -1,9 +1,37 @@
 import { NextResponse } from "next/server";
-import { createProduct, updateProduct, type ProductInput } from "@/lib/db";
+import {
+  adminListProducts,
+  createProduct,
+  updateProduct,
+  type ProductInput,
+} from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
+
+/** 제품 목록 조회 (토스 매칭 도구 등 외부 스크립트용) */
+export async function GET(req: Request) {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "권한 없음" }, { status: 401 });
+  }
+  const url = new URL(req.url);
+  const limit = Math.min(Number(url.searchParams.get("limit") || 500), 1000);
+  const products = (await adminListProducts(limit)).map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    category: p.category,
+    price: p.price,
+    isPublished: p.isPublished,
+    links: p.links.map((l) => ({
+      platform: l.platform,
+      url: l.url,
+      price: l.price,
+    })),
+  }));
+  return NextResponse.json({ products });
+}
 
 /** 제품 생성 (단건 또는 배열 일괄 등록) */
 export async function POST(req: Request) {

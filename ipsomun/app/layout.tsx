@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { CATEGORIES } from "@/lib/util";
+import UserMenu from "@/components/UserMenu";
+import SearchBar from "@/components/SearchBar";
+import InstallPrompt from "@/components/InstallPrompt";
 
 export const metadata: Metadata = {
   title: {
@@ -16,25 +19,45 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
+        <meta
+          name="naver-site-verification"
+          content="58d80a68ed81e9188787cf42dc0b0b97eb858264"
+        />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#e8590c" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="apple-mobile-web-app-title" content="입소문" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
+        {/* Google Analytics (GA4) */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-21K65KFJ2J"
+        ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-21K65KFJ2J');`,
+          }}
+        />
       </head>
       <body>
+        <div className="notice-bar">
+          이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의
+          수수료를 제공받습니다.
+        </div>
         <header className="site-header">
           <div className="container header-inner">
             <Link href="/" className="logo">
               입<span>소문</span>
             </Link>
-            <form className="search-form" action="/search">
-              <input name="q" placeholder="어떤 제품이 궁금하세요?" />
-              <button type="submit" aria-label="검색">⌕</button>
-            </form>
+            <SearchBar />
             <nav className="header-links">
               <Link href="/deals">오늘의 딜</Link>
               <Link href="/ranking">랭킹</Link>
               <Link href="/favorites">찜 ♥</Link>
+              <UserMenu />
             </nav>
           </div>
           <div className="container">
@@ -49,6 +72,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
 
         <main className="container">{children}</main>
+
+        <InstallPrompt />
 
         <footer className="site-footer">
           <div className="container">

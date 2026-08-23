@@ -4,6 +4,8 @@ import { adminListProducts, adminStats } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { won, platformName } from "@/lib/util";
 import { deleteProductAction, toggleAction, logoutAction } from "./actions";
+import GoldboxButton from "@/components/GoldboxButton";
+import TossDealsButton from "@/components/TossDealsButton";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "관리자" };
@@ -20,7 +22,9 @@ export default async function AdminPage() {
     <div className="admin-wrap" style={{ maxWidth: 1000 }}>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <h1 style={{ margin: 0, fontSize: 24 }}>📦 입소문 관리자</h1>
-        <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <GoldboxButton />
+          <TossDealsButton />
           <Link href="/admin/new" className="btn">
             + 제품 등록
           </Link>

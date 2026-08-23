@@ -103,6 +103,21 @@ export async function searchProducts(
   return data.data?.productData ?? [];
 }
 
+/** 카테고리별 베스트 상품 (categoryId: 쿠팡 문서 기준, 예: 1016=가전디지털) */
+export async function bestCategoryProducts(
+  categoryId: number,
+  limit = 10
+): Promise<CoupangProduct[]> {
+  const path =
+    `/v2/providers/affiliate_open_api/apis/openapi/products/bestcategories/${categoryId}?limit=` +
+    limit +
+    (process.env.COUPANG_SUB_ID
+      ? "&subId=" + encodeURIComponent(process.env.COUPANG_SUB_ID)
+      : "");
+  const data = await coupangRequest<{ data: CoupangProduct[] }>("GET", path);
+  return data.data ?? [];
+}
+
 /** 골드박스(오늘의 특가) 상품 목록 */
 export async function goldboxProducts(limit = 20): Promise<CoupangProduct[]> {
   const path =

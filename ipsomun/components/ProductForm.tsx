@@ -7,6 +7,7 @@ import { CATEGORIES, PLATFORMS } from "@/lib/util";
 export interface FormLink {
   platform: string;
   url: string;
+  price?: string;
 }
 
 export interface FormProduct {
@@ -22,6 +23,8 @@ export interface FormProduct {
   review: string;
   pros: string;
   cons: string;
+  rating: string;
+  ratingCount: string;
   links: FormLink[];
 }
 
@@ -37,6 +40,8 @@ export const emptyProduct: FormProduct = {
   review: "",
   pros: "",
   cons: "",
+  rating: "",
+  ratingCount: "",
   links: [{ platform: "coupang", url: "" }],
 };
 
@@ -113,7 +118,19 @@ export default function ProductForm({ initial }: { initial: FormProduct }) {
         originalPrice: p.originalPrice
           ? Number(p.originalPrice.replace(/[^0-9]/g, ""))
           : null,
-        links: p.links.filter((l) => l.url.trim()),
+        rating: p.rating
+          ? Math.min(5, Math.max(0, Number(p.rating.replace(/[^0-9.]/g, "")))) || null
+          : null,
+        ratingCount: p.ratingCount
+          ? Number(p.ratingCount.replace(/[^0-9]/g, "")) || null
+          : null,
+        links: p.links
+          .filter((l) => l.url.trim())
+          .map((l) => ({
+            platform: l.platform,
+            url: l.url,
+            price: l.price ? Number(l.price.replace(/[^0-9]/g, "")) || null : null,
+          })),
       };
       const res = await fetch("/api/admin/products", {
         method: isEdit ? "PUT" : "POST",
@@ -185,6 +202,27 @@ export default function ProductForm({ initial }: { initial: FormProduct }) {
         </div>
       </div>
 
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div>
+          <label>⭐ 평점 (0~5, 선택)</label>
+          <input
+            type="text"
+            value={p.rating}
+            onChange={(e) => set("rating", e.target.value)}
+            placeholder="4.5"
+          />
+        </div>
+        <div>
+          <label>리뷰 개수 (선택)</label>
+          <input
+            type="text"
+            value={p.ratingCount}
+            onChange={(e) => set("ratingCount", e.target.value)}
+            placeholder="1234"
+          />
+        </div>
+      </div>
+
       <label>이미지 URL</label>
       <input
         type="url"
@@ -216,6 +254,13 @@ export default function ProductForm({ initial }: { initial: FormProduct }) {
                 ? "쿠팡 상품 URL 붙여넣기 → 딥링크 변환"
                 : "상품 URL 붙여넣기 → 제휴링크 변환 (링크프라이스)"
             }
+          />
+          <input
+            type="text"
+            style={{ width: 100, flexShrink: 0 }}
+            value={l.price || ""}
+            onChange={(e) => setLink(i, { price: e.target.value })}
+            placeholder="가격(선택)"
           />
           <button
             className="btn secondary sm"
