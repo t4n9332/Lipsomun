@@ -1,14 +1,21 @@
 import Link from "next/link";
-import { getDeals, getPopular, getRecentReviewed } from "@/lib/db";
+import Image from "next/image";
+import {
+  getDeals,
+  getPopular,
+  getRecentReviewed,
+  getPublishedCollections,
+} from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [deals, popular, recent] = await Promise.all([
+  const [deals, popular, recent, picks] = await Promise.all([
     getDeals(8),
     getPopular(5),
     getRecentReviewed(4),
+    getPublishedCollections(4).catch(() => []),
   ]);
 
   return (
@@ -61,8 +68,13 @@ export default async function Home() {
                 <span className="rank-num">{i + 1}</span>
                 <span className="thumb">
                   {p.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.imageUrl} alt={p.title} loading="lazy" />
+                    <Image
+                      src={p.imageUrl}
+                      alt={p.title}
+                      fill
+                      sizes="64px"
+                      style={{ objectFit: "cover" }}
+                    />
                   )}
                 </span>
                 <span className="info">
@@ -77,6 +89,36 @@ export default async function Home() {
           </div>
         )}
       </section>
+
+      {picks.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>🧺 기획전</h2>
+            <span className="sub">주제별로 골라 담은 추천 모음</span>
+            <Link className="more" href="/pick">
+              전체보기 →
+            </Link>
+          </div>
+          <div className="pick-grid">
+            {picks.map((c) => (
+              <Link key={c.id} href={`/pick/${c.slug}`} className="pick-card">
+                <span className="pick-thumbs">
+                  {c.images.slice(0, 4).map((img, i) => (
+                    <span key={i} className="pt">
+                      <Image src={img} alt="" fill sizes="80px" style={{ objectFit: "cover" }} />
+                    </span>
+                  ))}
+                </span>
+                <span className="pick-info">
+                  <b>{c.title}</b>
+                  {c.description && <span className="d">{c.description}</span>}
+                  <span className="n">{c.itemCount}개 제품</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section">
         <div className="section-head">

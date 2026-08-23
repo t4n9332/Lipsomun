@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { won, discountRate } from "@/lib/util";
 import FavButton from "./FavButton";
 import Stars from "./Stars";
@@ -33,8 +34,13 @@ export default function ProductCard({
       <FavButton slug={p.slug} />
       <div className="thumb">
         {p.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={p.imageUrl} alt={p.title} loading="lazy" />
+          <Image
+            src={p.imageUrl}
+            alt={p.title}
+            fill
+            sizes="(max-width: 640px) 50vw, 220px"
+            style={{ objectFit: "cover" }}
+          />
         ) : (
           <span className="noimg">🛍️</span>
         )}

@@ -37,6 +37,15 @@ export default function MyPage() {
     navigator.serviceWorker.getRegistration().then(async (reg) => {
       const sub = await reg?.pushManager.getSubscription();
       setPushState(sub ? "on" : "off");
+      // 이미 구독 중이면 서버에 다시 등록 — 로그인 상태라면 계정과 연결됨
+      // (찜한 상품 가격인하 알림이 이 연결을 통해 발송됨)
+      if (sub) {
+        fetch("/api/push/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sub.toJSON()),
+        }).catch(() => {});
+      }
     });
   }, []);
 
@@ -191,7 +200,8 @@ export default function MyPage() {
         <h2 style={{ fontSize: 16, marginTop: 0 }}>🔔 특가 알림</h2>
         {pushState === "on" ? (
           <p style={{ fontSize: 14, color: "#2b8a3e", margin: 0 }}>
-            알림 설정 완료 — 매일 아침 오늘의 특가를 보내드려요.
+            알림 설정 완료 — 매일 아침 오늘의 특가와, 찜한 상품의 가격 인하
+            소식을 보내드려요.
           </p>
         ) : pushState === "unsupported" ? (
           <p style={{ fontSize: 13.5, color: "#8a867f", margin: 0 }}>

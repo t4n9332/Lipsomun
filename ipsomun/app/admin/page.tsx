@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { adminListProducts, adminStats } from "@/lib/db";
+import {
+  adminListProducts,
+  adminStats,
+  adminCategoryStats,
+  adminTopProducts,
+} from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { won, platformName } from "@/lib/util";
 import { deleteProductAction, toggleAction, logoutAction } from "./actions";
@@ -13,9 +18,11 @@ export const metadata = { title: "관리자" };
 export default async function AdminPage() {
   if (!(await isAdmin())) redirect("/admin/login");
 
-  const [products, stats] = await Promise.all([
-    adminListProducts(200),
+  const [products, stats, catStats, topProducts] = await Promise.all([
+    adminListProducts(600),
     adminStats(),
+    adminCategoryStats(),
+    adminTopProducts(10),
   ]);
 
   return (
@@ -25,6 +32,9 @@ export default async function AdminPage() {
         <div style={{ marginLeft: "auto", display: "flex", gap: 8, flexWrap: "wrap" }}>
           <GoldboxButton />
           <TossDealsButton />
+          <Link href="/admin/collections" className="btn secondary">
+            🧺 기획전
+          </Link>
           <Link href="/admin/new" className="btn">
             + 제품 등록
           </Link>
@@ -52,6 +62,74 @@ export default async function AdminPage() {
         <div className="stat">
           <div className="num">{products.filter((p) => p.isDeal).length}</div>
           <div className="label">오늘의 딜</div>
+        </div>
+      </div>
+
+      <div className="dash-2col">
+        <div className="admin-card">
+          <h2>📊 카테고리별 성과</h2>
+          {catStats.every((c) => c.clicks === 0 && c.views === 0) ? (
+            <div className="empty">아직 데이터가 쌓이는 중이에요.</div>
+          ) : (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>카테고리</th>
+                  <th>제품</th>
+                  <th>조회</th>
+                  <th>클릭</th>
+                  <th>클릭률</th>
+                </tr>
+              </thead>
+              <tbody>
+                {catStats.map((c) => (
+                  <tr key={c.category}>
+                    <td><b style={{ fontSize: 13 }}>{c.category}</b></td>
+                    <td>{c.products}</td>
+                    <td>{c.views.toLocaleString()}</td>
+                    <td><b>{c.clicks.toLocaleString()}</b></td>
+                    <td>{c.views > 0 ? ((c.clicks / c.views) * 100).toFixed(1) + "%" : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <p style={{ fontSize: 12, color: "#8a867f", margin: "10px 0 0" }}>
+            클릭이 잘 나오는 카테고리에 제품을 더 등록하는 게 유리해요.
+          </p>
+        </div>
+
+        <div className="admin-card">
+          <h2>🔥 클릭 TOP 10</h2>
+          {topProducts.length === 0 ? (
+            <div className="empty">아직 클릭 데이터가 없어요.</div>
+          ) : (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>제품</th>
+                  <th>클릭</th>
+                  <th>조회</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topProducts.map((p, i) => (
+                  <tr key={p.id}>
+                    <td>{i + 1}</td>
+                    <td style={{ maxWidth: 260 }}>
+                      <Link href={`/p/${p.slug}`} target="_blank">
+                        <b style={{ fontSize: 13 }}>{p.title}</b>
+                      </Link>
+                      <div style={{ fontSize: 12, color: "#8a867f" }}>{p.category}</div>
+                    </td>
+                    <td><b>{p.clicks}</b></td>
+                    <td>{p.views}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 

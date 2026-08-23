@@ -29,3 +29,13 @@ self.addEventListener("notificationclick", (event) => {
     })
   );
 });
+
+// 홈 화면 설치(PWA) 요건용 — 네트워크 그대로 통과
+self.addEventListener("fetch", () => {});
+
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clients.claim());
+});

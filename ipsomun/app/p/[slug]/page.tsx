@@ -1,12 +1,58 @@
 import { notFound } from "next/navigation";
-import { getBySlug, getRelated, incrementViews } from "@/lib/db";
+import type { Metadata } from "next";
+import Image from "next/image";
+import {
+  getBySlug,
+  getRelated,
+  incrementViews,
+  getPriceHistory,
+  getPriceStats,
+} from "@/lib/db";
 import { won, discountRate, platformName, platformColor } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
 import FavButton from "@/components/FavButton";
 import ShareButton from "@/components/ShareButton";
 import Stars from "@/components/Stars";
+import PriceHistoryChart from "@/components/PriceHistoryChart";
 
 export const dynamic = "force-dynamic";
+
+const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getBySlug(decodeURIComponent(slug)).catch(() => null);
+  if (!product || !product.isPublished) return { title: "제품을 찾을 수 없어요" };
+
+  const desc =
+    (product.review || product.description || "").slice(0, 150) ||
+    `${product.title} 최저가 비교와 솔직 리뷰를 입소문에서 확인하세요.`;
+  const url = `${SITE}/p/${product.slug}`;
+
+  return {
+    title: product.title,
+    description: desc,
+    alternates: { canonical: url },
+    openGraph: {
+      title: product.title,
+      description: desc,
+      url,
+      type: "website",
+      siteName: "입소문",
+      images: product.imageUrl ? [{ url: product.imageUrl }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.title,
+      description: desc,
+      images: product.imageUrl ? [product.imageUrl] : undefined,
+    },
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -20,17 +66,74 @@ export default async function ProductPage({
   // 조회수 증가 (실패 무시)
   incrementViews(product.id).catch(() => {});
 
-  const related = await getRelated(product.category, product.id, 4);
+  const [related, history, priceStats] = await Promise.all([
+    getRelated(product.category, product.id, 4),
+    getPriceHistory(product.id).catch(() => []),
+    getPriceStats(product.id).catch(() => null),
+  ]);
 
   const dc = discountRate(product.price, product.originalPrice);
+  const isAllTimeLow =
+    product.price != null &&
+    priceStats != null &&
+    priceStats.days >= 2 &&
+    product.price <= priceStats.minPrice;
+
+  // 구조화 데이터 (구글 리치 결과용)
+  const jsonLd: Record<string, unknown>[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.title,
+      image: product.imageUrl || undefined,
+      description:
+        product.review || product.description || product.title,
+      category: product.category,
+      ...(product.price != null
+        ? {
+            offers: {
+              "@type": "Offer",
+              price: product.price,
+              priceCurrency: "KRW",
+              availability: "https://schema.org/InStock",
+              url: `${SITE}/p/${product.slug}`,
+            },
+          }
+        : {}),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "홈", item: SITE },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: product.category,
+          item: `${SITE}/category/${encodeURIComponent(product.category)}`,
+        },
+        { "@type": "ListItem", position: 3, name: product.title },
+      ],
+    },
+  ];
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="detail">
         <div className="photo">
           {product.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={product.imageUrl} alt={product.title} />
+            <Image
+              src={product.imageUrl}
+              alt={product.title}
+              fill
+              sizes="(max-width: 760px) 100vw, 520px"
+              style={{ objectFit: "contain" }}
+              priority
+            />
           ) : (
             <span style={{ fontSize: 60, opacity: 0.2 }}>🛍️</span>
           )}
@@ -54,6 +157,7 @@ export default async function ProductPage({
               <span className="price">{won(product.price)}</span>
             )}
             {dc && <span className="original">{won(product.originalPrice)}</span>}
+            {isAllTimeLow && <span className="low-badge">역대 최저가</span>}
           </div>
           <div className="buy-buttons">
             {(() => {
@@ -105,6 +209,8 @@ export default async function ProductPage({
           </div>
         </div>
       </div>
+
+      <PriceHistoryChart history={history} isAllTimeLow={isAllTimeLow} />
 
       {(product.review || product.pros || product.cons) && (
         <div className="review-box" id="review">
