@@ -51,6 +51,11 @@ export default async function Home() {
               <CompareCard key={p.id} p={p} />
             ))}
           </div>
+          <p className="vs-note">
+            ※ 쿠폰 보유에 따라 가격 변동이 있습니다. 이 콘텐츠는 토스쇼핑
+            쉐어링크 활동의 일환으로, 링크를 통한 구매가 발생하면 일정 수수료를
+            지급받습니다.
+          </p>
         </section>
       )}
 
