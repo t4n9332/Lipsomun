@@ -120,6 +120,34 @@ function priceRatioSuspicious(a, b) {
   return Math.max(a, b) / Math.min(a, b) > 2.2;
 }
 
+/** 발급된 쉐어링크가 실제 가리키는 상품 제목 (og:title) */
+async function fetchSharelinkTitle(url) {
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+    });
+    const html = (await res.text()).slice(0, 200_000);
+    const m =
+      html.match(/property="og:title"[^>]*content="([^"]*)"/) ||
+      html.match(/content="([^"]*)"[^>]*property="og:title"/);
+    return m ? m[1].replace(/\s*\|\s*토스쇼핑\s*$/, "").trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 발급 직후 검증: 링크가 실제로 클릭한 카탈로그 상품을 가리키는지 확인.
+ * (클릭/클립보드가 어긋나 엉뚱한 상품 링크가 잡히는 사고 방지)
+ */
+async function verifyIssuedLink(link, expectedTitle) {
+  const actual = await fetchSharelinkTitle(link);
+  if (!actual) return { ok: false, actual: null }; // 확인 불가 시 부착하지 않음 (보수적)
+  const sim = similarity(expectedTitle, actual);
+  return { ok: sim >= 0.7, actual, sim };
+}
+
 /* ---------- 쉐어링크 어드민 조작 ---------- */
 
 async function ensureLoggedIn(page) {
@@ -336,6 +364,15 @@ async function runMatch(config, page, opts = {}) {
           failed++;
           continue;
         }
+        // 발급된 링크가 진짜 그 상품을 가리키는지 실체 검증
+        const v = await verifyIssuedLink(link, m.cat.title);
+        if (!v.ok) {
+          console.log(
+            `  ✘ [${m.cat.title.slice(0, 30)}] 링크 검증 실패 — 실제 상품: ${v.actual?.slice(0, 35) ?? "확인 불가"} (부착 안 함)`
+          );
+          failed++;
+          continue;
+        }
         await siteApi(config, "POST", "/api/admin/links", {
           productId: m.target.id,
           platform: "toss",
@@ -430,6 +467,13 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
       const link = row ? await issueLinkByIndex(page, row.btnIndex) : null;
       if (!link) {
         console.log(`  ✘ [${c.title.slice(0, 34)}] 쉐어링크 발급 실패`);
+        continue;
+      }
+      const v = await verifyIssuedLink(link, c.title);
+      if (!v.ok) {
+        console.log(
+          `  ✘ [${c.title.slice(0, 34)}] 링크 검증 실패 — 실제 상품: ${v.actual?.slice(0, 35) ?? "확인 불가"} (등록 안 함)`
+        );
         continue;
       }
       await siteApi(config, "POST", "/api/admin/products", [
@@ -589,6 +633,13 @@ async function runImport(config, page) {
       const link = await issueLinkByIndex(page, row.btnIndex);
       if (!link) {
         console.log(`  ✘ [${c.title.slice(0, 30)}] 링크 발급 실패`);
+        continue;
+      }
+      const v = await verifyIssuedLink(link, c.title);
+      if (!v.ok) {
+        console.log(
+          `  ✘ [${c.title.slice(0, 30)}] 링크 검증 실패 — 실제 상품: ${v.actual?.slice(0, 35) ?? "확인 불가"} (건너뜀)`
+        );
         continue;
       }
       console.log(`  ✔ ${c.title.slice(0, 40)} → ${link}`);
