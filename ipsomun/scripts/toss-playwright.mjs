@@ -94,26 +94,30 @@ function tokenize(title) {
     .filter((t) => t.length > 0);
 }
 
-/** 자카드 유사도 + 숫자 토큰(용량·수량) 가중치 */
+/** 자카드 유사도 + 숫자 토큰(용량·수량) 양방향 가중치 */
 function similarity(a, b) {
   const ta = new Set(tokenize(a));
   const tb = new Set(tokenize(b));
   if (ta.size === 0 || tb.size === 0) return 0;
   let inter = 0;
-  let numInter = 0;
-  let numTotal = 0;
-  for (const t of ta) {
-    if (/\d/.test(t)) numTotal++;
-    if (tb.has(t)) {
-      inter++;
-      if (/\d/.test(t)) numInter++;
-    }
-  }
+  for (const t of ta) if (tb.has(t)) inter++;
   const union = ta.size + tb.size - inter;
   const jaccard = inter / union;
-  // 숫자 토큰(500ml, 60개 등)이 다르면 다른 옵션일 가능성 → 감점
-  const numScore = numTotal === 0 ? 1 : numInter / numTotal;
+  // 숫자 토큰(1000mg, 60정, 3개 등)은 양방향으로 비교 —
+  // 한쪽 제목에만 있는 수량 표기도 "다른 옵션일 가능성"으로 감점
+  // (예: "비타민C 1000" vs "비타민C 1000, 60정, 3개" → 수량이 달라도 걸러냄)
+  const numsA = [...ta].filter((t) => /\d/.test(t));
+  const numsB = [...tb].filter((t) => /\d/.test(t));
+  const numUnion = new Set([...numsA, ...numsB]).size;
+  const numInter = numsA.filter((t) => tb.has(t)).length;
+  const numScore = numUnion === 0 ? 1 : numInter / numUnion;
   return jaccard * 0.7 + numScore * 0.3;
+}
+
+/** 두 플랫폼 가격이 2.2배 이상 차이나면 용량/구성이 다른 상품일 가능성이 높음 */
+function priceRatioSuspicious(a, b) {
+  if (a == null || b == null || a <= 0 || b <= 0) return false;
+  return Math.max(a, b) / Math.min(a, b) > 2.2;
 }
 
 /* ---------- 쉐어링크 어드민 조작 ---------- */
@@ -270,7 +274,14 @@ async function runMatch(config, page, opts = {}) {
         best = c;
       }
     }
-    if (best && bestScore >= 0.45) matches.push({ target: t, cat: best, score: bestScore });
+    if (!best || bestScore < 0.45) continue;
+    if (priceRatioSuspicious(t.price, best.price)) {
+      console.log(
+        `  ⚠ 가격차 과다로 제외(용량 다를 가능성): ${t.title.slice(0, 34)} (쿠팡 ${t.price?.toLocaleString("ko-KR")}원 vs 토스 ${best.price?.toLocaleString("ko-KR")}원)`
+      );
+      continue;
+    }
+    matches.push({ target: t, cat: best, score: bestScore });
   }
   console.log(`제목 유사도 45% 이상 일치: ${matches.length}쌍`);
   if (matches.length === 0) {
@@ -401,6 +412,12 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
         console.log(`  ↷ [${c.title.slice(0, 34)}] 쿠팡에서 동일 상품 못 찾음 (${(bestScore * 100).toFixed(0)}%)`);
         continue;
       }
+      if (priceRatioSuspicious(best.productPrice, c.price)) {
+        console.log(
+          `  ⚠ [${c.title.slice(0, 34)}] 가격차 과다로 제외 (쿠팡 ${best.productPrice?.toLocaleString("ko-KR")}원 vs 토스 ${c.price?.toLocaleString("ko-KR")}원)`
+        );
+        continue;
+      }
       // 토스 쉐어링크 발급
       await page.goto(c.pageUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
       await page.waitForTimeout(3500);
@@ -481,6 +498,7 @@ async function runPriceRefresh(config, catalog, products) {
     }
     if (!best || bestScore < 0.6 || best.price == null) continue;
     if (tossLink.price === best.price) continue;
+    if (priceRatioSuspicious(p.price, best.price)) continue;
     try {
       await siteApi(config, "POST", "/api/admin/links", {
         productId: p.id,

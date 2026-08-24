@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getById, upsertLink } from "@/lib/db";
+import { getById, upsertLink, q } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
@@ -34,4 +34,33 @@ export async function POST(req: Request) {
   );
   revalidatePath(`/p/${product.slug}`);
   return NextResponse.json({ ok: true, productId, platform });
+}
+
+/**
+ * 상품에서 특정 플랫폼 링크 제거 (오매칭 정리용).
+ * body: { productId, platform }
+ */
+export async function DELETE(req: Request) {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: "권한 없음" }, { status: 401 });
+  }
+  const body = await req.json().catch(() => null);
+  const { productId, platform } = body || {};
+  if (!productId || !platform) {
+    return NextResponse.json(
+      { error: "productId와 platform이 필요합니다" },
+      { status: 400 }
+    );
+  }
+  const product = await getById(productId);
+  if (!product) {
+    return NextResponse.json({ error: "제품을 찾을 수 없습니다" }, { status: 404 });
+  }
+  const rows = await q(
+    `DELETE FROM affiliate_links WHERE product_id = $1 AND platform = $2 RETURNING id`,
+    [productId, String(platform)]
+  );
+  revalidatePath(`/p/${product.slug}`);
+  revalidatePath("/");
+  return NextResponse.json({ ok: true, removed: rows.length });
 }
