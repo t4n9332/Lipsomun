@@ -28,17 +28,27 @@ export async function generateMetadata({
   const product = await getBySlug(decodeURIComponent(slug)).catch(() => null);
   if (!product || !product.isPublished) return { title: "제품을 찾을 수 없어요" };
 
-  const desc =
-    (product.review || product.description || "").slice(0, 150) ||
-    `${product.title} 최저가 비교와 솔직 리뷰를 입소문에서 확인하세요.`;
+  // 쿠팡·토스 가격이 모두 있으면 검색결과 제목/설명에 가격비교를 노출 (CTR 향상)
+  const cLink = product.links.find((l) => l.platform === "coupang");
+  const tLink = product.links.find((l) => l.platform === "toss");
+  const cPrice = cLink ? (cLink.price ?? product.price) : null;
+  const tPrice = tLink?.price ?? null;
+  const isCompare = cPrice != null && tPrice != null;
+
+  const title = isCompare ? `${product.title} 가격비교 (쿠팡 vs 토스)` : product.title;
+  const desc = isCompare
+    ? `쿠팡 ${won(cPrice)} vs 토스쇼핑 ${won(tPrice)} — 오늘 더 싼 곳에서 구매하세요. ` +
+      (product.review || product.description || "").slice(0, 90)
+    : (product.review || product.description || "").slice(0, 150) ||
+      `${product.title} 최저가 비교와 솔직 리뷰를 입소문에서 확인하세요.`;
   const url = `${SITE}/p/${product.slug}`;
 
   return {
-    title: product.title,
+    title,
     description: desc,
     alternates: { canonical: url },
     openGraph: {
-      title: product.title,
+      title,
       description: desc,
       url,
       type: "website",
@@ -47,7 +57,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: product.title,
+      title,
       description: desc,
       images: product.imageUrl ? [product.imageUrl] : undefined,
     },
@@ -79,7 +89,13 @@ export default async function ProductPage({
     priceStats.days >= 2 &&
     product.price <= priceStats.minPrice;
 
-  // 구조화 데이터 (구글 리치 결과용)
+  // 구조화 데이터 (구글 리치 결과용) — 가격비교 상품은 AggregateOffer + 평점 표시
+  const ldCoupang = product.links.find((l) => l.platform === "coupang");
+  const ldToss = product.links.find((l) => l.platform === "toss");
+  const ldPrices = [
+    ldCoupang ? (ldCoupang.price ?? product.price) : null,
+    ldToss?.price ?? null,
+  ].filter((p): p is number => p != null);
   const jsonLd: Record<string, unknown>[] = [
     {
       "@context": "https://schema.org",
@@ -89,17 +105,39 @@ export default async function ProductPage({
       description:
         product.review || product.description || product.title,
       category: product.category,
-      ...(product.price != null
+      ...(product.rating != null && product.rating > 0 && product.ratingCount
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: product.rating,
+              reviewCount: product.ratingCount,
+              bestRating: 5,
+            },
+          }
+        : {}),
+      ...(ldPrices.length >= 2
         ? {
             offers: {
-              "@type": "Offer",
-              price: product.price,
+              "@type": "AggregateOffer",
+              lowPrice: Math.min(...ldPrices),
+              highPrice: Math.max(...ldPrices),
+              offerCount: ldPrices.length,
               priceCurrency: "KRW",
               availability: "https://schema.org/InStock",
               url: `${SITE}/p/${product.slug}`,
             },
           }
-        : {}),
+        : product.price != null
+          ? {
+              offers: {
+                "@type": "Offer",
+                price: product.price,
+                priceCurrency: "KRW",
+                availability: "https://schema.org/InStock",
+                url: `${SITE}/p/${product.slug}`,
+              },
+            }
+          : {}),
     },
     {
       "@context": "https://schema.org",

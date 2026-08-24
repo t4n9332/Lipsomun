@@ -6,5 +6,6 @@ node_modules/
 scripts/.toss-state.json
 scripts/.toss-config.json
 scripts/.toss-profile/
+scripts/.blog-drafted.json
 *.tsbuildinfo
 next-env.d.ts
