@@ -35,6 +35,36 @@ function loadDone() {
   }
 }
 
+// 후킹 문장 로테이션 (매일 같은 문장 반복 방지)
+const HOOKS = [
+  (n, s) => `같은 ${n}인데 ${s} 차이 납니다.`,
+  (n, s) => `${n} 사려던 분, 잠깐만요. 어디서 사느냐로 ${s}이 갈립니다.`,
+  (n, s) => `오늘 ${n} 가격 비교해보니 ${s} 차이났어요.`,
+  (n, s) => `${n}, 늘 사던 곳이 최저가일까요? 오늘은 ${s} 차이입니다.`,
+];
+
+function captionText({ title, coupang, toss, savings, slug }) {
+  const shortName = title.split(",")[0].trim();
+  const cheaper = toss < coupang ? "토스쇼핑" : "쿠팡";
+  const dayIdx = Number(today.replaceAll("-", "")) % HOOKS.length;
+  const hook = HOOKS[dayIdx](shortName, won(savings));
+  return `${hook}
+
+쿠팡 ${won(coupang)} vs 토스쇼핑 ${won(toss)}
+→ 오늘은 ${cheaper}이 ${won(savings)} 저렴
+
+사기 전 30초 실시간 비교
+lipsomun.co.kr/p/${slug}
+
+매일 특가 브리핑 받기
+t.me/cheapicker
+
+쿠팡 파트너스·토스쇼핑 쉐어링크 활동으로 수수료를 받을 수 있습니다. 가격은 작성 시점 기준입니다.
+
+#가격비교 #최저가 #${shortName.replace(/\s+/g, "")} #쿠팡 #토스쇼핑 #할인정보 #알뜰쇼핑
+`;
+}
+
 function cardHtml({ title, imageUrl, coupang, toss, savings }) {
   const cheaper = toss < coupang ? "토스쇼핑" : "쿠팡";
   const cheaperColor = toss < coupang ? "#2f9cf4" : "#c9302c";
@@ -130,8 +160,22 @@ async function main() {
     const safe = p.title.split(",")[0].trim().replace(/[\\/:*?"<>|]/g, "").slice(0, 25);
     const out = path.join(OUT_DIR, `카드-${today}-${safe}.png`);
     await page.screenshot({ path: out });
+    // 스레드/인스타용 캡션 텍스트 (복붙용 — 링크는 주소 그대로 적어야 클릭됨)
+    const capPath = path.join(OUT_DIR, `캡션-${today}-${safe}.txt`);
+    writeFileSync(
+      capPath,
+      captionText({
+        title: p.title,
+        coupang,
+        toss,
+        savings: Math.abs(coupang - toss),
+        slug: p.slug,
+      }),
+      "utf8"
+    );
     done.push(p.slug);
     console.log(`✔ 카드 생성: ${out}`);
+    console.log(`✔ 캡션 생성: ${capPath}`);
   }
   await browser.close();
   writeFileSync(DONE_PATH, JSON.stringify(done, null, 2));
