@@ -7,5 +7,6 @@ scripts/.toss-state.json
 scripts/.toss-config.json
 scripts/.toss-profile/
 scripts/.blog-drafted.json
+scripts/.social-done.json
 *.tsbuildinfo
 next-env.d.ts
