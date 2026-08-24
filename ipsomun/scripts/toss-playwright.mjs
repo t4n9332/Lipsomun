@@ -653,6 +653,13 @@ async function main() {
         await runDiscover(config, page, r.catalog, r.products, 5);
         await runPriceRefresh(config, r.catalog, r.products);
       }
+      // 그날 데이터로 블로그 리포트 자동 발행 (하루 1개, 이미 있으면 건너뜀)
+      try {
+        const b = await siteApi(config, "GET", "/api/cron/blogpost");
+        console.log(`[블로그] ${b.message}`);
+      } catch (e) {
+        console.log(`[블로그] 발행 실패: ${e.message}`);
+      }
       console.log("[자동 실행] 완료\n");
       return;
     }

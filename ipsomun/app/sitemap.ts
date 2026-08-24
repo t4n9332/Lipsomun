@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllSlugs, getAllCollectionSlugs } from "@/lib/db";
+import { getAllSlugs, getAllCollectionSlugs, getAllPostSlugs } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -7,10 +7,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.SITE_URL || "https://example.com";
   let products: { slug: string; updatedAt: Date }[] = [];
   let picks: { slug: string; updatedAt: Date }[] = [];
+  let posts: { slug: string; updatedAt: Date }[] = [];
   try {
-    [products, picks] = await Promise.all([
+    [products, picks, posts] = await Promise.all([
       getAllSlugs(),
       getAllCollectionSlugs(),
+      getAllPostSlugs(),
     ]);
   } catch {
     // DB 미연결 시 기본 페이지만
@@ -21,6 +23,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/deals`, changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/ranking`, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/pick`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/blog`, changeFrequency: "daily", priority: 0.8 },
+    ...posts.map((p) => ({
+      url: `${base}/blog/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     ...picks.map((c) => ({
       url: `${base}/pick/${c.slug}`,
       lastModified: c.updatedAt,

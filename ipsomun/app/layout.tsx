@@ -68,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <SearchBar />
             <nav className="header-links">
               <Link href="/compare">가격비교</Link>
+              <Link href="/blog">리포트</Link>
               <Link href="/deals">오늘의 딜</Link>
               <Link href="/ranking">랭킹</Link>
               <Link href="/pick">기획전</Link>

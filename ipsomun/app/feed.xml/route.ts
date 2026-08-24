@@ -16,13 +16,31 @@ function esc(s: string): string {
 export async function GET() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let rows: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let postRows: any[] = [];
   try {
-    rows = await q(
-      `SELECT title, slug, description, image_url, price, is_deal, updated_at
-       FROM products WHERE is_published
-       ORDER BY updated_at DESC LIMIT 50`
-    );
+    [rows, postRows] = await Promise.all([
+      q(
+        `SELECT title, slug, description, image_url, price, is_deal, updated_at
+         FROM products WHERE is_published
+         ORDER BY updated_at DESC LIMIT 50`
+      ),
+      q(`SELECT title, slug, created_at FROM posts ORDER BY created_at DESC LIMIT 20`),
+    ]);
   } catch {}
+
+  const postItems = postRows
+    .map((r) => {
+      const link = `${SITE}/blog/${encodeURIComponent(r.slug)}`;
+      return `    <item>
+      <title>${esc(r.title)}</title>
+      <link>${esc(link)}</link>
+      <guid isPermaLink="true">${esc(link)}</guid>
+      <description>${esc("매일 자동 발행되는 쿠팡·토스쇼핑 최저가 비교 리포트")}</description>
+      <pubDate>${new Date(r.created_at).toUTCString()}</pubDate>
+    </item>`;
+    })
+    .join("\n");
 
   const items = rows
     .map((r) => {
@@ -49,6 +67,7 @@ export async function GET() {
     <description>매일 갱신되는 특가와 쿠팡·토스쇼핑 가격비교 정보</description>
     <language>ko</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+${postItems}
 ${items}
   </channel>
 </rss>`;

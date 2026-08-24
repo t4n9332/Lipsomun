@@ -152,6 +152,14 @@ CREATE TABLE IF NOT EXISTS collections (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS posts (
+  id TEXT PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 CREATE TABLE IF NOT EXISTS collection_items (
   collection_id TEXT NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
   product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -414,6 +422,61 @@ export async function adminStats(): Promise<{ clicks: number; views: number }> {
     `SELECT COALESCE(SUM(clicks),0)::int AS clicks, COALESCE(SUM(views),0)::int AS views FROM products`
   );
   return { clicks: rows[0]?.clicks ?? 0, views: rows[0]?.views ?? 0 };
+}
+
+/* ---------- 자동 블로그 ---------- */
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  content: string; // JSON 문자열 (렌더러가 파싱)
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function rowToPost(r: any): BlogPost {
+  return {
+    id: r.id,
+    slug: r.slug,
+    title: r.title,
+    content: r.content,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+/** 글 생성 (같은 slug가 있으면 건너뜀). 생성됐으면 true */
+export async function createPost(
+  slug: string,
+  title: string,
+  content: string
+): Promise<boolean> {
+  const rows = await q(
+    `INSERT INTO posts (id, slug, title, content) VALUES ($1,$2,$3,$4)
+     ON CONFLICT (slug) DO NOTHING RETURNING id`,
+    [crypto.randomUUID(), slug, title, content]
+  );
+  return rows.length > 0;
+}
+
+export async function getPosts(limit = 30): Promise<BlogPost[]> {
+  const rows = await q(
+    `SELECT * FROM posts ORDER BY created_at DESC LIMIT $1`,
+    [limit]
+  );
+  return rows.map(rowToPost);
+}
+
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  const rows = await q(`SELECT * FROM posts WHERE slug = $1`, [slug]);
+  return rows.length ? rowToPost(rows[0]) : null;
+}
+
+export async function getAllPostSlugs(): Promise<{ slug: string; updatedAt: Date }[]> {
+  const rows = await q(`SELECT slug, updated_at FROM posts ORDER BY created_at DESC LIMIT 1000`);
+  return rows.map((r) => ({ slug: r.slug, updatedAt: r.updated_at }));
 }
 
 export interface PlatformStat {
