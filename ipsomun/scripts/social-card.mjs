@@ -157,7 +157,13 @@ async function main() {
       savings: Math.abs(coupang - toss),
     });
     await page.setContent(html, { waitUntil: "networkidle", timeout: 30000 });
-    const safe = p.title.split(",")[0].trim().replace(/[\\/:*?"<>|]/g, "").slice(0, 25);
+    // 같은 날 다른 상품이 같은 파일명을 덮어쓰지 않도록 용량/수량을 함께 붙인다
+    // (예: 스파클 생수 500ml / 스파클 생수 2L)
+    const parts = p.title.split(",").map((s) => s.trim());
+    const spec = parts.slice(1).find((s) => /\d/.test(s)) || "";
+    const base = `${parts[0]}${spec ? ` ${spec}` : ""}`.replace(/[\\/:*?"<>|]/g, "").slice(0, 30);
+    let safe = base;
+    for (let n = 2; existsSync(path.join(OUT_DIR, `카드-${today}-${safe}.png`)); n++) safe = `${base}-${n}`;
     const out = path.join(OUT_DIR, `카드-${today}-${safe}.png`);
     await page.screenshot({ path: out });
     // 스레드/인스타용 캡션 텍스트 (복붙용 — 링크는 주소 그대로 적어야 클릭됨)

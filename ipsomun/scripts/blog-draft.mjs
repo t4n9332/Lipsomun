@@ -122,7 +122,12 @@ async function main() {
 
   mkdirSync(BLOG_DIR, { recursive: true });
   for (const { p, cPrice, tPrice } of candidates.slice(0, COUNT)) {
-    const safe = p.title.split(",")[0].trim().replace(/[\\/:*?"<>|]/g, "").slice(0, 30);
+    // 같은 날 다른 상품이 같은 파일명을 덮어쓰지 않도록 용량/수량을 함께 붙인다
+    const parts = p.title.split(",").map((s) => s.trim());
+    const spec = parts.slice(1).find((s) => /\d/.test(s)) || "";
+    const base = `${parts[0]}${spec ? ` ${spec}` : ""}`.replace(/[\\/:*?"<>|]/g, "").slice(0, 30);
+    let safe = base;
+    for (let n = 2; existsSync(path.join(BLOG_DIR, `자동초안-${today}-${safe}.md`)); n++) safe = `${base}-${n}`;
     const file = path.join(BLOG_DIR, `자동초안-${today}-${safe}.md`);
     writeFileSync(file, draft(p, cPrice, tPrice), "utf8");
     done.push(p.slug);
