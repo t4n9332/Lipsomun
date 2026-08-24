@@ -19,10 +19,17 @@ interface CompareItem {
   savings: number;
 }
 
+interface LowItem {
+  slug: string;
+  title: string;
+  price: number | null;
+}
+
 interface DailyCompare {
   type: string;
   date: string;
   items: CompareItem[];
+  lows?: LowItem[];
   totalCompare: number;
   totalSavings: number;
 }
@@ -101,6 +108,17 @@ export default async function BlogPostPage({
       <p className="post-date">{`${y}년 ${m}월 ${d}일 · 자동 가격비교 리포트`}</p>
       <h1>{post.title}</h1>
       <p className="post-intro">{intro}</p>
+
+      {data.lows && data.lows.length > 0 && (
+        <div className="post-lows">
+          <b>🔥 오늘 역대 최저가 진입</b>
+          {data.lows.map((l) => (
+            <Link key={l.slug} href={`/p/${l.slug}`}>
+              {l.title.slice(0, 45)} — <b>{won(l.price ?? 0)}</b>
+            </Link>
+          ))}
+        </div>
+      )}
 
       <div style={{ overflowX: "auto" }}>
         <table className="post-table">

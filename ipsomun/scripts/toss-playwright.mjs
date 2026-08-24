@@ -660,6 +660,13 @@ async function main() {
       } catch (e) {
         console.log(`[블로그] 발행 실패: ${e.message}`);
       }
+      // 텔레그램 다이제스트 + 역대최저가 푸시
+      try {
+        const n = await siteApi(config, "GET", "/api/cron/notify");
+        console.log(`[알림] ${n.message}`);
+      } catch (e) {
+        console.log(`[알림] 실패: ${e.message}`);
+      }
       console.log("[자동 실행] 완료\n");
       return;
     }

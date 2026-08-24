@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   getPriceCompareProducts,
+  getAllTimeLows,
   createPost,
   kstToday,
   type ProductWithLinks,
@@ -33,7 +34,15 @@ export async function GET(req: Request) {
   }
 
   try {
-    const all = await getPriceCompareProducts(100);
+    const [all, lowsRaw] = await Promise.all([
+      getPriceCompareProducts(100),
+      getAllTimeLows(5).catch(() => []),
+    ]);
+    const lows = lowsRaw.map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      price: p.price,
+    }));
     const items = all
       .map((p) => {
         const { coupang, toss } = effPrices(p);
@@ -69,6 +78,7 @@ export async function GET(req: Request) {
       type: "daily-compare",
       date,
       items,
+      lows,
       totalCompare: all.length,
       totalSavings,
     });

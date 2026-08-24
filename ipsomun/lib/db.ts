@@ -853,6 +853,42 @@ export async function getPriceStats(productId: string): Promise<PriceStats | nul
   return { minPrice: rows[0].min, maxPrice: rows[0].max, days: rows[0].days };
 }
 
+/** 오늘 역대 최저가에 진입한 상품 (히스토리 5일 이상, 이전 최저가보다 낮아진 것) */
+export async function getAllTimeLows(limit = 10): Promise<Product[]> {
+  const rows = await q(
+    `SELECT p.* FROM products p
+     JOIN (
+       SELECT product_id, MIN(price)::int AS prev_min, COUNT(*)::int AS days
+       FROM price_history WHERE day < $1::date
+       GROUP BY product_id
+     ) h ON h.product_id = p.id
+     WHERE p.is_published AND p.price IS NOT NULL
+       AND h.days >= 5 AND p.price < h.prev_min
+     ORDER BY (h.prev_min - p.price)::float / h.prev_min DESC
+     LIMIT $2`,
+    [kstToday(), limit]
+  );
+  return rows.map(rowToProduct);
+}
+
+/** 리뷰 콘텐츠만 부분 업데이트 (AI 리뷰 보강용 — 다른 필드는 건드리지 않음) */
+export async function updateReviewContent(
+  id: string,
+  review: string,
+  pros: string,
+  cons: string,
+  description?: string
+): Promise<boolean> {
+  const rows = await q(
+    `UPDATE products SET review=$2, pros=$3, cons=$4,
+       description = COALESCE(NULLIF($5, ''), description),
+       updated_at = now()
+     WHERE id=$1 RETURNING id`,
+    [id, review, pros, cons, description ?? ""]
+  );
+  return rows.length > 0;
+}
+
 /** 찜한 상품 중 직전 스냅샷보다 가격이 내려간 것 (푸시용) */
 export interface FavoriteDrop {
   userId: string;
