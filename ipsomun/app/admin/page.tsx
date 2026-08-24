@@ -5,9 +5,10 @@ import {
   adminStats,
   adminCategoryStats,
   adminTopProducts,
+  adminPlatformStats,
 } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
-import { won, platformName } from "@/lib/util";
+import { won, platformName, platformColor } from "@/lib/util";
 import { deleteProductAction, toggleAction, logoutAction } from "./actions";
 import GoldboxButton from "@/components/GoldboxButton";
 import TossDealsButton from "@/components/TossDealsButton";
@@ -18,11 +19,12 @@ export const metadata = { title: "관리자" };
 export default async function AdminPage() {
   if (!(await isAdmin())) redirect("/admin/login");
 
-  const [products, stats, catStats, topProducts] = await Promise.all([
+  const [products, stats, catStats, topProducts, platformStats] = await Promise.all([
     adminListProducts(600),
     adminStats(),
     adminCategoryStats(),
     adminTopProducts(10),
+    adminPlatformStats().catch(() => []),
   ]);
 
   return (
@@ -64,6 +66,47 @@ export default async function AdminPage() {
           <div className="label">오늘의 딜</div>
         </div>
       </div>
+
+      {platformStats.length > 0 && (
+        <div className="admin-card">
+          <h2>🔗 플랫폼별 클릭 (수수료율: 토스 ~10% · 쿠팡 ~3%)</h2>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>플랫폼</th>
+                <th>링크 수</th>
+                <th>클릭</th>
+                <th>클릭 비중</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(() => {
+                const totalClicks = platformStats.reduce((s, p) => s + p.clicks, 0);
+                return platformStats.map((p) => (
+                  <tr key={p.platform}>
+                    <td>
+                      <b style={{ fontSize: 13, color: platformColor(p.platform) }}>
+                        {platformName(p.platform)}
+                      </b>
+                    </td>
+                    <td>{p.links.toLocaleString()}</td>
+                    <td><b>{p.clicks.toLocaleString()}</b></td>
+                    <td>
+                      {totalClicks > 0
+                        ? ((p.clicks / totalClicks) * 100).toFixed(1) + "%"
+                        : "—"}
+                    </td>
+                  </tr>
+                ));
+              })()}
+            </tbody>
+          </table>
+          <p style={{ fontSize: 12, color: "#8a867f", margin: "10px 0 0" }}>
+            같은 구매라면 토스(약 10%)가 쿠팡(약 3%)보다 수수료가 높습니다. 토스
+            클릭 비중이 오를수록 수익 효율이 좋아져요.
+          </p>
+        </div>
+      )}
 
       <div className="dash-2col">
         <div className="admin-card">

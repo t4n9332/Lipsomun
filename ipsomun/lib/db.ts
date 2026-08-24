@@ -416,6 +416,20 @@ export async function adminStats(): Promise<{ clicks: number; views: number }> {
   return { clicks: rows[0]?.clicks ?? 0, views: rows[0]?.views ?? 0 };
 }
 
+export interface PlatformStat {
+  platform: string;
+  links: number;
+  clicks: number;
+}
+
+/** 플랫폼별 링크 수·클릭 수 (수익 채널 분석용) */
+export async function adminPlatformStats(): Promise<PlatformStat[]> {
+  return q(
+    `SELECT platform, COUNT(*)::int AS links, COALESCE(SUM(clicks),0)::int AS clicks
+     FROM affiliate_links GROUP BY platform ORDER BY clicks DESC, links DESC`
+  );
+}
+
 export async function getById(id: string): Promise<ProductWithLinks | null> {
   const rows = await q(`SELECT * FROM products WHERE id = $1`, [id]);
   if (rows.length === 0) return null;

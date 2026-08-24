@@ -206,7 +206,16 @@ export default async function ProductPage({
                 .map(effPrice)
                 .filter((p): p is number => p != null);
               const lowest = priced.length >= 2 ? Math.min(...priced) : null;
-              return product.links.map((l) => {
+              // 토스가 더 싸거나 같으면 토스 버튼을 맨 위로 (수수료 유리 + 방문자에게도 최저가 우선)
+              const cLinkBtn = product.links.find((l) => l.platform === "coupang");
+              const tLinkBtn = product.links.find((l) => l.platform === "toss");
+              const cP = cLinkBtn ? effPrice(cLinkBtn) : null;
+              const tP = tLinkBtn ? effPrice(tLinkBtn) : null;
+              const tossFirst = tP != null && (cP == null || tP <= cP);
+              const orderOf = (l: (typeof product.links)[number]) =>
+                l.platform === "toss" ? (tossFirst ? 0 : 2) : l.platform === "coupang" ? 1 : 9;
+              const orderedLinks = [...product.links].sort((a, b) => orderOf(a) - orderOf(b));
+              return orderedLinks.map((l) => {
                 const p = effPrice(l);
                 return (
                   <a

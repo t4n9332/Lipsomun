@@ -363,11 +363,14 @@ async function runMatch(config, page, opts = {}) {
  * ⚠️ 쿠팡 검색 API는 시간당 약 10회 제한 → 한 번에 최대 maxSearches개만 시도.
  */
 async function runDiscover(config, page, catalog, products, maxSearches = 5) {
-  // 이미 사이트에 있는(비슷한 제목) 카탈로그 상품 제외
+  // 이미 사이트에 있는(비슷한 제목) 카탈로그 상품 제외.
+  // 수수료는 가격의 %이므로 '가격 × 인기(리뷰수 로그)' 점수로 건당 수익이 큰 상품부터 시도
+  const revenueScore = (c) =>
+    (c.price ?? 0) * Math.log10((c.ratingCount ?? 0) + 10);
   const fresh = catalog
     .filter((c) => c.price != null)
     .filter((c) => !products.some((p) => similarity(p.title, c.title) >= 0.6))
-    .sort((a, b) => (b.ratingCount ?? 0) - (a.ratingCount ?? 0));
+    .sort((a, b) => revenueScore(b) - revenueScore(a));
 
   console.log(
     `\n[역매칭] 사이트에 없는 토스 인기상품 ${fresh.length}개 중 상위 ${Math.min(maxSearches, fresh.length)}개를 쿠팡에서 검색합니다.`
@@ -453,6 +456,48 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
   }
   console.log(`[역매칭] 신규 가격비교 상품 ${created}개 등록 (검색 ${tried}회 사용)`);
   return created;
+}
+
+/* ---------- 자동 모드 3단계: 기존 토스 링크 가격 갱신 ---------- */
+
+/**
+ * 이미 토스 링크가 붙은 상품의 가격을 오늘 카탈로그 기준으로 갱신.
+ * (오래된 가격은 방문자 신뢰를 떨어뜨림 — 링크 URL은 그대로 유지, 가격만 교체)
+ */
+async function runPriceRefresh(config, catalog, products) {
+  let updated = 0;
+  for (const p of products) {
+    const tossLink = p.links.find((l) => l.platform === "toss");
+    if (!tossLink) continue;
+    // 갱신은 오매칭 방지를 위해 더 엄격한 유사도(60%)로만
+    let best = null;
+    let bestScore = 0;
+    for (const c of catalog) {
+      const s = similarity(p.title, c.title);
+      if (s > bestScore) {
+        bestScore = s;
+        best = c;
+      }
+    }
+    if (!best || bestScore < 0.6 || best.price == null) continue;
+    if (tossLink.price === best.price) continue;
+    try {
+      await siteApi(config, "POST", "/api/admin/links", {
+        productId: p.id,
+        platform: "toss",
+        url: tossLink.url,
+        price: best.price,
+      });
+      updated++;
+      console.log(
+        `  ↻ 가격 갱신: ${p.title.slice(0, 34)} 토스 ${tossLink.price?.toLocaleString("ko-KR") ?? "?"}원 → ${best.price.toLocaleString("ko-KR")}원`
+      );
+    } catch (e) {
+      console.log(`  ✘ 갱신 실패 [${p.title.slice(0, 30)}]: ${e.message}`);
+    }
+  }
+  console.log(`[가격 갱신] 토스 가격 ${updated}개 업데이트`);
+  return updated;
 }
 
 /* ---------- 모드 2: 카탈로그 신규 등록 ---------- */
@@ -604,7 +649,10 @@ async function main() {
       console.log(`\n[자동 실행] ${new Date().toLocaleString("ko-KR")}`);
       const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
       const r = await runMatch(config, page, { auto: true });
-      if (r) await runDiscover(config, page, r.catalog, r.products, 5);
+      if (r) {
+        await runDiscover(config, page, r.catalog, r.products, 5);
+        await runPriceRefresh(config, r.catalog, r.products);
+      }
       console.log("[자동 실행] 완료\n");
       return;
     }
