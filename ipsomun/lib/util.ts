@@ -23,6 +23,9 @@ export function platformColor(key: string): string {
   return PLATFORMS.find((p) => p.key === key)?.color ?? "#6b7280";
 }
 
+/** 텔레그램 특가 알림 채널 */
+export const TELEGRAM_CHANNEL_URL = "https://t.me/cheapicker";
+
 export const CATEGORIES = [
   "가전/디지털",
   "생활용품",

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
-import { CATEGORIES } from "@/lib/util";
+import { CATEGORIES, TELEGRAM_CHANNEL_URL } from "@/lib/util";
 import UserMenu from "@/components/UserMenu";
 import SearchBar from "@/components/SearchBar";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -67,6 +67,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <SearchBar />
             <nav className="header-links">
+              <a
+                href={TELEGRAM_CHANNEL_URL}
+                target="_blank"
+                rel="noopener"
+                className="tg-link"
+              >
+                📣 특가알림
+              </a>
               <Link href="/compare">가격비교</Link>
               <Link href="/blog">리포트</Link>
               <Link href="/deals">오늘의 딜</Link>
@@ -111,6 +119,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/privacy">개인정보처리방침</Link>
               <span aria-hidden> · </span>
               <a href="mailto:t4n9332@gmail.com">문의·제휴 t4n9332@gmail.com</a>
+            </p>
+            <p>
+              📣 매일 특가 브리핑:{" "}
+              <a
+                href={TELEGRAM_CHANNEL_URL}
+                target="_blank"
+                rel="noopener"
+                style={{ color: "#5eb5f7", fontWeight: 600 }}
+              >
+                텔레그램 채널 구독하기
+              </a>
             </p>
             <p>© {new Date().getFullYear()} 입소문</p>
           </div>

@@ -9,6 +9,7 @@ import {
 } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 import CompareCard, { comparePrices } from "@/components/CompareCard";
+import { TELEGRAM_CHANNEL_URL } from "@/lib/util";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +59,20 @@ export default async function Home() {
           </p>
         </section>
       )}
+
+      <a
+        href={TELEGRAM_CHANNEL_URL}
+        target="_blank"
+        rel="noopener"
+        className="tg-banner"
+      >
+        <span className="tg-icon">📣</span>
+        <span className="tg-text">
+          <b>매일 아침·저녁, 특가 브리핑을 텔레그램으로</b>
+          <span>역대 최저가 · 쿠팡 vs 토스 가격차 TOP을 무료로 받아보세요</span>
+        </span>
+        <span className="tg-cta">무료 구독 →</span>
+      </a>
 
       <section className="section">
         <div className="section-head">
