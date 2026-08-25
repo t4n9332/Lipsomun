@@ -877,7 +877,13 @@ async function main() {
     if (mode === "2") await runImport(config, page);
     else await runMatch(config, page);
   } finally {
-    await context.close().catch(() => {});
+    // context.close()가 간혹 응답 없는 크로미움 프로세스 때문에 무한 대기하는 경우가 있어
+    // 타임아웃을 두고 강제로 넘어간다 (실제 사고: 9:30 회차가 5시간 동안 좀비 프로세스로 남아
+    // 다음 회차의 로그 파일 append를 막아 13:30 회차가 통째로 실패함).
+    await Promise.race([
+      context.close().catch(() => {}),
+      new Promise((resolve) => setTimeout(resolve, 15000)),
+    ]);
   }
   process.exit(0);
 }
