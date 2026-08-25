@@ -14,7 +14,10 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = path.join(__dirname, ".toss-config.json");
-const BATCH_PATH = path.join(__dirname, "reviews-batch.json");
+// 인수로 배치 파일을 지정할 수 있다 (예: node scripts/apply-reviews.mjs scripts/reviews-batch-2.json)
+const BATCH_PATH = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(__dirname, "reviews-batch.json");
 
 if (!existsSync(CONFIG_PATH)) {
   console.error("설정 파일(.toss-config.json)이 없습니다. toss-playwright.mjs를 먼저 1회 실행하세요.");
