@@ -774,6 +774,21 @@ html { scroll-behavior: smooth; }
   .hero { padding: 24px 20px; border-radius: 16px; }
   .hero h1 { font-size: 22px; }
   .hero p { font-size: 13.5px; }
+
+  /* 가격비교 기획전도 2열로. 좌우 패딩이 26px씩이면 minmax(190px)가 2열을
+     못 채워 1열로 떨어지고, 카드 8개가 3,400px를 차지해 홈 절반이 이 섹션이 된다. */
+  .vs-section { padding: 16px 12px 18px; border-radius: 16px; margin: 20px 0 32px; }
+  .vs-section .section-head { margin-bottom: 10px; }
+  .vs-section .section-head h2 { font-size: 17px; }
+  .vs-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .vs-card { border-radius: 12px; }
+  .vs-body { padding: 8px 10px 10px; gap: 4px; }
+  .vs-title { font-size: 12px; min-height: 32px; }
+  .vs-price { font-size: 12px; gap: 4px; }
+  .vs-price em { font-size: 10px; padding: 1px 5px; }
+  .vs-price .chip { font-size: 9.5px; padding: 1px 5px; }
+  .vs-save { font-size: 10px; padding: 2px 7px; left: 6px; bottom: 6px; }
+  .vs-note { font-size: 11px; margin-top: 10px; }
 }
 
 /* ---------- 홈 화면 추가(설치) 배너 ---------- */
