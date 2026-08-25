@@ -70,7 +70,7 @@ export async function generateMetadata({
   const desc = data
     ? `오늘 가격차 1위: ${data.items[0]?.title?.slice(0, 40)} (${won(data.items[0]?.savings)} 차이). 쿠팡·토스쇼핑 실시간 최저가 비교.`
     : post.title;
-  const url = `${SITE}/blog/${post.slug}`;
+  const url = `${SITE}/blog/${encodeURIComponent(post.slug)}`;
   return {
     title: post.title,
     description: desc,
@@ -102,7 +102,7 @@ export default async function BlogPostPage({
     dateModified: new Date(post.updatedAt).toISOString(),
     author: { "@type": "Organization", name: "입소문" },
     publisher: { "@type": "Organization", name: "입소문" },
-    mainEntityOfPage: `${SITE}/blog/${post.slug}`,
+    mainEntityOfPage: `${SITE}/blog/${encodeURIComponent(post.slug)}`,
   };
 
   return (

@@ -4,6 +4,13 @@ import { CATEGORIES } from "@/lib/util";
 
 export const revalidate = 1800; // 사이트맵
 
+/**
+ * 사이트맵 규격은 URL을 퍼센트 인코딩하도록 요구한다. 슬러그가 한글이라
+ * 인코딩하지 않으면 원문 그대로 실리고, 그 형태로 요청하면 400이 난다
+ * (브라우저는 자동 인코딩하지만 크롤러·도구는 그렇지 않을 수 있다).
+ */
+const enc = (slug: string) => encodeURIComponent(slug);
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.SITE_URL || "https://example.com";
   let products: { slug: string; updatedAt: Date }[] = [];
@@ -32,19 +39,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     })),
     ...posts.map((p) => ({
-      url: `${base}/blog/${p.slug}`,
+      url: `${base}/blog/${enc(p.slug)}`,
       lastModified: p.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
     ...picks.map((c) => ({
-      url: `${base}/pick/${c.slug}`,
+      url: `${base}/pick/${enc(c.slug)}`,
       lastModified: c.updatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
     ...products.map((p) => ({
-      url: `${base}/p/${p.slug}`,
+      url: `${base}/p/${enc(p.slug)}`,
       lastModified: p.updatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.7,

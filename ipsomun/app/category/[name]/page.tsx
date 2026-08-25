@@ -52,7 +52,7 @@ export default async function CategoryPage({
       "@type": "ListItem",
       position: i + 1,
       name: p.title,
-      url: `${SITE}/p/${p.slug}`,
+      url: `${SITE}/p/${encodeURIComponent(p.slug)}`,
     })),
   };
 

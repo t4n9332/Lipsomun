@@ -21,7 +21,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const col = await getCollectionBySlug(decodeURIComponent(slug)).catch(() => null);
   if (!col) return { title: "기획전을 찾을 수 없어요" };
-  const url = `${SITE}/pick/${col.slug}`;
+  const url = `${SITE}/pick/${encodeURIComponent(col.slug)}`;
   const desc =
     col.description ||
     `${col.title} — 입소문이 골라 담은 추천 제품 ${col.products.length}개`;
@@ -60,7 +60,7 @@ export default async function PickPage({
       "@type": "ListItem",
       position: i + 1,
       name: p.title,
-      url: `${SITE}/p/${p.slug}`,
+      url: `${SITE}/p/${encodeURIComponent(p.slug)}`,
     })),
   };
 
