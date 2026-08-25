@@ -1165,3 +1165,12 @@ export async function adminTopProducts(limit = 10): Promise<Product[]> {
   );
   return rows.map(rowToProduct);
 }
+
+/** 게시 여부를 지정한 값으로 설정 (토글이 아니라 명시적 설정 — 일괄 처리 도구용) */
+export async function setProductPublished(id: string, published: boolean): Promise<boolean> {
+  const rows = await q(
+    `UPDATE products SET is_published=$2, updated_at = now() WHERE id=$1 RETURNING id`,
+    [id, published]
+  );
+  return rows.length > 0;
+}
