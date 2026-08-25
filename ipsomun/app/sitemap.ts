@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllSlugs, getAllCollectionSlugs, getAllPostSlugs } from "@/lib/db";
+import { CATEGORIES } from "@/lib/util";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/ranking`, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/pick`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/blog`, changeFrequency: "daily", priority: 0.8 },
+    // '기타'는 게시 상품 0개 유지가 원칙이라 빈 페이지 색인을 막기 위해 제외
+    ...CATEGORIES.filter((c) => c !== "기타").map((c) => ({
+      url: `${base}/category/${encodeURIComponent(c)}`,
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    })),
     ...posts.map((p) => ({
       url: `${base}/blog/${p.slug}`,
       lastModified: p.updatedAt,
