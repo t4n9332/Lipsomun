@@ -24,6 +24,8 @@ export async function GET(req: Request) {
     category: p.category,
     price: p.price,
     isPublished: p.isPublished,
+    clicks: p.clicks,
+    views: p.views,
     links: p.links.map((l) => ({
       platform: l.platform,
       url: l.url,

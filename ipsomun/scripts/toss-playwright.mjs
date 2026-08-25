@@ -27,6 +27,7 @@
 
 import { createInterface } from "node:readline/promises";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -51,6 +52,31 @@ const DISCOVER_MAX_PRICE = 200_000;
 
 /** 정렬 점수에서 가격 기여분을 포화시키는 지점 (고가 상품 쏠림 방지) */
 const DISCOVER_PRICE_CAP = 50_000;
+
+/** 역매칭 실패 이력 저장 파일 — 같은 상품을 매 회차 재검색하며 쿼터를 낭비하지 않기 위함 */
+const TRIED_PATH = path.join(__dirname, ".discover-tried.json");
+
+/** 역매칭 실패 상품 재시도 유예기간(일) — 이 기간이 지나면 다시 후보에 오른다 */
+const DISCOVER_RETRY_DAYS = 14;
+
+/**
+ * 토스 필터 카테고리 → 사이트 카테고리 매핑.
+ * 역매칭 신규 등록이 전부 '기타'로 들어가는 것을 막는다 (사이트는 '기타' 0개 유지가 원칙).
+ * 필터 없이 수집된 상품(프로모션·베스트·하루특가)과 매핑이 없는 필터는 '기타'로 남고,
+ * 이후 apply-categories.mjs 재분류 도구로 정리한다.
+ */
+const TOSS_TO_SITE_CATEGORY = {
+  식품: "식품",
+  생활용품: "생활용품",
+  뷰티: "뷰티",
+  "가전/디지털": "가전/디지털",
+  주방용품: "주방용품",
+  "출산/유아동": "육아",
+  "반려/애완용품": "반려동물",
+  패션의류잡화: "패션",
+  "스포츠/레져": "스포츠/레저",
+  "가구/홈데코": "홈인테리어",
+};
 
 /** 상품 조회 페이지 — 카테고리 필터를 적용해 카탈로그를 넓히는 데 쓴다 */
 const FILTER_PAGE_URL = "https://sharelink.toss.im/links/recommended-products";
@@ -539,8 +565,19 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
   //   → 가격 기여분은 5만원에서 포화시키고, 20만원 초과 상품은 후보에서 제외
   const revenueScore = (c) =>
     Math.log10((c.ratingCount ?? 0) + 10) * Math.min(c.price ?? 0, DISCOVER_PRICE_CAP);
+
+  // 최근 검색했던 후보는 유예기간 동안 제외 — 이 기록이 없으면 매 회차 동일한
+  // 상위 후보를 재검색하며 시간당 10회뿐인 쿠팡 쿼터를 전부 재실패에 낭비한다
+  // (실제 사고: 카탈로그 확장 후 3회차 연속 같은 8개 검색 → 신규 등록 0).
+  let triedLog = {};
+  try {
+    triedLog = JSON.parse(readFileSync(TRIED_PATH, "utf8"));
+  } catch {}
+  const retryCutoff = Date.now() - DISCOVER_RETRY_DAYS * 24 * 3600 * 1000;
+
   const fresh = catalog
     .filter((c) => c.price != null && c.price <= DISCOVER_MAX_PRICE)
+    .filter((c) => !(triedLog[c.title] > retryCutoff))
     .filter((c) => !products.some((p) => similarity(p.title, c.title) >= 0.6))
     .sort((a, b) => revenueScore(b) - revenueScore(a));
 
@@ -553,6 +590,9 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
   for (const c of fresh) {
     if (tried >= maxSearches) break;
     tried++;
+    // 성공·실패 무관하게 기록 — 성공한 상품은 사이트에 등록되므로 어차피 재후보가 안 되고,
+    // 실패한 상품은 유예기간 동안 다른 후보에게 검색 기회를 넘긴다
+    triedLog[c.title] = Date.now();
     const keyword = tokenize(c.title).slice(0, 6).join(" ");
     try {
       const { products: found } = await siteApi(
@@ -599,7 +639,7 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
           title: c.title,
           imageUrl: c.imageUrl || best.productImage || "",
           price: best.productPrice ?? null,
-          category: "기타",
+          category: TOSS_TO_SITE_CATEGORY[c.filterCategory] || "기타",
           isDeal: false,
           isPublished: true,
           source: "toss-match",
@@ -632,6 +672,15 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
         break;
       }
     }
+  }
+  // 유예기간 지난 항목은 정리하고 저장
+  const pruned = Object.fromEntries(
+    Object.entries(triedLog).filter(([, ts]) => ts > retryCutoff)
+  );
+  try {
+    writeFileSync(TRIED_PATH, JSON.stringify(pruned, null, 2));
+  } catch (e) {
+    console.log(`  ⚠ 검색 이력 저장 실패: ${e.message}`);
   }
   console.log(`[역매칭] 신규 가격비교 상품 ${created}개 등록 (검색 ${tried}회 사용)`);
   return created;
@@ -884,6 +933,14 @@ async function main() {
       context.close().catch(() => {}),
       new Promise((resolve) => setTimeout(resolve, 15000)),
     ]);
+    // close가 실패했으면 크로미움이 고아로 남아 상속받은 로그 파일 핸들을 계속 잡는다
+    // (실제 사고: 17:30 회차의 고아 크로미움이 21:30 회차의 로그 append를 막아 실패).
+    // .toss-profile을 쓰는 프로세스만 정리하므로 사용자의 실제 크롬은 건드리지 않는다.
+    spawnSync("powershell.exe", [
+      "-NoProfile",
+      "-Command",
+      "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*.toss-profile*' -and $_.ProcessId -ne $PID } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }",
+    ], { timeout: 20000 });
   }
   process.exit(0);
 }

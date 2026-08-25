@@ -11,3 +11,4 @@ scripts/.social-done.json
 *.tsbuildinfo
 next-env.d.ts
 scripts/toss-auto.log
+scripts/.discover-tried.json

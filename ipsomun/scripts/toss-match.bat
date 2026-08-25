@@ -1,6 +1,8 @@
 @echo off
-rem í† ìŠ¤ ê°€ê²©ë¹„êµ ë§¤ì¹­Â·ì—­ë§¤ì¹­ë§Œ ì‹¤í–‰ (ë¸”ë¡œê·¸ ë°œí–‰Â·í…”ë ˆê·¸ëž¨ ë°œì†¡ ì—†ìŒ)
-rem í•˜ë£¨ ì¤‘ ì¶”ê°€ íšŒì°¨ìš© â€” ì¿ íŒ¡ ê²€ìƒ‰ API ì‹œê°„ë‹¹ ì œí•œ ë•Œë¬¸ì— íšŒì°¨ ê°„ê²©ì€ ìµœì†Œ 3ì‹œê°„ ì´ìƒ
+rem Åä½º °¡°Ýºñ±³ ¸ÅÄª¡¤¿ª¸ÅÄª¸¸ ½ÇÇà (ºí·Î±× ¹ßÇà¡¤ÅÚ·¹±×·¥ ¹ß¼Û ¾øÀ½)
+rem ÇÏ·ç Áß Ãß°¡ È¸Â÷¿ë ? ÄíÆÎ °Ë»ö API ½Ã°£´ç Á¦ÇÑ ¶§¹®¿¡ È¸Â÷ °£°ÝÀº ÃÖ¼Ò 3½Ã°£ ÀÌ»ó
 chcp 65001 >nul
 cd /d "%~dp0.."
+rem ÀÌÀü È¸Â÷ÀÇ Á»ºñ node¡¤°í¾Æ Å©·Î¹Ì¿ò Á¤¸® ? ·Î±× ÆÄÀÏ ÇÚµéÀ» ¹°°í ÀÖÀ¸¸é ÀÌ¹ø È¸Â÷°¡ ½ÃÀÛÁ¶Â÷ ¸ø ÇÑ´Ù
+powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { ($_.CommandLine -like '*toss-playwright.mjs*' -or $_.CommandLine -like '*.toss-profile*') -and $_.ProcessId -ne $PID } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 node scripts\toss-playwright.mjs --match-only >> "scripts\toss-auto.log" 2>&1

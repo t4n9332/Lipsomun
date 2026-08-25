@@ -1,7 +1,9 @@
 @echo off
-rem í† ìŠ¤ì‡¼í•‘ ê°€ê²©ë¹„êµ ìžë™ ë§¤ì¹­ (ìž‘ì—… ìŠ¤ì¼€ì¤„ëŸ¬ìš©)
+rem Åä½º¼îÇÎ °¡°Ýºñ±³ ÀÚµ¿ ¸ÅÄª (ÀÛ¾÷ ½ºÄÉÁÙ·¯¿ë)
 chcp 65001 >nul
 cd /d "%~dp0.."
+rem ÀÌÀü È¸Â÷ÀÇ Á»ºñ node¡¤°í¾Æ Å©·Î¹Ì¿ò Á¤¸® ? ·Î±× ÆÄÀÏ ÇÚµéÀ» ¹°°í ÀÖÀ¸¸é ÀÌ¹ø È¸Â÷°¡ ½ÃÀÛÁ¶Â÷ ¸ø ÇÑ´Ù
+powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { ($_.CommandLine -like '*toss-playwright.mjs*' -or $_.CommandLine -like '*.toss-profile*') -and $_.ProcessId -ne $PID } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 node scripts\toss-playwright.mjs --auto >> "scripts\toss-auto.log" 2>&1
 node scripts\blog-draft.mjs >> "scripts\toss-auto.log" 2>&1
 node scripts\social-card.mjs >> "scripts\toss-auto.log" 2>&1
