@@ -1,7 +1,7 @@
 import { getPriceCompareProducts } from "@/lib/db";
 import CompareCard, { comparePrices } from "@/components/CompareCard";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // 가격비교 — 가격 자주 변동
 export const metadata = {
   title: "쿠팡 vs 토스 가격비교",
   description:

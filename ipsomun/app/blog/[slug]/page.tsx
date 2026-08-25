@@ -4,7 +4,13 @@ import type { Metadata } from "next";
 import { getPostBySlug, getPosts } from "@/lib/db";
 import { won } from "@/lib/util";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // 블로그 본문 — 발행 후 거의 불변
+
+// 동적 세그먼트는 generateStaticParams가 없으면 revalidate가 무시된다.
+// 빈 배열 = 빌드 때는 생성 안 하고 첫 요청 때 만들어 캐시에 올린다.
+export function generateStaticParams() {
+  return [];
+}
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 

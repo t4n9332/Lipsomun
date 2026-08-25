@@ -1,7 +1,7 @@
 import { getPopular } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600; // 랭킹
 export const metadata = { title: "인기 랭킹" };
 
 export default async function RankingPage() {

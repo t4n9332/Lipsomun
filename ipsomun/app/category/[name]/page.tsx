@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import { getByCategory } from "@/lib/db";
+import { CATEGORIES } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600; // 카테고리 목록
+
+// 동적 세그먼트는 generateStaticParams가 없으면 revalidate가 무시된다.
+// 카테고리는 10개뿐이라 빌드 때 전부 미리 만들어 둔다('기타'는 게시 상품 0개라 제외).
+export function generateStaticParams() {
+  return CATEGORIES.filter((c) => c !== "기타").map((name) => ({ name }));
+}
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 const TOP = 33;

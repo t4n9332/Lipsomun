@@ -11,7 +11,7 @@ import ProductCard from "@/components/ProductCard";
 import CompareCard, { comparePrices } from "@/components/CompareCard";
 import { TELEGRAM_CHANNEL_URL } from "@/lib/util";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // 홈 — 딜·가격 자주 변동
 
 export default async function Home() {
   const [deals, popular, recent, picks, compareRaw] = await Promise.all([

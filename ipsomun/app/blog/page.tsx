@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getPosts } from "@/lib/db";
 import { won } from "@/lib/util";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // 블로그 목록 — 하루 1건 발행
 export const metadata = {
   title: "가격비교 리포트",
   description:

@@ -1,6 +1,6 @@
 import { q } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // RSS
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 

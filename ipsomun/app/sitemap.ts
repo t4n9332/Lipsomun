@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllSlugs, getAllCollectionSlugs, getAllPostSlugs } from "@/lib/db";
 import { CATEGORIES } from "@/lib/util";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // 사이트맵
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.SITE_URL || "https://example.com";

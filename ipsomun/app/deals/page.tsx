@@ -1,7 +1,7 @@
 import { getDeals } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // 오늘의 딜
 export const metadata = { title: "오늘의 딜" };
 
 export default async function DealsPage() {

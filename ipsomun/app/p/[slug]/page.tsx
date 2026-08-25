@@ -4,7 +4,6 @@ import Image from "next/image";
 import {
   getBySlug,
   getRelated,
-  incrementViews,
   getPriceHistory,
   getPriceStats,
 } from "@/lib/db";
@@ -14,8 +13,18 @@ import FavButton from "@/components/FavButton";
 import ShareButton from "@/components/ShareButton";
 import Stars from "@/components/Stars";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
+import ViewTracker from "@/components/ViewTracker";
 
-export const dynamic = "force-dynamic";
+// 방문마다 서버 렌더 + DB 조회를 하면 TTFB가 1초를 넘는다. 10분 캐시로 CDN이
+// 바로 응답하게 하고, 가격이 바뀌면 다음 재생성 때 반영된다.
+export const revalidate = 600;
+
+// 동적 세그먼트는 generateStaticParams가 없으면 revalidate를 무시하고 매 요청
+// 서버 렌더로 떨어진다. 빈 배열을 주면 빌드 때는 아무것도 만들지 않고(빌드 시간
+// 유지), 첫 요청 때 생성한 뒤 캐시에 올린다(온디맨드 ISR).
+export function generateStaticParams() {
+  return [];
+}
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 
@@ -72,9 +81,6 @@ export default async function ProductPage({
   const { slug } = await params;
   const product = await getBySlug(decodeURIComponent(slug));
   if (!product || !product.isPublished) notFound();
-
-  // 조회수 증가 (실패 무시)
-  incrementViews(product.id).catch(() => {});
 
   const [related, history, priceStats] = await Promise.all([
     getRelated(product.category, product.id, 4),
@@ -157,6 +163,7 @@ export default async function ProductPage({
 
   return (
     <>
+      <ViewTracker id={product.id} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getPublishedCollections } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // 기획전 목록
 export const metadata = {
   title: "기획전",
   description:
