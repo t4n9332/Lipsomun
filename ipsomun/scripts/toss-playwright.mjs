@@ -16,6 +16,7 @@
  * 실행:
  *   node scripts/toss-playwright.mjs              # 모드 선택 후 진행
  *   node scripts/toss-playwright.mjs --crawl-test # 카탈로그 수집만 테스트 (등록 안 함)
+ *   node scripts/toss-playwright.mjs --match-only # 매칭·가격갱신만 (블로그·알림 없음)
  *
  * 모드:
  *   1) 쿠팡 상품 매칭 (기본) — 사이트에서 '쿠팡 링크는 있고 토스 링크는 없는' 상품을
@@ -40,6 +41,35 @@ const CATALOG_PAGES = [
   { name: "프로모션 상품", url: "https://sharelink.toss.im/links/recommended-products" },
   { name: "베스트 랭킹", url: "https://sharelink.toss.im/links/best-ranking" },
   { name: "홈(하루특가)", url: "https://sharelink.toss.im/home" },
+];
+
+/** 한 회차에 시도할 역매칭(쿠팡 검색) 횟수 — 쿠팡 검색 API 시간당 약 10회 제한을 고려 */
+const DISCOVER_PER_RUN = 8;
+
+/** 역매칭 후보 가격 상한 — 이보다 비싼 상품은 쿠팡 제목 검색 매칭률이 낮다 */
+const DISCOVER_MAX_PRICE = 200_000;
+
+/** 정렬 점수에서 가격 기여분을 포화시키는 지점 (고가 상품 쏠림 방지) */
+const DISCOVER_PRICE_CAP = 50_000;
+
+/** 상품 조회 페이지 — 카테고리 필터를 적용해 카탈로그를 넓히는 데 쓴다 */
+const FILTER_PAGE_URL = "https://sharelink.toss.im/links/recommended-products";
+
+/** 쉐어링크 어드민의 카테고리 필터 항목 (사이트 카테고리와는 별개) */
+const TOSS_FILTER_CATEGORIES = [
+  "식품",
+  "생활용품",
+  "뷰티",
+  "가전/디지털",
+  "주방용품",
+  "출산/유아동",
+  "반려/애완용품",
+  "패션의류잡화",
+  "스포츠/레져",
+  "가구/홈데코",
+  "완구/취미",
+  "문구/오피스",
+  "자동차용품",
 ];
 
 const CATEGORIES = [
@@ -236,6 +266,76 @@ async function issueLinkByIndex(page, btnIndex) {
   return m ? m[0] : null;
 }
 
+/**
+ * 상품 조회 페이지에서 카테고리 필터 하나를 적용하고 상품 행을 수집.
+ * 필터 상태가 남지 않도록 매번 페이지를 새로 연다.
+ */
+async function collectRowsWithCategory(page, category) {
+  await page.goto(FILTER_PAGE_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page.waitForTimeout(3500);
+
+  // '카테고리' 필터 패널 열기
+  const opened = await page.evaluate(() => {
+    const b = [...document.querySelectorAll("button")].find(
+      (x) => (x.textContent || "").trim() === "카테고리"
+    );
+    if (!b) return false;
+    b.click();
+    return true;
+  });
+  if (!opened) throw new Error("카테고리 필터 버튼을 찾지 못함");
+  await page.waitForTimeout(1500);
+
+  // 해당 카테고리 체크박스 선택
+  const picked = await page.evaluate((cat) => {
+    const l = [...document.querySelectorAll("label")].find(
+      (x) => (x.textContent || "").trim() === cat
+    );
+    if (!l) return false;
+    l.click();
+    return true;
+  }, category);
+  if (!picked) throw new Error(`'${category}' 항목을 찾지 못함`);
+  await page.waitForTimeout(2500);
+
+  // 적용 버튼이 있으면 누르고, 없으면 패널만 닫는다
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll("button")].find(
+      (x) => /^(적용|확인|검색)$/.test((x.textContent || "").trim()) && x.offsetParent
+    );
+    if (b) b.click();
+  });
+  await page.keyboard.press("Escape").catch(() => {});
+  await page.waitForTimeout(3000);
+
+  // 지연 로딩 대비 스크롤
+  for (let i = 0; i < 3; i++) {
+    await page.mouse.wheel(0, 4000);
+    await page.waitForTimeout(800);
+  }
+  return collectRows(page);
+}
+
+/** 카탈로그 항목이 어느 화면 상태에서 수집됐는지 나타내는 키 (필터 포함) */
+function pageKey(cat) {
+  return `${cat.pageUrl}|${cat.filterCategory || ""}`;
+}
+
+/**
+ * 카탈로그 항목이 수집됐던 화면을 그대로 다시 열고 행 목록을 반환.
+ * 필터로 수집한 항목이면 같은 카테고리 필터를 다시 적용한다.
+ */
+async function openCatalogPage(page, cat) {
+  if (cat.filterCategory) return collectRowsWithCategory(page, cat.filterCategory);
+  await page.goto(cat.pageUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page.waitForTimeout(4000);
+  for (let i = 0; i < 3; i++) {
+    await page.mouse.wheel(0, 4000);
+    await page.waitForTimeout(600);
+  }
+  return collectRows(page);
+}
+
 /** 카탈로그 페이지 전체 수집 (페이지명 포함, 제목으로 중복 제거) */
 async function crawlCatalog(page) {
   const catalog = [];
@@ -260,6 +360,29 @@ async function crawlCatalog(page) {
       console.log(`  [${cp.name}] 상품 ${rows.length}개 수집 (신규 ${added}개)`);
     } catch (e) {
       console.log(`  [${cp.name}] 수집 실패: ${e.message}`);
+    }
+  }
+
+  // 상품 조회 페이지의 카테고리 필터를 순회해 카탈로그를 넓힌다.
+  // (필터 없이 보이는 목록은 100여 개뿐이지만, 카테고리별로 다른 상품이 노출된다)
+  for (const cat of TOSS_FILTER_CATEGORIES) {
+    try {
+      const rows = await collectRowsWithCategory(page, cat);
+      let added = 0;
+      for (const r of rows) {
+        if (seen.has(r.title)) continue;
+        seen.add(r.title);
+        catalog.push({
+          ...r,
+          pageUrl: FILTER_PAGE_URL,
+          pageName: `상품조회:${cat}`,
+          filterCategory: cat, // 발급 단계에서 같은 필터를 다시 적용해야 행을 찾을 수 있다
+        });
+        added++;
+      }
+      console.log(`  [상품조회/${cat}] 상품 ${rows.length}개 수집 (신규 ${added}개)`);
+    } catch (e) {
+      console.log(`  [상품조회/${cat}] 수집 실패: ${e.message}`);
     }
   }
   return catalog;
@@ -332,24 +455,20 @@ async function runMatch(config, page, opts = {}) {
   }
 
   // 페이지별로 묶어서 발급 (버튼 인덱스는 페이지 로드 기준이므로 같은 페이지에서 처리)
+  // 카테고리 필터로 수집한 상품은 같은 필터를 다시 적용해야 행이 보인다.
   const byPage = new Map();
   for (const m of matches) {
-    const arr = byPage.get(m.cat.pageUrl) || [];
+    const key = pageKey(m.cat);
+    const arr = byPage.get(key) || [];
     arr.push(m);
-    byPage.set(m.cat.pageUrl, arr);
+    byPage.set(key, arr);
   }
 
   let done = 0;
   let failed = 0;
-  for (const [pageUrl, group] of byPage) {
-    await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
-    await page.waitForTimeout(4000);
-    for (let i = 0; i < 3; i++) {
-      await page.mouse.wheel(0, 4000);
-      await page.waitForTimeout(600);
-    }
+  for (const [, group] of byPage) {
     // 버튼 인덱스가 어긋났을 수 있으니 제목 기준으로 다시 찾기
-    const rows = await collectRows(page);
+    const rows = await openCatalogPage(page, group[0].cat);
     for (const m of group) {
       const row = rows.find((r) => r.title === m.cat.title);
       if (!row) {
@@ -412,11 +531,16 @@ async function runMatch(config, page, opts = {}) {
  */
 async function runDiscover(config, page, catalog, products, maxSearches = 5) {
   // 이미 사이트에 있는(비슷한 제목) 카탈로그 상품 제외.
-  // 수수료는 가격의 %이므로 '가격 × 인기(리뷰수 로그)' 점수로 건당 수익이 큰 상품부터 시도
+  //
+  // 정렬 기준: 쿠팡 검색 API 호출이 시간당 10회로 제한되므로, 한 번의 검색이
+  // 실제 등록으로 이어질 확률이 높은 상품부터 시도해야 한다.
+  // - 리뷰 수가 많다 = 대중적인 상품 = 쿠팡에도 같은 상품이 있을 확률이 높다
+  // - 가격은 수수료와 직결되지만, 고가 전자제품은 제목이 제각각이라 매칭이 거의 안 된다
+  //   → 가격 기여분은 5만원에서 포화시키고, 20만원 초과 상품은 후보에서 제외
   const revenueScore = (c) =>
-    (c.price ?? 0) * Math.log10((c.ratingCount ?? 0) + 10);
+    Math.log10((c.ratingCount ?? 0) + 10) * Math.min(c.price ?? 0, DISCOVER_PRICE_CAP);
   const fresh = catalog
-    .filter((c) => c.price != null)
+    .filter((c) => c.price != null && c.price <= DISCOVER_MAX_PRICE)
     .filter((c) => !products.some((p) => similarity(p.title, c.title) >= 0.6))
     .sort((a, b) => revenueScore(b) - revenueScore(a));
 
@@ -455,14 +579,8 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
         );
         continue;
       }
-      // 토스 쉐어링크 발급
-      await page.goto(c.pageUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
-      await page.waitForTimeout(3500);
-      for (let i = 0; i < 3; i++) {
-        await page.mouse.wheel(0, 4000);
-        await page.waitForTimeout(500);
-      }
-      const rows = await collectRows(page);
+      // 토스 쉐어링크 발급 (필터로 수집한 상품이면 같은 필터를 다시 적용)
+      const rows = await openCatalogPage(page, c);
       const row = rows.find((r) => r.title === c.title);
       const link = row ? await issueLinkByIndex(page, row.btnIndex) : null;
       if (!link) {
@@ -608,22 +726,17 @@ async function runImport(config, page) {
   }
   const dealAns = (await rl.question("'오늘의 딜'로 표시할까요? (y/N): ")).trim().toLowerCase();
 
-  // 페이지별로 발급
+  // 페이지(+필터)별로 묶어서 발급
   const byPage = new Map();
   for (const c of chosen) {
-    const arr = byPage.get(c.pageUrl) || [];
+    const key = pageKey(c);
+    const arr = byPage.get(key) || [];
     arr.push(c);
-    byPage.set(c.pageUrl, arr);
+    byPage.set(key, arr);
   }
   const items = [];
-  for (const [pageUrl, group] of byPage) {
-    await page.goto(pageUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
-    await page.waitForTimeout(4000);
-    for (let i = 0; i < 3; i++) {
-      await page.mouse.wheel(0, 4000);
-      await page.waitForTimeout(600);
-    }
-    const rows = await collectRows(page);
+  for (const [, group] of byPage) {
+    const rows = await openCatalogPage(page, group[0]);
     for (const c of group) {
       const row = rows.find((r) => r.title === c.title);
       if (!row) {
@@ -680,6 +793,7 @@ async function main() {
 
   const crawlTest = process.argv.includes("--crawl-test");
   const auto = process.argv.includes("--auto");
+  const matchOnly = process.argv.includes("--match-only");
 
   if (auto && !existsSync(CONFIG_PATH)) {
     console.error(
@@ -689,7 +803,7 @@ async function main() {
   }
 
   const context = await chromium.launchPersistentContext(PROFILE_DIR, {
-    headless: crawlTest || auto, // 테스트·자동 모드는 헤드리스, 대화형은 창 표시
+    headless: crawlTest || auto || matchOnly, // 테스트·자동 모드는 헤드리스, 대화형은 창 표시
     viewport: { width: 1280, height: 900 },
     args: ["--lang=ko-KR"],
     permissions: ["clipboard-read", "clipboard-write"],
@@ -713,13 +827,27 @@ async function main() {
       return;
     }
 
+    if (matchOnly) {
+      // 매칭·역매칭·가격갱신만 실행 (블로그 발행·텔레그램 발송 없음).
+      // 하루 중 여러 번 돌려 가격비교 상품을 늘리는 용도.
+      console.log(`\n[매칭 전용 실행] ${new Date().toLocaleString("ko-KR")}`);
+      const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+      const r = await runMatch(config, page, { auto: true });
+      if (r) {
+        await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
+        await runPriceRefresh(config, r.catalog, r.products);
+      }
+      console.log("[매칭 전용 실행] 완료\n");
+      return;
+    }
+
     if (auto) {
       // 완전 자동: ① 기존 쿠팡 상품 매칭 → ② 토스 인기상품 쿠팡 역매칭 신규 등록
       console.log(`\n[자동 실행] ${new Date().toLocaleString("ko-KR")}`);
       const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
       const r = await runMatch(config, page, { auto: true });
       if (r) {
-        await runDiscover(config, page, r.catalog, r.products, 5);
+        await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
         await runPriceRefresh(config, r.catalog, r.products);
       }
       // 그날 데이터로 블로그 리포트 자동 발행 (하루 1개, 이미 있으면 건너뜀)
