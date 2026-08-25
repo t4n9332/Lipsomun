@@ -1174,3 +1174,12 @@ export async function setProductPublished(id: string, published: boolean): Promi
   );
   return rows.length > 0;
 }
+
+/** 카테고리만 부분 업데이트 (일괄 재분류 도구용) */
+export async function setProductCategory(id: string, category: string): Promise<boolean> {
+  const rows = await q(
+    `UPDATE products SET category=$2, updated_at = now() WHERE id=$1 RETURNING id`,
+    [id, category]
+  );
+  return rows.length > 0;
+}
