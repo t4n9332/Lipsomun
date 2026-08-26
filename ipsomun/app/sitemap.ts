@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllSlugs, getAllCollectionSlugs, getAllPostSlugs } from "@/lib/db";
 import { CATEGORIES } from "@/lib/util";
 import { CALCULATORS } from "@/lib/calculators";
+import { TOOLS } from "@/lib/tools";
 
 export const revalidate = 1800; // 사이트맵
 
@@ -36,6 +37,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/calc`, changeFrequency: "monthly", priority: 0.8 },
     ...CALCULATORS.map((c) => ({
       url: `${base}/calc/${encodeURIComponent(c.slug)}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    { url: `${base}/tools`, changeFrequency: "monthly" as const, priority: 0.8 },
+    ...TOOLS.map((t) => ({
+      url: `${base}/tools/${encodeURIComponent(t.slug)}`,
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),

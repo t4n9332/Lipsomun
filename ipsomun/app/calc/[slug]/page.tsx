@@ -141,6 +141,7 @@ function CalcBridge({ calc }: { calc: Calc }) {
             {r.label}
           </Link>
         ))}
+        <Link href="/tools">파일 도구</Link>
         <Link href="/compare">가격비교</Link>
         <Link href="/deals">오늘의 딜</Link>
         <Link href="/blog">리포트</Link>

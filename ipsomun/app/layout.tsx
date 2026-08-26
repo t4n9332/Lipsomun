@@ -93,6 +93,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="nav-div" aria-hidden />
               <Link href="/blog">리포트</Link>
               <Link href="/calc">계산기</Link>
+              <Link href="/tools">도구</Link>
               <span className="nav-div" aria-hidden />
               <Link href="/favorites">찜 ♥</Link>
               <UserMenu />

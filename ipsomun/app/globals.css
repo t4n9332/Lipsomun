@@ -1133,3 +1133,136 @@ html { scroll-behavior: smooth; }
   cursor: pointer;
 }
 .calc-check .calc-input em { font-size: 12.5px; }
+
+/* ---------- 파일 도구 (/tools) ---------- */
+
+.tool { margin: 6px 0 20px; }
+
+.tool-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 34px 20px;
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.tool-drop:hover, .tool-drop:focus-visible { border-color: var(--brand); background: var(--brand-soft); }
+.tool-drop.over { border-color: var(--brand); background: var(--brand-soft); transform: scale(1.005); }
+.tool-drop-icon { font-size: 34px; }
+.tool-drop b { font-size: 15.5px; font-weight: 700; }
+.tool-drop em { font-style: normal; font-size: 13px; color: var(--ink-faint); }
+
+.tool-list { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
+.tool-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.tool-list li.bad { border-color: rgba(200,60,50,.4); background: rgba(200,60,50,.05); }
+.tool-idx {
+  flex: 0 0 auto;
+  width: 24px; height: 24px;
+  display: grid; place-items: center;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 12px; font-weight: 700;
+}
+.tool-list li.bad .tool-idx { background: rgba(200,60,50,.12); color: #c0392b; }
+.tool-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.tool-meta b {
+  font-size: 14px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tool-meta em { font-style: normal; font-size: 12.5px; color: var(--ink-faint); }
+.tool-list li.bad .tool-meta em { color: #c0392b; }
+
+.tool-btns { display: flex; gap: 4px; flex: 0 0 auto; }
+.tool-btns button {
+  width: 30px; height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink-soft);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tool-btns button:hover:not(:disabled) { border-color: var(--brand); color: var(--brand); }
+.tool-btns button:disabled { opacity: 0.3; cursor: default; }
+
+.tool-sum { margin: 12px 0 0; font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+.tool-note { font-weight: 400; color: var(--ink-faint); }
+
+.tool-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.tool-go {
+  flex: 1 1 200px;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.tool-go:hover:not(:disabled) { opacity: 0.9; }
+.tool-go:disabled { opacity: 0.4; cursor: default; }
+.tool-reset {
+  padding: 13px 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+}
+.tool-reset:disabled { opacity: 0.4; cursor: default; }
+
+.tool-status { margin-top: 12px; font-size: 13.5px; color: var(--ink-soft); }
+
+.tool-done {
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: rgba(16,150,110,.10);
+  text-align: center;
+}
+.tool-done-head { font-size: 15px; font-weight: 800; color: #0e8a63; }
+.tool-done-sub { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+.tool-download {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 11px 24px;
+  border-radius: 10px;
+  background: #0e8a63;
+  color: #fff;
+  font-size: 15px; font-weight: 700;
+}
+.tool-download:hover { opacity: 0.9; }
+
+.tool-privacy {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+}
+.tool-privacy b { color: var(--ink); }
+
+@media (max-width: 640px) {
+  .tool-drop { padding: 26px 14px; }
+  .tool-actions { flex-direction: column; }
+}
