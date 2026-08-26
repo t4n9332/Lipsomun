@@ -104,3 +104,49 @@ export const LOCAL_TAX_RATE = 0.1;
 
 export const won = (n: number) =>
   Math.round(n).toLocaleString("ko-KR") + "원";
+
+/* ---------- 최저임금 · 실업급여 · 통상임금 ---------- */
+
+/** 매년 8월 고시, 다음 해 1월 적용. 갱신 시점 주의. */
+export const MIN_WAGE_HOURLY = 10_320; // 2026년
+
+/**
+ * 통상임금 계산의 월 소정근로시간.
+ * 주 40시간 + 주휴 8시간 = 주 48시간 × (365/7/12) ≈ 209시간.
+ * 이 숫자는 법이 바뀌지 않는 한 그대로다.
+ */
+export const MONTHLY_WORK_HOURS = 209;
+
+/** 구직급여(실업급여) */
+export const UNEMPLOYMENT = {
+  /** 평균임금의 60% */
+  rate: 0.6,
+  /** 1일 상한액 — 2019년부터 66,000원으로 묶여 있다 */
+  dailyCap: 66_000,
+  /** 1일 하한액 = 최저임금 × 80% × 1일 소정근로 8시간 */
+  dailyFloor: Math.round(MIN_WAGE_HOURLY * 0.8 * 8),
+};
+
+/**
+ * 소정급여일수 — 나이와 고용보험 가입기간으로 정해진다 (2019.10 개정 기준).
+ * 만 50세 이상과 장애인은 한 칸씩 더 받는다.
+ */
+export function unemploymentDays(years: number, isOver50: boolean) {
+  const under50 = [120, 150, 180, 210, 240];
+  const over50 = [120, 180, 210, 240, 270];
+  const i =
+    years < 1 ? 0 : years < 3 ? 1 : years < 5 ? 2 : years < 10 ? 3 : 4;
+  return (isOver50 ? over50 : under50)[i];
+}
+
+/**
+ * 연차 발생일수 (근로기준법 제60조).
+ * 1년 미만은 1개월 개근마다 1일씩 최대 11일,
+ * 1년부터 15일, 3년째부터 2년마다 1일씩 붙어 25일에서 멈춘다.
+ */
+export function annualLeaveDays(months: number) {
+  if (months < 12) return Math.min(11, Math.floor(months));
+  const years = Math.floor(months / 12);
+  const extra = Math.floor((years - 1) / 2);
+  return Math.min(25, 15 + extra);
+}

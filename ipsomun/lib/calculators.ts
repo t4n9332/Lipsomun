@@ -87,6 +87,40 @@ export const CALCULATORS: Calc[] = [
     emoji: "💼",
     group: "급여·퇴직",
   },
+  {
+    slug: "실업급여",
+    title: "실업급여 계산기 — 하루 얼마, 며칠, 총 얼마 받는지",
+    short: "실업급여",
+    desc:
+      "입사일과 퇴사일, 월급만 넣으면 구직급여일액과 받을 수 있는 일수가 나옵니다. " +
+      "정작 궁금한 총 수령액까지 한 번에 확인하세요.",
+    keywords: [
+      "실업급여계산기",
+      "구직급여계산",
+      "실업급여수급기간",
+      "실업급여상한액",
+      "실업급여얼마",
+    ],
+    emoji: "🧾",
+    group: "급여·퇴직",
+  },
+  {
+    slug: "연차수당",
+    title: "연차 개수·연차수당 계산기 — 입사일만 넣으면 됩니다",
+    short: "연차수당",
+    desc:
+      "근속기간에 따라 몇 개가 발생했는지, 남은 연차를 수당으로 받으면 얼마인지 " +
+      "계산합니다. 통상임금은 209시간 기준으로 자동 환산합니다.",
+    keywords: [
+      "연차수당계산기",
+      "연차개수계산",
+      "연차발생기준",
+      "미사용연차수당",
+      "통상임금계산",
+    ],
+    emoji: "📅",
+    group: "급여·퇴직",
+  },
 ];
 
 export const getCalc = (slug: string) =>
@@ -98,3 +132,10 @@ export const groupedCalculators = () =>
     group: g,
     items: CALCULATORS.filter((c) => c.group === g),
   })).filter((x) => x.items.length > 0);
+
+/** 같은 그룹의 다른 계산기 — 퇴직금을 계산한 사람은 곧바로 실업급여를 찾는다 */
+export const siblingCalculators = (slug: string) => {
+  const me = getCalc(slug);
+  if (!me) return [];
+  return CALCULATORS.filter((c) => c.group === me.group && c.slug !== me.slug);
+};

@@ -1,10 +1,17 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { CALCULATORS, getCalc, type Calc } from "@/lib/calculators";
+import {
+  CALCULATORS,
+  getCalc,
+  siblingCalculators,
+  type Calc,
+} from "@/lib/calculators";
 import LoanSwitchCalc from "@/components/calc/LoanSwitchCalc";
 import SalaryNetCalc from "@/components/calc/SalaryNetCalc";
 import SeverancePayCalc from "@/components/calc/SeverancePayCalc";
+import UnemploymentCalc from "@/components/calc/UnemploymentCalc";
+import AnnualLeaveCalc from "@/components/calc/AnnualLeaveCalc";
 import AdSlot from "@/components/AdSlot";
 
 export const revalidate = 86400; // 계산 로직은 바뀌지 않는다
@@ -22,6 +29,8 @@ const REGISTRY: Record<
   대출갈아타기: { Calc: LoanSwitchCalc, Guide: LoanSwitchGuide },
   연봉실수령액: { Calc: SalaryNetCalc, Guide: SalaryNetGuide },
   퇴직금: { Calc: SeverancePayCalc, Guide: SeverancePayGuide },
+  실업급여: { Calc: UnemploymentCalc, Guide: UnemploymentGuide },
+  연차수당: { Calc: AnnualLeaveCalc, Guide: AnnualLeaveGuide },
 };
 
 export function generateStaticParams() {
@@ -69,11 +78,46 @@ export default async function CalcPage(
 
       <Guide />
 
+      <CalcSiblings slug={c.slug} />
+
       <CalcBridge calc={c} />
 
       <p className="calc-back">
         <Link href="/calc">← 다른 계산기 보기</Link>
       </p>
+    </section>
+  );
+}
+
+/**
+ * 같은 그룹의 다른 계산기.
+ *
+ * 체류시간이 광고 단가를 올린다는 게 이 계산기들의 전제인데, 계산 한 번 하고
+ * 나가버리면 그 전제가 무너진다. 퇴직금을 계산한 사람은 실업급여를,
+ * 실업급여를 본 사람은 연차수당을 곧바로 찾는다 — 그 흐름을 끊지 않는다.
+ */
+function CalcSiblings({ slug }: { slug: string }) {
+  const siblings = siblingCalculators(slug);
+  if (siblings.length === 0) return null;
+
+  return (
+    <section className="calc-siblings">
+      <h3>같이 보면 좋은 계산기</h3>
+      <div className="calc-list">
+        {siblings.map((s) => (
+          <Link
+            key={s.slug}
+            href={`/calc/${encodeURIComponent(s.slug)}`}
+            className="calc-card"
+          >
+            <span className="calc-emoji">{s.emoji}</span>
+            <span className="calc-card-body">
+              <b>{s.short} 계산기</b>
+              <em>{s.desc}</em>
+            </span>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }
@@ -238,6 +282,101 @@ function SeverancePayGuide() {
         DC형 퇴직연금에 가입돼 있다면 위 계산식이 아니라 적립금 운용 실적으로
         금액이 정해진다. 본인이 DB형인지 DC형인지는 회사 인사팀이나
         가입된 금융사 앱에서 확인할 수 있다.
+      </p>
+    </article>
+  );
+}
+
+function UnemploymentGuide() {
+  return (
+    <article className="calc-guide">
+      <h3>총액을 가르는 건 금액이 아니라 일수다</h3>
+      <p>
+        실업급여를 검색하면 대부분 &lsquo;하루 얼마&rsquo;까지만 알려준다. 그런데 월급이 어느
+        정도 되는 사람은 어차피 <b>상한액에 걸려 하루 금액이 똑같다</b>. 실제로 총액을
+        가르는 건 며칠 받느냐다. 위 계산기에서 입사일만 1년 당겨보면 30일이 늘어나
+        200만원 가까이 차이가 난다.
+      </p>
+
+      <h3>며칠 받는지는 두 가지로 정해진다</h3>
+      <p>
+        나이(만 50세 기준)와 고용보험 가입기간, 이 두 가지다. 50세 미만은 가입기간에
+        따라 120일에서 240일, 50세 이상이거나 장애인이면 120일에서 270일이다.
+        가입기간 1년·3년·5년·10년이 경계선이라, 퇴사 시점을 조금 미룰 수 있다면
+        이 선을 넘기고 나오는 쪽이 유리하다.
+      </p>
+
+      <h3>하루 금액에는 위아래로 벽이 있다</h3>
+      <p>
+        구직급여일액은 평균임금의 60%인데, 위로는 상한액에서 잘리고 아래로는
+        최저임금의 80%(1일 8시간 기준)로 받쳐준다. 상한은 2019년부터 하루 66,000원에
+        묶여 있는 반면 하한은 최저임금을 따라 매년 올라와서, 지금은 두 값이
+        거의 붙어 있다. 그래서 <b>월급이 얼마든 하루 6만원대 중반에서 크게 벗어나지
+        않는다.</b>
+      </p>
+
+      <h3>받을 수 있는지부터가 관문이다</h3>
+      <p>
+        금액보다 먼저 확인할 게 자격이다. 이직 전 18개월 동안 피보험단위기간이
+        <b> 180일 이상</b>이어야 하고, 퇴사 사유가 비자발적이어야 한다. 스스로 낸
+        사표는 원칙적으로 대상이 아니다. 다만 임금체불, 직장 내 괴롭힘, 통근 곤란,
+        질병처럼 정당한 사유로 인정되는 경우가 있으므로 사유가 애매하면 고용센터에
+        먼저 물어보는 게 순서다.
+      </p>
+
+      <p className="calc-src">
+        피보험단위기간은 재직일수와 다르다(무급일은 빠진다). 본인 가입이력은
+        고용보험 홈페이지에서 조회할 수 있고, 최종 지급액은 고용센터 결정에 따른다.
+      </p>
+    </article>
+  );
+}
+
+function AnnualLeaveGuide() {
+  return (
+    <article className="calc-guide">
+      <h3>1년 미만과 1년 이상은 규칙이 다르다</h3>
+      <p>
+        입사 첫해에는 <b>1개월 개근할 때마다 1일씩</b> 생긴다. 최대 11일이다.
+        그러다 1년을 채우면 여기에 <b>15일이 따로</b> 붙는다. 그래서 입사 1년 시점에
+        최대 26일을 쥐게 된다. 이 둘을 하나로 아는 사람이 많아서 첫해 연차를
+        손해 보는 경우가 흔하다.
+      </p>
+
+      <h3>3년째부터 2년마다 하루씩</h3>
+      <p>
+        1년 이상이면 15일에서 시작해 3년째에 16일, 5년째에 17일 하는 식으로
+        2년마다 1일씩 붙는다. 상한은 <b>25일</b>이고 21년째에 도달한다.
+        그 뒤로는 아무리 오래 다녀도 법정 연차가 더 늘지 않는다.
+      </p>
+
+      <h3>수당은 월급을 209로 나누는 데서 시작한다</h3>
+      <p>
+        연차수당은 <b>1일 통상임금 × 남은 연차</b>다. 여기서 1일 통상임금은
+        월 통상임금을 <b>209시간</b>으로 나눠 시급을 구한 뒤 8시간을 곱한 값이다.
+        209는 주 40시간에 주휴 8시간을 더해 한 달로 환산한 숫자다. 이 209를 모르면
+        회사가 준 금액이 맞는지 검산할 수가 없다.
+      </p>
+
+      <h3>통상임금에는 월급 말고도 들어가는 게 있다</h3>
+      <p>
+        정기적·일률적·고정적으로 지급되는 수당은 통상임금에 포함된다. 직책수당,
+        기술수당처럼 매달 같은 금액이 나오는 것들이다. 반대로 실적에 따라 달라지는
+        성과급이나 연장근로수당은 빠진다. 위 계산기에는 <b>기본급에 고정수당을 더한
+        금액</b>을 넣어야 실제와 맞는다.
+      </p>
+
+      <h3>안 쓰면 사라질 수도 있다</h3>
+      <p>
+        회사가 <b>연차사용촉진</b> 절차를 법대로 밟았다면(서면 통보 등) 미사용 연차수당
+        지급 의무가 없어진다. 아무 통보도 없었다면 수당으로 청구할 수 있다.
+        연차수당 청구권의 소멸시효는 3년이다.
+      </p>
+
+      <p className="calc-src">
+        상시 5인 미만 사업장에는 연차 규정 자체가 적용되지 않는다.
+        회계연도 기준으로 운영하는 회사라도 퇴직 시점에 입사일 기준보다 적으면
+        차액을 정산해줘야 한다.
       </p>
     </article>
   );

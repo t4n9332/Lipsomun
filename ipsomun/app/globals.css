@@ -1113,3 +1113,23 @@ html { scroll-behavior: smooth; }
   .calc-intro { font-size: 14px; padding: 14px 15px; }
   .calc-bridge { flex-direction: column; align-items: flex-start; }
 }
+
+/* 같은 그룹의 다른 계산기 — 계산 한 번 하고 나가지 않도록 */
+.calc-siblings { margin-top: 34px; }
+.calc-siblings h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: var(--ink-soft);
+}
+
+/* 체크박스는 숫자 입력과 높이가 달라 그대로 두면 줄이 틀어진다 */
+.calc-check .calc-input { gap: 8px; }
+.calc-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand);
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+.calc-check .calc-input em { font-size: 12.5px; }
