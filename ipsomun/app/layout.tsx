@@ -83,12 +83,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               >
                 📣 특가알림
               </a>
+              {/* 쇼핑 축 */}
               <Link href="/compare">가격비교</Link>
-              <Link href="/blog">리포트</Link>
-              <Link href="/calc">계산기</Link>
               <Link href="/deals">오늘의 딜</Link>
               <Link href="/ranking">랭킹</Link>
               <Link href="/pick">기획전</Link>
+              {/* 정보 축 — 성격이 다르므로 선으로 갈라준다.
+                  섞어두면 계산기가 쇼핑 메뉴에 얹힌 남의 물건처럼 보인다. */}
+              <span className="nav-div" aria-hidden />
+              <Link href="/blog">리포트</Link>
+              <Link href="/calc">계산기</Link>
+              <span className="nav-div" aria-hidden />
               <Link href="/favorites">찜 ♥</Link>
               <UserMenu />
             </nav>

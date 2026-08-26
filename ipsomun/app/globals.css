@@ -1022,3 +1022,94 @@ html { scroll-behavior: smooth; }
   display: block; font-size: 10px; letter-spacing: .08em; opacity: .4;
   text-transform: uppercase; margin-bottom: 5px;
 }
+
+/* ---------- 계산기 허브 · 네비게이션 축 구분 ---------- */
+
+/* 쇼핑 메뉴와 정보 메뉴 사이의 세로선.
+   계산기는 이미 최상위에 있었지만 쇼핑 링크들과 평평하게 섞여 있어서
+   사이트에 얹힌 남의 물건처럼 보였다. 갈라주는 것만으로 갈래가 읽힌다. */
+.nav-div {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 1px;
+  background: var(--line);
+  flex: 0 0 auto;
+}
+
+.calc-intro {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin: 0 0 22px;
+}
+.calc-intro b { color: var(--ink); }
+
+/* 상품 카테고리(.cat-nav)와 같은 알약 모양을 쓴다.
+   사이트 안에서 같은 문법으로 읽혀야 계산기가 이 사이트 것처럼 보인다. */
+.calc-groupnav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 8px;
+}
+.calc-groupnav::-webkit-scrollbar { display: none; }
+.calc-groupnav a {
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 6px 14px;
+  border-radius: 999px;
+  transition: all 0.15s;
+}
+.calc-groupnav a:hover { background: var(--brand-soft); color: var(--brand); border-color: var(--brand-soft); }
+
+.calc-group { margin-top: 26px; }
+.calc-group-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  scroll-margin-top: 90px; /* 헤더가 고정이라 앵커 이동 시 제목이 가린다 */
+}
+.calc-group-title span { font-size: 12.5px; font-weight: 500; color: var(--ink-faint); }
+
+/* 계산기 → 사이트 나머지로 나가는 다리 */
+.calc-bridge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 30px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.calc-bridge > b { font-size: 13.5px; font-weight: 700; color: var(--ink-soft); }
+.calc-bridge-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.calc-bridge-links a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 5px 12px;
+  border-radius: 999px;
+  transition: all 0.15s;
+}
+.calc-bridge-links a:hover { background: var(--brand-soft); color: var(--brand); border-color: var(--brand-soft); }
+
+@media (max-width: 640px) {
+  .calc-intro { font-size: 14px; padding: 14px 15px; }
+  .calc-bridge { flex-direction: column; align-items: flex-start; }
+}

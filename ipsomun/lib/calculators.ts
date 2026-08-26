@@ -5,8 +5,13 @@
  * 체류시간이 길수록 광고 단가가 오른다. 그리고 한 번 만들면 계속 돈다 —
  * 매일 글을 쓰지 않아도 되는 자산이다.
  *
- * 새 계산기를 추가하려면 여기 한 줄 넣고 components/calc 에 컴포넌트를 만들면 된다.
+ * 새 계산기를 추가하려면 여기 한 줄 넣고, components/calc 에 컴포넌트를 만든 뒤
+ * app/calc/[slug]/page.tsx 의 REGISTRY 에 연결하면 된다.
  */
+
+/** 계산기가 늘어나면 평평한 목록은 무너진다. 그래서 처음부터 묶어둔다. */
+export const CALC_GROUPS = ["급여·퇴직", "대출·금리"] as const;
+export type CalcGroup = (typeof CALC_GROUPS)[number];
 
 export type Calc = {
   slug: string;
@@ -15,6 +20,13 @@ export type Calc = {
   desc: string;        // 메타 설명
   keywords: string[];
   emoji: string;
+  group: CalcGroup;
+  /**
+   * 계산기 아래에 붙는 사이트 내부 링크.
+   * 계산기만 덩그러니 있으면 쇼핑 사이트에 얹힌 남의 물건처럼 보인다.
+   * 문맥이 실제로 이어지는 곳만 넣는다 — 억지로 붙이면 독자가 먼저 안다.
+   */
+  related?: { label: string; href: string }[];
 };
 
 export const CALCULATORS: Calc[] = [
@@ -33,8 +45,56 @@ export const CALCULATORS: Calc[] = [
       "대출갈아타기이득",
     ],
     emoji: "🏠",
+    group: "대출·금리",
+    related: [
+      // 카테고리명이 한글이라 인코딩해서 넣는다. 사이트맵과 같은 규칙이다 —
+      // 브라우저는 알아서 인코딩하지만 크롤러·도구는 그렇지 않을 수 있다.
+      { label: "홈인테리어", href: `/category/${encodeURIComponent("홈인테리어")}` },
+      { label: "생활용품", href: `/category/${encodeURIComponent("생활용품")}` },
+    ],
+  },
+  {
+    slug: "연봉실수령액",
+    title: "연봉 실수령액 계산기 — 세후 월급이 얼마인지 바로 확인",
+    short: "연봉 실수령액",
+    desc:
+      "연봉에서 4대보험과 세금을 빼면 매달 통장에 얼마가 들어오는지 계산합니다. " +
+      "부양가족 수와 비과세 식대까지 반영해 본인 상황에 맞는 금액이 나옵니다.",
+    keywords: [
+      "연봉실수령액",
+      "연봉실수령액계산기",
+      "세후월급계산",
+      "4대보험계산기",
+      "월급실수령액",
+    ],
+    emoji: "💰",
+    group: "급여·퇴직",
+  },
+  {
+    slug: "퇴직금",
+    title: "퇴직금 계산기 — 세금 떼고 실제로 받는 금액까지",
+    short: "퇴직금",
+    desc:
+      "입사일과 퇴사일, 월급만 넣으면 법정 퇴직금이 나옵니다. " +
+      "상여금·연차수당 반영과 퇴직소득세를 뺀 실수령액까지 함께 확인하세요.",
+    keywords: [
+      "퇴직금계산기",
+      "퇴직금계산방법",
+      "퇴직소득세계산기",
+      "평균임금계산",
+      "퇴직금실수령액",
+    ],
+    emoji: "💼",
+    group: "급여·퇴직",
   },
 ];
 
 export const getCalc = (slug: string) =>
   CALCULATORS.find((c) => c.slug === decodeURIComponent(slug));
+
+/** 그룹 순서를 CALC_GROUPS 로 고정한다. 빈 그룹은 내보내지 않는다. */
+export const groupedCalculators = () =>
+  CALC_GROUPS.map((g) => ({
+    group: g,
+    items: CALCULATORS.filter((c) => c.group === g),
+  })).filter((x) => x.items.length > 0);
