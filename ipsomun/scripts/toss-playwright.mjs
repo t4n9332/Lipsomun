@@ -60,26 +60,49 @@ const TRIED_PATH = path.join(__dirname, ".discover-tried.json");
 const DISCOVER_RETRY_DAYS = 14;
 
 /**
- * 토스 필터 카테고리 → 사이트 카테고리 매핑.
- * 역매칭 신규 등록이 전부 '기타'로 들어가는 것을 막는다 (사이트는 '기타' 0개 유지가 원칙).
- * 필터 없이 수집된 상품(프로모션·베스트·하루특가)과 매핑이 없는 필터는 '기타'로 남고,
- * 이후 apply-categories.mjs 재분류 도구로 정리한다.
+ * 토스 카탈로그의 카테고리명을 사이트 카테고리 10종으로 접는 규칙.
+ *
+ * 토스가 주는 categoryName은 '양념/가공육', '팩트 하이라이터', '국산생수'처럼
+ * 매우 세분화된 말단 분류라 1:1 표로는 감당이 안 된다. 키워드 규칙으로 접고,
+ * 카테고리명으로 판정이 안 되면 상품명으로 한 번 더 시도한다.
+ * 순서가 중요하다 — 위에서부터 먼저 맞는 규칙을 쓴다
+ * (예: '강아지 간식'은 '간식'(식품)보다 '강아지'(반려동물)가 먼저여야 한다).
  */
-const TOSS_TO_SITE_CATEGORY = {
-  식품: "식품",
-  생활용품: "생활용품",
-  뷰티: "뷰티",
-  "가전/디지털": "가전/디지털",
-  주방용품: "주방용품",
-  "출산/유아동": "육아",
-  "반려/애완용품": "반려동물",
-  패션의류잡화: "패션",
-  "스포츠/레져": "스포츠/레저",
-  "가구/홈데코": "홈인테리어",
-};
+const CATEGORY_RULES = [
+  ["반려동물", /강아지|고양이|반려|애완|펫|사료|캣|독\b/],
+  ["육아", /유아|아기|기저귀|분유|이유식|아동|신생아|출산|어린이|베이비|유모차|젖병/],
+  ["뷰티", /화장|스킨|로션|에멀젼|크림|세럼|앰플|에센스|클렌징|마스크팩|선크림|자외선|립|아이섀도|섀도|하이라이터|팩트|파운데이션|쿠션|매니큐어|네일|향수|샴푸|린스|트리트먼트|헤어|바디워시|바디로션|면도|제모|미용|뷰티|비누/],
+  ["주방용품", /주방|냄비|프라이팬|후라이팬|밀폐|도마|칼\b|수저|식기|그릇|컵\b|텀블러|보온병|조리|국자|채반|주걱|랩\b|호일|위생장갑|수세미|행주/],
+  ["가전/디지털", /가전|전자|디지털|노트북|모니터|키보드|마우스|충전기|케이블|이어폰|헤드폰|스피커|카메라|tv\b|티비|냉장고|세탁기|청소기|에어컨|선풍기|공기청정|드라이어|면도기|전동칫솔|배터리|건전지|스마트폰|태블릿|공유기|ssd|usb/i],
+  ["스포츠/레저", /스포츠|레저|레져|운동|헬스|요가|필라테스|등산|캠핑|낚시|자전거|골프|수영|런닝|러닝|덤벨|아령|매트|텐트|보호대/],
+  ["패션", /의류|패션|티셔츠|셔츠|바지|청바지|원피스|치마|자켓|재킷|코트|패딩|니트|맨투맨|후드|양말|속옷|언더웨어|브라|팬티|신발|운동화|구두|슬리퍼|샌들|부츠|가방|백팩|지갑|벨트|모자|장갑|스카프|목도리|시계|주얼리|액세서리/],
+  ["홈인테리어", /인테리어|가구|홈데코|침대|매트리스|이불|베개|커튼|russ|러그|카펫|소파|의자|책상|선반|수납|정리함|조명|스탠드|액자|화분|디퓨저|캔들|수건|타월/],
+  ["식품", /식품|음료|과자|간식|커피|차\b|생수|물\b|주스|우유|두유|요거트|라면|면\b|밥\b|즉석|가공육|생고기|고기|육류|정육|수산|생선|해산|과일|채소|야채|쌀\b|잡곡|견과|건과|김치|반찬|소스|양념|장류|기름|올리브유|설탕|소금|밀가루|빵\b|떡\b|만두|탕\b|찌개|국\b|죽\b|햄|소시지|어묵|계란|달걀|치즈|버터|아이스크림|초콜릿|사탕|젤리|영양제|비타민|유산균|홍삼|효소|단백질|프로틴|건강기능/],
+  ["생활용품", /생활|세제|섬유유연제|표백|청소|욕실|화장지|휴지|물티슈|기저귀커버|쓰레기봉투|봉투|건조대|빨래|세탁|제습|방향|탈취|해충|모기|살충|마스크|밴드|의약외품|공구|철물|문구|사무|필기|노트|테이프|차량|자동차|타이어|워셔/],
+];
+
+/** 토스 카테고리명·상품명으로 사이트 카테고리를 정한다 */
+function siteCategoryFor(tossCategoryName, title) {
+  for (const source of [tossCategoryName, title]) {
+    if (!source) continue;
+    for (const [siteCat, re] of CATEGORY_RULES) {
+      if (re.test(source)) return siteCat;
+    }
+  }
+  return "기타";
+}
 
 /** 상품 조회 페이지 — 카테고리 필터를 적용해 카탈로그를 넓히는 데 쓴다 */
 const FILTER_PAGE_URL = "https://sharelink.toss.im/links/recommended-products";
+
+/** 상품 조회 페이지 cursor 증가 폭 (화면 1페이지 = 120개) */
+const CURSOR_STEP = 120;
+
+/** 목록 API에서 총 개수를 못 읽었을 때 쓸 보수적 기본값 */
+const CURSOR_FALLBACK_TOTAL = 1200;
+
+/** 한 회차에 수집할 상한 — 회차 시간이 과도해지지 않도록 제한 */
+const CURSOR_MAX_ITEMS = 4800;
 
 /** 쉐어링크 어드민의 카테고리 필터 항목 (사이트 카테고리와는 별개) */
 const TOSS_FILTER_CATEGORIES = [
@@ -342,16 +365,75 @@ async function collectRowsWithCategory(page, category) {
   return collectRows(page);
 }
 
-/** 카탈로그 항목이 어느 화면 상태에서 수집됐는지 나타내는 키 (필터 포함) */
+/**
+ * 상품 조회 페이지를 cursor 파라미터로 넘겨 수집.
+ * 화면에는 한 번에 120개만 보이지만 ?cursor=N 으로 다음 구간이 표시되므로,
+ * 카탈로그 전체(4,000여 개)를 화면에 띄울 수 있고 그대로 링크 발급도 된다.
+ */
+async function collectRowsWithCursor(page, cursor) {
+  const url = cursor > 0 ? `${FILTER_PAGE_URL}?cursor=${cursor}` : FILTER_PAGE_URL;
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page.waitForTimeout(4000);
+  for (let i = 0; i < 3; i++) {
+    await page.mouse.wheel(0, 5000);
+    await page.waitForTimeout(700);
+  }
+  return collectRows(page);
+}
+
+/**
+ * 목록 API를 읽어 총 개수와 '상품명 → 카테고리명' 표를 만든다(읽기 전용).
+ * 화면이 이미 호출하는 요청과 동일하다. 카테고리는 신규 등록 시 사이트
+ * 카테고리를 정하는 데 쓴다(없으면 전부 '기타'로 들어간다).
+ */
+async function fetchCatalogMeta(page, maxItems) {
+  try {
+    return await page.evaluate(async (max) => {
+      const out = { total: null, categories: {} };
+      let cursor = 0;
+      for (let i = 0; i < 60; i++) {
+        const qs = cursor ? `?size=120&nextCursor=${cursor}` : "?size=120";
+        const r = await fetch("/api-public/v3/shopping/sharelink/products" + qs, {
+          credentials: "include",
+        });
+        const j = await r.json().catch(() => null);
+        const body = j?.success;
+        if (!body?.items?.length) break;
+        if (out.total == null) out.total = body.paging?.totalCount ?? null;
+        for (const it of body.items) {
+          // displayName은 taca.productView 안, categoryName은 아이템 최상위에 있다
+          const name = it?.taca?.productView?.displayName;
+          const cat = it?.categoryName;
+          if (name && cat) out.categories[name] = cat;
+        }
+        const next = body.paging?.nextCursor;
+        if (!next || Number(next) <= cursor) break;
+        cursor = Number(next);
+        if (cursor >= max) break;
+      }
+      return out;
+    }, maxItems);
+  } catch {
+    return { total: null, categories: {} };
+  }
+}
+
+/**
+ * 카탈로그 항목이 어느 화면 상태에서 수집됐는지 나타내는 키.
+ * 커서로 수집한 항목은 커서가 화면 상태를 결정하므로 filterCategory(카테고리
+ * 이름 표기용)는 키에 넣지 않는다 — 넣으면 같은 구간이 불필요하게 쪼개진다.
+ */
 function pageKey(cat) {
+  if (cat.cursor != null) return `${cat.pageUrl}|cursor=${cat.cursor}`;
   return `${cat.pageUrl}|${cat.filterCategory || ""}`;
 }
 
 /**
  * 카탈로그 항목이 수집됐던 화면을 그대로 다시 열고 행 목록을 반환.
- * 필터로 수집한 항목이면 같은 카테고리 필터를 다시 적용한다.
+ * 커서로 수집한 항목이면 같은 커서 구간을, 필터로 수집한 항목이면 같은 필터를 다시 적용한다.
  */
 async function openCatalogPage(page, cat) {
+  if (cat.cursor != null) return collectRowsWithCursor(page, cat.cursor);
   if (cat.filterCategory) return collectRowsWithCategory(page, cat.filterCategory);
   await page.goto(cat.pageUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForTimeout(4000);
@@ -389,11 +471,21 @@ async function crawlCatalog(page) {
     }
   }
 
-  // 상품 조회 페이지의 카테고리 필터를 순회해 카탈로그를 넓힌다.
-  // (필터 없이 보이는 목록은 100여 개뿐이지만, 카테고리별로 다른 상품이 노출된다)
-  for (const cat of TOSS_FILTER_CATEGORIES) {
+  // 상품 조회 페이지를 cursor로 끝까지 넘기며 카탈로그 전체를 수집한다.
+  // 화면은 한 번에 120개만 보여주지만 ?cursor=N 으로 다음 구간이 나오므로,
+  // 카테고리 필터 순회(1,100여 개)보다 훨씬 넓은 전체 카탈로그를 담을 수 있다.
+  const meta = await fetchCatalogMeta(page, CURSOR_MAX_ITEMS);
+  const total = meta.total ?? CURSOR_FALLBACK_TOTAL;
+  const maxCursor = Math.min(total, CURSOR_MAX_ITEMS);
+  const catNames = meta.categories || {};
+  console.log(
+    `  [상품조회] 카탈로그 총 ${total}개 — cursor로 ${maxCursor}개까지 수집` +
+      ` (카테고리 정보 ${Object.keys(catNames).length}건)`
+  );
+  let emptyStreak = 0;
+  for (let cursor = 0; cursor < maxCursor; cursor += CURSOR_STEP) {
     try {
-      const rows = await collectRowsWithCategory(page, cat);
+      const rows = await collectRowsWithCursor(page, cursor);
       let added = 0;
       for (const r of rows) {
         if (seen.has(r.title)) continue;
@@ -401,14 +493,27 @@ async function crawlCatalog(page) {
         catalog.push({
           ...r,
           pageUrl: FILTER_PAGE_URL,
-          pageName: `상품조회:${cat}`,
-          filterCategory: cat, // 발급 단계에서 같은 필터를 다시 적용해야 행을 찾을 수 있다
+          pageName: `상품조회:${cursor}`,
+          cursor, // 발급 단계에서 같은 구간을 다시 열어야 행을 찾을 수 있다
+          filterCategory: catNames[r.title] || null, // 신규 등록 시 사이트 카테고리 결정용
         });
         added++;
       }
-      console.log(`  [상품조회/${cat}] 상품 ${rows.length}개 수집 (신규 ${added}개)`);
+      if (added === 0) {
+        // 같은 구간이 반복되면(파라미터 무시 등) 무한 루프를 막기 위해 중단
+        if (++emptyStreak >= 3) {
+          console.log(`  [상품조회] 신규 없음 3회 연속 — cursor ${cursor}에서 중단`);
+          break;
+        }
+      } else {
+        emptyStreak = 0;
+      }
+      if (cursor % (CURSOR_STEP * 5) === 0 || added === 0) {
+        console.log(`  [상품조회/cursor=${cursor}] ${rows.length}개 (신규 ${added}개) · 누적 ${catalog.length}`);
+      }
     } catch (e) {
-      console.log(`  [상품조회/${cat}] 수집 실패: ${e.message}`);
+      console.log(`  [상품조회/cursor=${cursor}] 수집 실패: ${e.message}`);
+      if (++emptyStreak >= 3) break;
     }
   }
   return catalog;
@@ -639,7 +744,7 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
           title: c.title,
           imageUrl: c.imageUrl || best.productImage || "",
           price: best.productPrice ?? null,
-          category: TOSS_TO_SITE_CATEGORY[c.filterCategory] || "기타",
+          category: siteCategoryFor(c.filterCategory, c.title),
           isDeal: false,
           isPublished: true,
           source: "toss-match",
