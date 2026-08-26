@@ -104,6 +104,12 @@ const CURSOR_FALLBACK_TOTAL = 1200;
 /** 한 회차에 수집할 상한 — 회차 시간이 과도해지지 않도록 제한 */
 const CURSOR_MAX_ITEMS = 4800;
 
+/**
+ * 한 회차 전체 실행 예산(분). 작업 스케줄러의 ExecutionTimeLimit(1시간)보다
+ * 넉넉히 짧게 잡아, 강제 종료당하지 않고 스스로 정리하고 끝내게 한다.
+ */
+const RUN_BUDGET_MIN = 35;
+
 /** 쉐어링크 어드민의 카테고리 필터 항목 (사이트 카테고리와는 별개) */
 const TOSS_FILTER_CATEGORIES = [
   "식품",
@@ -935,6 +941,21 @@ async function runImport(config, page) {
 /* ---------- 메인 ---------- */
 
 async function main() {
+  // 전체 실행 감시 타이머.
+  // 크로미움이 응답하지 않으면 스크립트가 통째로 매달려 작업 스케줄러의
+  // 1시간 제한에 걸려 강제 종료되고, 로그도 남지 않고 다음 회차까지 막는다
+  // (실제로 09:30·17:30 회차가 267014=TERMINATED, 11:30 회차가 미완료 상태였다).
+  // 제한 시간 전에 스스로 끝내 로그를 남기고 다음 회차에 자리를 넘긴다.
+  if (!process.argv.includes("--no-watchdog")) {
+    const wd = setTimeout(() => {
+      console.log(
+        `\n[감시] ${RUN_BUDGET_MIN}분을 초과해 실행을 중단합니다 (다음 회차에서 이어서 진행).`
+      );
+      process.exit(0); // 0으로 끝내야 스케줄러가 실패로 기록하지 않는다
+    }, RUN_BUDGET_MIN * 60 * 1000);
+    wd.unref(); // 정상 종료를 막지 않도록
+  }
+
   let chromium;
   try {
     ({ chromium } = await import("playwright"));
