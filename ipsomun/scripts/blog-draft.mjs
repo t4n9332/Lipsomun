@@ -20,7 +20,7 @@ const CONFIG_PATH = path.join(__dirname, ".toss-config.json");
 const DONE_PATH = path.join(__dirname, ".blog-drafted.json");
 const BLOG_DIR = path.join(__dirname, "..", "..", "블로그");
 
-const COUNT = Math.min(Number(process.argv[2]) || 1, 5);
+const COUNT = Math.min(Number(process.argv[2]) || 1, 20);
 
 if (!existsSync(CONFIG_PATH)) {
   console.error("설정 파일(.toss-config.json)이 없습니다. toss-playwright.mjs를 먼저 1회 실행하세요.");
@@ -40,12 +40,66 @@ function loadDone() {
   }
 }
 
+/**
+ * 토스 링크가 없는 인기 상품용 단일 소개 글.
+ * 가격비교가 성립하지 않으므로 '가격 추이 + 구매 판단' 쪽으로 각을 잡는다.
+ * 네이버는 정형화된 글을 싫어하므로 비교 글과 구조를 일부러 다르게 둔다.
+ */
+function draftSingle(p, cPrice) {
+  const url = `https://lipsomun.co.kr/p/${encodeURIComponent(p.slug)}`;
+  const shortName = p.title.split(",")[0].trim();
+  const cat = p.category && p.category !== "기타" ? p.category : null;
+  const ratingLine =
+    p.rating && p.ratingCount
+      ? `\n실구매자 평점은 **${p.rating}점(리뷰 ${Number(p.ratingCount).toLocaleString("ko-KR")}개)** 입니다.\n`
+      : "";
+
+  return `# [자동 초안 ${today}] ${shortName} — 살까 말까 정리
+
+> 추천 제목(택1):
+> - ${shortName} 가격 지금 얼마? 사기 전 확인할 것
+> - ${shortName} 최저가 확인하고 샀습니다
+> - ${shortName}, 지금이 살 때인지 가격부터 봤습니다
+
+---
+
+(💡 첫 문단은 직접 쓰세요 — 왜 이걸 찾아봤는지, 어떤 상황이었는지 2~3줄.
+네이버는 도입부의 실제 경험 유무로 글의 성격을 판단합니다. 이 블록을 비워두고
+발행하면 상위 노출이 거의 안 됩니다.)
+
+## 오늘 가격
+
+**${p.title}**
+현재 쿠팡 기준 **${won(cPrice)}** 입니다.${ratingLine}
+
+생필품은 가격이 자주 흔들려서, 평소 가격을 알아두면 지금이 살 때인지 판단하기 쉽습니다.
+아래 페이지에 이 상품의 가격 변동 그래프와 역대 최저가를 정리해뒀습니다.
+
+👉 **${shortName} 가격 확인**: ${url}
+
+## 살 때 확인할 것
+
+(💡 아래 3줄은 직접 겪은 내용으로 바꾸면 글의 질이 크게 올라갑니다)
+
+- 용량·수량 단위가 다른 상품이 섞여 있으니 개당 가격으로 비교하세요
+- 쿠폰 적용가는 계정마다 다를 수 있어 결제 직전 금액을 확인하세요
+- 정기배송·묶음 옵션이 더 싼 경우가 있습니다
+${cat ? `\n${cat} 카테고리의 다른 인기 상품도 모아뒀습니다: https://lipsomun.co.kr/category/${encodeURIComponent(p.category)}\n` : ""}
+---
+*이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.*
+
+> 태그 추천: #${shortName.replace(/\s+/g, "")} #최저가 #쿠팡${cat ? ` #${cat.replace(/[\s/]/g, "")}` : ""} #가격비교 #생활꿀팁
+`;
+}
+
 function draft(p, cPrice, tPrice) {
+  if (tPrice == null) return draftSingle(p, cPrice);
   const cheaperName = tPrice < cPrice ? "토스쇼핑" : "쿠팡";
   const low = Math.min(cPrice, tPrice);
   const high = Math.max(cPrice, tPrice);
   const savings = high - low;
-  const url = `https://lipsomun.co.kr/p/${p.slug}`;
+  // 슬러그가 한글이라 인코딩하지 않으면 붙여넣었을 때 깨지거나 400이 난다
+  const url = `https://lipsomun.co.kr/p/${encodeURIComponent(p.slug)}`;
   const shortName = p.title.split(",")[0].trim();
   const ratingLine =
     p.rating && p.ratingCount
@@ -103,7 +157,7 @@ async function main() {
   if (!res.ok) throw new Error(data.error || `API 오류 ${res.status}`);
 
   const done = loadDone();
-  const candidates = data.products
+  const rows = data.products
     .filter((p) => p.isPublished && !done.includes(p.slug))
     .map((p) => {
       const c = p.links.find((l) => l.platform === "coupang");
@@ -111,14 +165,29 @@ async function main() {
       const cPrice = c ? (c.price ?? p.price) : null;
       const tPrice = t ? t.price : null;
       return { p, cPrice, tPrice };
-    })
+    });
+
+  // 1순위: 가격차가 있는 토스 가격비교 상품 (수수료 10%, 비교 글이 성립)
+  const tier1 = rows
     .filter((x) => x.cPrice != null && x.tPrice != null && x.cPrice !== x.tPrice)
     .sort((a, b) => Math.abs(b.cPrice - b.tPrice) - Math.abs(a.cPrice - a.tPrice));
 
+  // 2순위: 토스 링크가 없어도 사이트에서 실제로 클릭이 많이 난 상품.
+  // 토스 상품이 12개뿐이라 1순위만 쓰면 열흘이면 후보가 고갈된다.
+  // 이쪽은 가격비교가 아닌 단일 상품 소개 글로 나간다.
+  const tier2 = rows
+    .filter((x) => x.cPrice != null && !tier1.some((t) => t.p.slug === x.p.slug))
+    .filter((x) => (x.p.clicks || 0) > 0)
+    .sort((a, b) => (b.p.clicks || 0) - (a.p.clicks || 0));
+
+  const candidates = [...tier1, ...tier2];
   if (candidates.length === 0) {
-    console.log("초안을 만들 새 가격비교 상품이 없습니다.");
+    console.log("초안을 만들 새 상품이 없습니다.");
     return;
   }
+  console.log(
+    `후보 ${candidates.length}개 (가격비교 ${tier1.length} / 인기상품 ${tier2.length}) 중 ${Math.min(COUNT, candidates.length)}개 생성`
+  );
 
   mkdirSync(BLOG_DIR, { recursive: true });
   for (const { p, cPrice, tPrice } of candidates.slice(0, COUNT)) {
