@@ -12,6 +12,7 @@ import SalaryNetCalc from "@/components/calc/SalaryNetCalc";
 import SeverancePayCalc from "@/components/calc/SeverancePayCalc";
 import UnemploymentCalc from "@/components/calc/UnemploymentCalc";
 import AnnualLeaveCalc from "@/components/calc/AnnualLeaveCalc";
+import PensionCreditCalc from "@/components/calc/PensionCreditCalc";
 import AdSlot from "@/components/AdSlot";
 
 export const revalidate = 86400; // 계산 로직은 바뀌지 않는다
@@ -31,6 +32,7 @@ const REGISTRY: Record<
   퇴직금: { Calc: SeverancePayCalc, Guide: SeverancePayGuide },
   실업급여: { Calc: UnemploymentCalc, Guide: UnemploymentGuide },
   연차수당: { Calc: AnnualLeaveCalc, Guide: AnnualLeaveGuide },
+  연금저축IRP세액공제: { Calc: PensionCreditCalc, Guide: PensionCreditGuide },
 };
 
 export function generateStaticParams() {
@@ -377,6 +379,57 @@ function AnnualLeaveGuide() {
         상시 5인 미만 사업장에는 연차 규정 자체가 적용되지 않는다.
         회계연도 기준으로 운영하는 회사라도 퇴직 시점에 입사일 기준보다 적으면
         차액을 정산해줘야 한다.
+      </p>
+    </article>
+  );
+}
+
+function PensionCreditGuide() {
+  return (
+    <article className="calc-guide">
+      <h3>퇴직금을 IRP로 받은 건 공제 대상이 아니다</h3>
+      <p>
+        가장 많이 오해하는 지점이다. 퇴직금 5,000만원이 IRP로 들어왔다고 해서
+        그 돈으로 세액공제를 받는 게 아니다. 그건 <b>퇴직소득세를 나중으로 미룬 것</b>이고,
+        세액공제는 <b>내가 따로 넣은 돈</b>에만 붙는다. 계좌 잔고가 아무리 커도
+        올해 추가로 납입한 금액이 기준이다.
+      </p>
+
+      <h3>600만원과 900만원, 두 개의 한도</h3>
+      <p>
+        연금저축만 쓰면 <b>600만원</b>까지다. 여기에 IRP를 더하면 합쳐서 <b>900만원</b>까지
+        늘어난다. 그래서 900만원을 채우려면 연금저축 600 + IRP 300처럼 나누거나,
+        IRP에만 900만원을 넣어도 된다. 반대로 연금저축에만 900만원을 넣으면
+        600만원까지만 인정되고 300만원은 그냥 묶인 돈이 된다.
+      </p>
+
+      <h3>총급여 5,500만원 한 줄에 30만원이 걸린다</h3>
+      <p>
+        공제율은 총급여 5,500만원을 경계로 <b>16.5%와 13.2%</b>로 갈린다.
+        900만원을 꽉 채웠을 때 148만원과 119만원, 약 30만원 차이다. 급여가 이 선
+        근처라면 비과세 식대 등으로 총급여가 어떻게 잡히는지 확인해볼 값어치가 있다.
+      </p>
+
+      <h3>돌려받을 세금이 없으면 넣어도 소용없다</h3>
+      <p>
+        세액공제는 <b>내야 할 세금을 깎아주는</b> 방식이다. 결정세액이 이미 0인 사람은
+        연금저축에 900만원을 넣어도 돌려받을 게 없다. 소득이 적은 해에 무리해서
+        채우는 것은 의미가 없다는 뜻이다. 그 해는 건너뛰고 소득이 높은 해에
+        채우는 쪽이 낫다.
+      </p>
+
+      <h3>중도해지하면 받은 것을 토해낸다</h3>
+      <p>
+        연금 개시 전에 깨면 그동안 공제받은 금액과 운용수익에 <b>기타소득세 16.5%</b>가
+        붙는다. 공제로 받은 만큼 그대로 돌려주는 구조라, 남는 게 없거나 오히려 손해다.
+        <b>당장 쓸 돈은 넣지 않는 것</b>이 이 계좌의 첫 번째 규칙이다.
+        만 55세 이후 연금으로 받아야 낮은 세율(3.3~5.5%)이 적용된다.
+      </p>
+
+      <p className="calc-src">
+        근로소득 외 소득이 있으면 총급여가 아니라 종합소득금액(4,500만원)이 기준이 된다.
+        ISA 만기자금을 연금계좌로 옮기면 전환금액의 10%(최대 300만원)를 추가로
+        공제받을 수 있으며, 위 계산에는 포함하지 않았다.
       </p>
     </article>
   );

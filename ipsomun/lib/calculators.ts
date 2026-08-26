@@ -121,6 +121,23 @@ export const CALCULATORS: Calc[] = [
     emoji: "📅",
     group: "급여·퇴직",
   },
+  {
+    slug: "연금저축IRP세액공제",
+    title: "IRP·연금저축 세액공제 계산기 — 연말정산에서 얼마 돌려받나",
+    short: "IRP·연금저축 세액공제",
+    desc:
+      "연금저축과 IRP에 넣은 돈으로 연말정산에서 얼마를 돌려받는지 계산합니다. " +
+      "한도까지 얼마를 더 넣으면 얼마를 더 받는지도 함께 보여줍니다.",
+    keywords: [
+      "연금저축세액공제",
+      "IRP세액공제",
+      "연금저축IRP한도",
+      "연말정산연금저축",
+      "IRP납입한도",
+    ],
+    emoji: "🏦",
+    group: "급여·퇴직",
+  },
 ];
 
 export const getCalc = (slug: string) =>

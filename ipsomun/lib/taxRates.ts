@@ -150,3 +150,28 @@ export function annualLeaveDays(months: number) {
   const extra = Math.floor((years - 1) / 2);
   return Math.min(25, 15 + extra);
 }
+
+/* ---------- 연금계좌 세액공제 (연금저축 · IRP) ---------- */
+
+/**
+ * 사람들이 가장 많이 틀리는 두 가지를 상수 이름에 박아둔다.
+ *  ① 연금저축은 600만원까지, IRP를 더해도 합쳐서 900만원까지다.
+ *  ② 공제율은 총급여 5,500만원을 경계로 갈린다 (지방소득세 포함 기준).
+ */
+export const PENSION_CREDIT = {
+  /** 연금저축 단독 한도 */
+  pensionOnlyCap: 6_000_000,
+  /** 연금저축 + IRP 합산 한도 */
+  totalCap: 9_000_000,
+  /** 총급여 기준선 — 이하면 높은 공제율 */
+  highRateGrossLimit: 55_000_000,
+  /** 지방소득세를 포함한 실제 환급률 (15% + 1.5% / 12% + 1.2%) */
+  highRate: 0.165,
+  lowRate: 0.132,
+};
+
+/** 총급여로 공제율을 고른다 */
+export const pensionCreditRate = (gross: number) =>
+  gross <= PENSION_CREDIT.highRateGrossLimit
+    ? PENSION_CREDIT.highRate
+    : PENSION_CREDIT.lowRate;
