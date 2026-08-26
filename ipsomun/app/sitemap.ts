@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllSlugs, getAllCollectionSlugs, getAllPostSlugs } from "@/lib/db";
 import { CATEGORIES } from "@/lib/util";
+import { CALCULATORS } from "@/lib/calculators";
 
 export const revalidate = 1800; // 사이트맵
 
@@ -32,6 +33,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/ranking`, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/pick`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/blog`, changeFrequency: "daily", priority: 0.8 },
+    { url: `${base}/calc`, changeFrequency: "monthly", priority: 0.8 },
+    ...CALCULATORS.map((c) => ({
+      url: `${base}/calc/${encodeURIComponent(c.slug)}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
     // '기타'는 게시 상품 0개 유지가 원칙이라 빈 페이지 색인을 막기 위해 제외
     ...CATEGORIES.filter((c) => c !== "기타").map((c) => ({
       url: `${base}/category/${encodeURIComponent(c)}`,

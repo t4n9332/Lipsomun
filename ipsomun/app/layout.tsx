@@ -44,6 +44,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
+        {/* Google AdSense — 환경변수가 있을 때만 로드한다 */}
+        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+          ></script>
+        )}
         {/* Google Analytics (GA4) */}
         <script
           async
@@ -77,6 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </a>
               <Link href="/compare">가격비교</Link>
               <Link href="/blog">리포트</Link>
+              <Link href="/calc">계산기</Link>
               <Link href="/deals">오늘의 딜</Link>
               <Link href="/ranking">랭킹</Link>
               <Link href="/pick">기획전</Link>
