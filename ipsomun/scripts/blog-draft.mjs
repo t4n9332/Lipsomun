@@ -172,13 +172,17 @@ async function main() {
     .filter((x) => x.cPrice != null && x.tPrice != null && x.cPrice !== x.tPrice)
     .sort((a, b) => Math.abs(b.cPrice - b.tPrice) - Math.abs(a.cPrice - a.tPrice));
 
-  // 2순위: 토스 링크가 없어도 사이트에서 실제로 클릭이 많이 난 상품.
-  // 토스 상품이 12개뿐이라 1순위만 쓰면 열흘이면 후보가 고갈된다.
-  // 이쪽은 가격비교가 아닌 단일 상품 소개 글로 나간다.
+  // 2순위: 토스 링크가 없는 상품. 토스 상품이 12개뿐이라 1순위만 쓰면
+  // 열흘이면 후보가 고갈된다. 가격비교가 아닌 단일 상품 소개 글로 나간다.
+  //
+  // 인기 지표로 사이트 클릭수를 쓰지 않는다 — 봇 오염으로 한 번 초기화했고
+  // 앞으로도 초기화하면 후보가 0이 된다. 대신 리뷰 수(쿠팡·토스에서 받아온
+  // 실제 구매자 수)를 쓴다. 초기화와 무관하고 실제 수요를 더 잘 반영한다.
+  const popularity = (p) =>
+    Math.log10((p.ratingCount || 0) + 10) * (p.rating || 3.5) + (p.clicks || 0) * 0.1;
   const tier2 = rows
     .filter((x) => x.cPrice != null && !tier1.some((t) => t.p.slug === x.p.slug))
-    .filter((x) => (x.p.clicks || 0) > 0)
-    .sort((a, b) => (b.p.clicks || 0) - (a.p.clicks || 0));
+    .sort((a, b) => popularity(b.p) - popularity(a.p));
 
   const candidates = [...tier1, ...tier2];
   if (candidates.length === 0) {

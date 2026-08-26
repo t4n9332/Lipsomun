@@ -407,6 +407,35 @@ export async function trackClick(linkId: string, productId: string): Promise<voi
   ]);
 }
 
+/**
+ * 클릭·조회 통계 초기화.
+ * 봇 필터를 넣기 전 집계된 수치는 크롤러가 링크를 하나씩 따라간 값이 섞여 있어
+ * (링크 2개 상품은 1클릭이 하나도 없었다) 어떤 상품이 실제로 인기인지 알 수 없다.
+ * 되돌릴 수 없으므로 관리자 API에서 명시적 확인 문자열을 받은 뒤에만 호출한다.
+ */
+export async function resetStats(): Promise<{
+  products: number;
+  links: number;
+  before: { clicks: number; views: number };
+}> {
+  // 초기화 전 수치를 함께 돌려줘 기록에 남길 수 있게 한다
+  const [sum] = await q<{ clicks: number; views: number }>(
+    `SELECT COALESCE(SUM(clicks),0)::int AS clicks, COALESCE(SUM(views),0)::int AS views FROM products`
+  );
+  // q()는 rows만 반환하므로 갱신 건수를 세려면 RETURNING이 필요하다
+  const p = await q(
+    `UPDATE products SET clicks = 0, views = 0 WHERE clicks <> 0 OR views <> 0 RETURNING id`
+  );
+  const l = await q(
+    `UPDATE affiliate_links SET clicks = 0 WHERE clicks <> 0 RETURNING id`
+  );
+  return {
+    products: p.length,
+    links: l.length,
+    before: { clicks: sum?.clicks ?? 0, views: sum?.views ?? 0 },
+  };
+}
+
 /* ---------- 관리자 ---------- */
 
 export async function adminListProducts(limit = 200): Promise<ProductWithLinks[]> {
