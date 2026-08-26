@@ -1,0 +1,32 @@
+# Claude Code 세션 데이터 — 대화 기록·로컬 설정이 들어간다. 공개 저장소에 올리지 말 것
+.claude/
+.claude-*/
+
+# 압축 파일 (백업본이라 저장소에 둘 이유가 없다)
+*.zip
+*.7z
+*.rar
+
+# 비밀값
+.env
+.env.*
+!.env.example
+
+# 빌드 산출물 / 의존성
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# 로그
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
