@@ -17,7 +17,31 @@ interface Draft {
   selected?: boolean;
 }
 
-export default function LinkpriceImport() {
+/**
+ * 붙여넣은 URL로 상품을 일괄 등록하는 화면.
+ *
+ * 두 가지로 쓴다.
+ *  - 기본(convert): 쇼핑몰 상품 URL → 링크프라이스 API로 제휴링크 생성
+ *  - asis: 이미 발급받은 제휴링크를 그대로 사용 (네이버 브랜드커넥트)
+ *    브랜드커넥트는 사이트에서 링크를 직접 발급받으므로 재변환하면 안 된다.
+ */
+export interface ImportVariant {
+  mode?: "convert" | "asis";
+  platform?: string; // asis일 때 플랫폼 고정
+  heading?: string;
+  guide?: React.ReactNode;
+  placeholder?: string;
+  actionLabel?: string;
+}
+
+export default function LinkpriceImport({
+  mode = "convert",
+  platform,
+  heading,
+  guide,
+  placeholder,
+  actionLabel,
+}: ImportVariant = {}) {
   const [input, setInput] = useState("");
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [category, setCategory] = useState("기타");
@@ -42,7 +66,7 @@ export default function LinkpriceImport() {
       const res = await fetch("/api/admin/linkprice/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ urls }),
+        body: JSON.stringify({ urls, mode, platform }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "가져오기 실패");
@@ -52,12 +76,18 @@ export default function LinkpriceImport() {
       }));
       setDrafts(list);
       const fail = list.filter((d) => !d.affiliateUrl).length;
+      // asis는 링크를 그대로 쓰므로 변환 실패가 없다. 대신 상품정보를 못 읽은 건을 알린다.
+      const noMeta = list.filter((d) => !d.title.trim()).length;
       setMsg({
-        ok: fail === 0,
+        ok: fail === 0 && (mode !== "asis" || noMeta === 0),
         text:
-          fail === 0
-            ? `${list.length}개 상품의 제휴링크·정보를 가져왔습니다. 내용을 확인하고 등록하세요.`
-            : `${list.length}개 중 ${fail}개는 제휴링크 변환에 실패했습니다 (해당 쇼핑몰 제휴 승인 여부 확인).`,
+          mode === "asis"
+            ? noMeta === 0
+              ? `${list.length}개 상품정보를 가져왔습니다. 내용을 확인하고 등록하세요.`
+              : `${list.length}개 중 ${noMeta}개는 제품명을 자동으로 못 읽었습니다. 직접 채워주세요.`
+            : fail === 0
+              ? `${list.length}개 상품의 제휴링크·정보를 가져왔습니다. 내용을 확인하고 등록하세요.`
+              : `${list.length}개 중 ${fail}개는 제휴링크 변환에 실패했습니다 (해당 쇼핑몰 제휴 승인 여부 확인).`,
       });
     } catch (e) {
       setMsg({ ok: false, text: e instanceof Error ? e.message : "가져오기 실패" });
@@ -113,12 +143,16 @@ export default function LinkpriceImport() {
 
   return (
     <div className="admin-card">
-      <h2>🔗 링크프라이스로 자동 등록</h2>
+      <h2>{heading ?? "🔗 링크프라이스로 자동 등록"}</h2>
       <p style={{ fontSize: 13.5, color: "#55524d", marginTop: 0 }}>
-        제휴된 쇼핑몰(11번가, 오늘의집, G마켓, 옥션, SSG, 롯데온 등)의{" "}
-        <b>상품 페이지 URL</b>을 한 줄에 하나씩 붙여넣으면, 링크프라이스 공식
-        API로 <b>내 제휴링크(수익링크)</b>를 만들고 제품명·이미지·가격을 자동으로
-        가져옵니다.
+        {guide ?? (
+          <>
+            제휴된 쇼핑몰(11번가, 오늘의집, G마켓, 옥션, SSG, 롯데온 등)의{" "}
+            <b>상품 페이지 URL</b>을 한 줄에 하나씩 붙여넣으면, 링크프라이스 공식
+            API로 <b>내 제휴링크(수익링크)</b>를 만들고 제품명·이미지·가격을
+            자동으로 가져옵니다.
+          </>
+        )}
       </p>
       {msg && <div className={`notice ${msg.ok ? "ok" : "err"}`}>{msg.text}</div>}
 
@@ -127,12 +161,15 @@ export default function LinkpriceImport() {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder={
+          placeholder ??
           "https://www.11st.co.kr/products/...\nhttps://ohou.se/productions/...\nhttps://item.gmarket.co.kr/..."
         }
       />
       <div style={{ marginTop: 10 }}>
         <button className="btn" disabled={busy} onClick={importUrls}>
-          {busy ? "가져오는 중..." : "제휴링크 만들기 + 상품정보 가져오기"}
+          {busy
+            ? "가져오는 중..."
+            : (actionLabel ?? "제휴링크 만들기 + 상품정보 가져오기")}
         </button>
       </div>
 

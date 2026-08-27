@@ -16,7 +16,7 @@ interface CoupangResult {
 }
 
 export default function NewProductClient() {
-  const [tab, setTab] = useState<"auto" | "linkprice" | "manual">("auto");
+  const [tab, setTab] = useState<"auto" | "naver" | "linkprice" | "manual">("auto");
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState<CoupangResult[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -103,6 +103,12 @@ export default function NewProductClient() {
           ⚡ 쿠팡 자동 등록
         </button>
         <button
+          className={`btn ${tab === "naver" ? "" : "secondary"}`}
+          onClick={() => setTab("naver")}
+        >
+          🟢 네이버 브랜드커넥트
+        </button>
+        <button
           className={`btn ${tab === "linkprice" ? "" : "secondary"}`}
           onClick={() => setTab("linkprice")}
         >
@@ -116,7 +122,31 @@ export default function NewProductClient() {
         </button>
       </div>
 
-      {tab === "linkprice" ? (
+      {tab === "naver" ? (
+        <LinkpriceImport
+          mode="asis"
+          platform="naver"
+          heading="🟢 네이버 브랜드커넥트 상품 등록"
+          guide={
+            <>
+              브랜드커넥트{" "}
+              <a
+                href="https://brandconnect.naver.com"
+                target="_blank"
+                rel="noopener"
+                style={{ color: "#03c75a", fontWeight: 700 }}
+              >
+                제휴 상품 페이지
+              </a>
+              에서 <b>발급받은 제휴링크</b>를 한 줄에 하나씩 붙여넣으세요. 이미
+              수익이 붙은 링크이므로 <b>그대로 사용</b>하고(재변환하지 않습니다),
+              제품명·이미지·가격만 자동으로 가져옵니다. 한 번에 최대 15개.
+            </>
+          }
+          placeholder={"브랜드커넥트에서 복사한 제휴링크를 한 줄에 하나씩\n(예: https://... )"}
+          actionLabel="상품정보 가져오기"
+        />
+      ) : tab === "linkprice" ? (
         <LinkpriceImport />
       ) : tab === "auto" ? (
         <div className="admin-card">
