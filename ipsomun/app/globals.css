@@ -103,13 +103,14 @@ button { font-family: inherit; }
 .cat-nav::-webkit-scrollbar { display: none; }
 .cat-nav a {
   white-space: nowrap;
-  font-size: 13.5px;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--ink-soft);
-  padding: 6px 13px;
+  padding: 7px 14px;
   border-radius: 999px;
   transition: all 0.15s;
 }
-.cat-nav a:hover, .cat-nav a.active { background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+.cat-nav a:hover, .cat-nav a.active { background: var(--brand-soft); color: var(--brand); font-weight: 700; }
 
 /* ---------- Sections ---------- */
 .section { margin: 44px 0; }
@@ -203,8 +204,18 @@ button { font-family: inherit; }
 .rank-num { font-size: 20px; font-weight: 900; color: var(--brand); width: 30px; text-align: center; flex-shrink: 0; }
 .rank-item .thumb { position: relative; width: 64px; height: 64px; border-radius: 10px; overflow: hidden; background: #f3f1ee; flex-shrink: 0; }
 .rank-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
-.rank-item .info { min-width: 0; }
-.rank-item .title { font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-item .info { min-width: 0; flex: 1; }
+/* span은 기본이 display:inline이라 overflow·text-overflow가 무시된다.
+   block으로 바꿔야 말줄임이 실제로 걸리고, 안 그러면 긴 제목이 칸을 뚫고
+   나가 모바일에서 가로 스크롤이 생긴다. */
+.rank-item .title {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .rank-item .price { font-size: 14px; font-weight: 800; margin-top: 2px; }
 .rank-item .clicks { margin-left: auto; font-size: 12.5px; color: var(--ink-faint); flex-shrink: 0; }
 
@@ -789,6 +800,39 @@ html { scroll-behavior: smooth; }
   .vs-price .chip { font-size: 9.5px; padding: 1px 5px; }
   .vs-save { font-size: 10px; padding: 2px 7px; left: 6px; bottom: 6px; }
   .vs-note { font-size: 11px; margin-top: 10px; }
+
+  /* ---- 헤더: 한 줄에 다 넣으면 606px가 되어 화면(375px)을 뚫는다 ----
+     로고+검색을 첫 줄에, 메뉴는 아랫줄에서 가로 스크롤시킨다. */
+  .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 10px;
+    padding-top: 10px;
+  }
+  .logo { font-size: 21px; }
+  .search-form { max-width: none; min-width: 0; }
+  .header-links {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    gap: 14px;
+    padding: 6px 0 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .header-links::-webkit-scrollbar { display: none; }
+  /* 스크롤 영역 안에서 항목이 찌그러지지 않게 */
+  .header-links > * { flex-shrink: 0; }
+  .user-chip { flex-shrink: 0; }
+
+}
+
+/* iOS는 글자 16px 미만 입력창에 포커스하면 화면을 강제로 확대한다.
+   확대가 막힌 환경에서는 작은 글자 그대로 남아 타이핑이 어렵다.
+   16px로 올리면 확대도 안 걸리고 글자도 읽힌다. (모바일 폭 전반에 적용) */
+@media (max-width: 900px) {
+  .search-form input { font-size: 16px; }
 }
 
 /* ---------- 홈 화면 추가(설치) 배너 ---------- */
