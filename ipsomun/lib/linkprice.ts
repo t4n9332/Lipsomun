@@ -97,6 +97,58 @@ function pickMeta(html: string, names: string[]): string {
   return "";
 }
 
+/**
+ * 상대·프로토콜상대 이미지 주소를 절대 주소로 바꾼다.
+ * 네이버는 og:image를 "/images/icon/og_sell.jpg"처럼 상대 경로로 주는데,
+ * 그대로 저장하면 우리 사이트 기준으로 해석돼 이미지가 깨진다.
+ * baseUrl은 리다이렉트까지 따라간 최종 주소여야 한다.
+ */
+function absolutize(src: string, baseUrl: string): string {
+  if (!src) return "";
+  if (/^data:/i.test(src)) return "";
+  try {
+    return new URL(src, baseUrl).href;
+  } catch {
+    return "";
+  }
+}
+
+/** JSON-LD(Product)에서 제목·이미지·가격을 꺼낸다. 토스처럼 메타태그가 부족한 곳 대비 */
+function pickJsonLd(html: string): { title: string; image: string; price: number | null } {
+  const empty = { title: "", image: "", price: null as number | null };
+  const blocks = [...html.matchAll(/<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)];
+  for (const b of blocks) {
+    let data: unknown;
+    try {
+      data = JSON.parse(b[1].trim());
+    } catch {
+      continue;
+    }
+    // @graph 배열이나 최상위 배열로 오는 경우가 있다
+    const list = Array.isArray(data)
+      ? data
+      : ((data as Record<string, unknown>)?.["@graph"] as unknown[]) || [data];
+    for (const raw of list) {
+      const node = raw as Record<string, unknown>;
+      if (!node || typeof node !== "object") continue;
+      const type = String(node["@type"] ?? "");
+      if (!/product/i.test(type)) continue;
+      const img = Array.isArray(node.image) ? node.image[0] : node.image;
+      const offers = (Array.isArray(node.offers) ? node.offers[0] : node.offers) as
+        | Record<string, unknown>
+        | undefined;
+      const rawPrice = offers?.price ?? offers?.lowPrice;
+      const price = rawPrice != null ? Number(String(rawPrice).replace(/[^0-9.]/g, "")) || null : null;
+      return {
+        title: typeof node.name === "string" ? node.name : "",
+        image: typeof img === "string" ? img : "",
+        price,
+      };
+    }
+  }
+  return empty;
+}
+
 function decodeEntities(s: string): string {
   return s
     .replace(/&amp;/g, "&")
@@ -126,17 +178,32 @@ export async function fetchProductMeta(url: string): Promise<ProductMeta> {
     if (!res.ok) return empty;
     const html = (await res.text()).slice(0, 500_000);
 
+    // 리다이렉트를 따라간 최종 주소. 상대 경로 이미지를 여기 기준으로 푼다.
+    const finalUrl = res.url || url;
+    const ld = pickJsonLd(html);
+
     const title = decodeEntities(
       pickMeta(html, ["og:title", "twitter:title"]) ||
+        ld.title ||
         (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "")
     );
-    const imageUrl = pickMeta(html, ["og:image", "twitter:image"]);
+
+    // og:image → twitter:image → JSON-LD → <link rel="image_src"> 순으로 찾고
+    // 어느 쪽이든 절대 주소로 바꾼다.
+    const rawImage =
+      pickMeta(html, ["og:image", "og:image:url", "og:image:secure_url", "twitter:image"]) ||
+      ld.image ||
+      html.match(/<link[^>]+rel=["']image_src["'][^>]+href=["']([^"']+)["']/i)?.[1] ||
+      "";
+    const imageUrl = absolutize(decodeEntities(rawImage), finalUrl);
+
     const priceRaw = pickMeta(html, [
       "product:price:amount",
       "og:price:amount",
       "product:sale_price:amount",
     ]);
-    const price = priceRaw ? Number(priceRaw.replace(/[^0-9]/g, "")) || null : null;
+    const price =
+      (priceRaw ? Number(priceRaw.replace(/[^0-9]/g, "")) || null : null) ?? ld.price;
     const description = decodeEntities(
       pickMeta(html, ["og:description", "description"])
     ).slice(0, 200);

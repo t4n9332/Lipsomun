@@ -16,7 +16,7 @@ interface CoupangResult {
 }
 
 export default function NewProductClient() {
-  const [tab, setTab] = useState<"auto" | "naver" | "linkprice" | "manual">("auto");
+  const [tab, setTab] = useState<"auto" | "naver" | "toss" | "linkprice" | "manual">("auto");
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState<CoupangResult[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -109,6 +109,12 @@ export default function NewProductClient() {
           🟢 네이버 브랜드커넥트
         </button>
         <button
+          className={`btn ${tab === "toss" ? "" : "secondary"}`}
+          onClick={() => setTab("toss")}
+        >
+          🔵 토스 손입력
+        </button>
+        <button
           className={`btn ${tab === "linkprice" ? "" : "secondary"}`}
           onClick={() => setTab("linkprice")}
         >
@@ -144,6 +150,33 @@ export default function NewProductClient() {
             </>
           }
           placeholder={"브랜드커넥트에서 복사한 제휴링크를 한 줄에 하나씩\n(예: https://... )"}
+          actionLabel="상품정보 가져오기"
+        />
+      ) : tab === "toss" ? (
+        <LinkpriceImport
+          mode="asis"
+          platform="toss"
+          heading="🔵 토스 쉐어링크 손입력"
+          guide={
+            <>
+              쉐어링크 어드민에서 <b>발급받은 토스 링크</b>(toss.im/_m/…)를 한 줄에
+              하나씩 붙여넣으세요. 이미 수익이 붙은 링크라 <b>그대로 사용</b>하고,
+              제품명·이미지는 자동으로 가져옵니다. 한 번에 최대 15개.
+              <br />
+              <span style={{ color: "#8a857e" }}>
+                ※ 토스는 가격을 화면에서 따로 불러오는 구조라 등록 시점에는 자동으로
+                못 읽습니다. 직접 입력하시거나 비워두셔도 됩니다 — 비워두면 매일
+                도는 <b>가격 갱신 자동화</b>가 토스 카탈로그에서 같은 상품을 찾아
+                채워줍니다.
+              </span>
+              <br />
+              <span style={{ color: "#8a857e" }}>
+                ※ 새 토스 링크를 붙이는 <b>자동 매칭</b>은 쿠팡 링크가 있는 상품만
+                대상이라, 여기서 넣은 상품과 겹치지 않습니다.
+              </span>
+            </>
+          }
+          placeholder={"https://toss.im/_m/xxxxxxxx\nhttps://toss.im/_m/yyyyyyyy"}
           actionLabel="상품정보 가져오기"
         />
       ) : tab === "linkprice" ? (
