@@ -9,7 +9,7 @@ import {
 } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 import CompareCard, { comparePrices } from "@/components/CompareCard";
-import { TELEGRAM_CHANNEL_URL } from "@/lib/util";
+import { TELEGRAM_CHANNEL_URL, imgUrl } from "@/lib/util";
 
 export const revalidate = 300; // 홈 — 딜·가격 자주 변동
 
@@ -113,7 +113,7 @@ export default async function Home() {
                 <span className="thumb">
                   {p.imageUrl && (
                     <Image
-                      src={p.imageUrl}
+                      src={imgUrl(p.imageUrl, 160)}
                       alt={p.title}
                       fill
                       sizes="64px"
@@ -149,7 +149,7 @@ export default async function Home() {
                 <span className="pick-thumbs">
                   {c.images.slice(0, 4).map((img, i) => (
                     <span key={i} className="pt">
-                      <Image src={img} alt="" fill sizes="80px" style={{ objectFit: "cover" }} />
+                      <Image src={imgUrl(img, 200)} alt="" fill sizes="80px" style={{ objectFit: "cover" }} />
                     </span>
                   ))}
                 </span>

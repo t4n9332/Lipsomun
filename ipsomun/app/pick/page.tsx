@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getPublishedCollections } from "@/lib/db";
+import { imgUrl } from "@/lib/util";
 
 export const revalidate = 1800; // 기획전 목록
 export const metadata = {
@@ -27,7 +28,7 @@ export default async function PickListPage() {
               <span className="pick-thumbs">
                 {c.images.slice(0, 4).map((img, i) => (
                   <span key={i} className="pt">
-                    <Image src={img} alt="" fill sizes="80px" style={{ objectFit: "cover" }} />
+                    <Image src={imgUrl(img, 200)} alt="" fill sizes="80px" style={{ objectFit: "cover" }} />
                   </span>
                 ))}
               </span>

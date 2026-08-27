@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { won } from "@/lib/util";
+import { won, imgUrl } from "@/lib/util";
 import type { ProductWithLinks } from "@/lib/db";
 import Stars from "./Stars";
 
@@ -34,7 +34,7 @@ export default function CompareCard({ p }: { p: ProductWithLinks }) {
       <span className="vs-thumb">
         {p.imageUrl ? (
           <Image
-            src={p.imageUrl}
+            src={imgUrl(p.imageUrl, 400)}
             alt={p.title}
             fill
             sizes="(max-width: 600px) 40vw, 180px"

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { won, discountRate } from "@/lib/util";
+import { won, discountRate, imgUrl } from "@/lib/util";
 import FavButton from "./FavButton";
 import Stars from "./Stars";
 
@@ -35,7 +35,7 @@ export default function ProductCard({
       <div className="thumb">
         {p.imageUrl ? (
           <Image
-            src={p.imageUrl}
+            src={imgUrl(p.imageUrl, 400)}
             alt={p.title}
             fill
             sizes="(max-width: 640px) 50vw, 220px"

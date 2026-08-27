@@ -7,7 +7,7 @@ import {
   getPriceHistory,
   getPriceStats,
 } from "@/lib/db";
-import { won, discountRate, platformName, platformColor } from "@/lib/util";
+import { won, discountRate, platformName, platformColor, imgUrl } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
 import FavButton from "@/components/FavButton";
 import ShareButton from "@/components/ShareButton";
@@ -174,7 +174,7 @@ export default async function ProductPage({
         <div className="photo">
           {product.imageUrl ? (
             <Image
-              src={product.imageUrl}
+              src={imgUrl(product.imageUrl, 800)}
               alt={product.title}
               fill
               sizes="(max-width: 760px) 100vw, 520px"
