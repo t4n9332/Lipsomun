@@ -149,6 +149,46 @@ function pickJsonLd(html: string): { title: string; image: string; price: number
   return empty;
 }
 
+/**
+ * og:title 끝에 붙는 사이트명 꼬리표를 떼어낸다.
+ * 예: "마포나루터 돼지목살왕구이, 500g, 3팩 | 토스쇼핑" → "마포나루터 … 3팩"
+ * 구분자 뒤가 **알려진 쇼핑몰 이름일 때만** 자른다. 상품명 자체에 '|'나 '-'가
+ * 들어가는 경우를 잘못 자르지 않기 위함이다.
+ */
+const SITE_SUFFIXES = [
+  "토스쇼핑",
+  "토스",
+  "네이버 스마트스토어",
+  "네이버쇼핑",
+  "네이버 쇼핑",
+  "스마트스토어",
+  "쿠팡!",
+  "쿠팡",
+  "11번가",
+  "G마켓",
+  "옥션",
+  "SSG.COM",
+  "롯데온",
+  "오늘의집",
+  "무신사",
+  "올리브영",
+];
+
+function stripSiteSuffix(title: string): string {
+  let out = title.trim();
+  // 꼬리표가 두 번 붙는 경우가 있어 몇 번 반복한다
+  for (let i = 0; i < 3; i++) {
+    const m = out.match(/^(.*?)\s*[|\-–—:]\s*([^|\-–—:]+)$/);
+    if (!m) break;
+    const tail = m[2].trim();
+    if (!SITE_SUFFIXES.some((s) => s.toLowerCase() === tail.toLowerCase())) break;
+    const head = m[1].trim();
+    if (head.length < 4) break; // 다 잘려나가는 것 방지
+    out = head;
+  }
+  return out;
+}
+
 function decodeEntities(s: string): string {
   return s
     .replace(/&amp;/g, "&")
@@ -182,10 +222,12 @@ export async function fetchProductMeta(url: string): Promise<ProductMeta> {
     const finalUrl = res.url || url;
     const ld = pickJsonLd(html);
 
-    const title = decodeEntities(
-      pickMeta(html, ["og:title", "twitter:title"]) ||
-        ld.title ||
-        (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "")
+    const title = stripSiteSuffix(
+      decodeEntities(
+        pickMeta(html, ["og:title", "twitter:title"]) ||
+          ld.title ||
+          (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? "")
+      )
     );
 
     // og:image → twitter:image → JSON-LD → <link rel="image_src"> 순으로 찾고
