@@ -58,7 +58,7 @@ export default function PrivacyPage() {
 
         <h2 style={{ fontSize: 17, marginTop: 28 }}>6. 문의처</h2>
         <p>
-          개인정보 관련 문의: <a href="mailto:t4n9332@gmail.com" style={{ color: "#1c7ed6" }}>t4n9332@gmail.com</a>
+          개인정보 관련 문의: <a href="mailto:t4n2140@gmail.com" style={{ color: "#1c7ed6" }}>t4n2140@gmail.com</a>
         </p>
 
         <p style={{ marginTop: 28, fontSize: 13, color: "#8a867f" }}>

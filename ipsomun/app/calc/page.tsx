@@ -68,7 +68,7 @@ export default function CalcHub() {
 
       <p className="calc-src">
         현재 {CALCULATORS.length}개이며 계속 늘려갑니다. 필요한 계산기가 있으면
-        <a href="mailto:t4n9332@gmail.com"> 알려주세요</a>.
+        <a href="mailto:t4n2140@gmail.com"> 알려주세요</a>.
       </p>
     </section>
   );

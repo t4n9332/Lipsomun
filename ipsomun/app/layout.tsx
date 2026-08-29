@@ -133,7 +133,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <p className="footer-links">
               <Link href="/privacy">개인정보처리방침</Link>
               <span aria-hidden> · </span>
-              <a href="mailto:t4n9332@gmail.com">문의·제휴 t4n9332@gmail.com</a>
+              <a href="mailto:t4n2140@gmail.com">문의·제휴 t4n2140@gmail.com</a>
             </p>
             <p>
               📣 매일 특가 브리핑:{" "}
