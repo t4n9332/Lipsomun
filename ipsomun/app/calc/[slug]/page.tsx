@@ -13,6 +13,7 @@ import SeverancePayCalc from "@/components/calc/SeverancePayCalc";
 import UnemploymentCalc from "@/components/calc/UnemploymentCalc";
 import AnnualLeaveCalc from "@/components/calc/AnnualLeaveCalc";
 import PensionCreditCalc from "@/components/calc/PensionCreditCalc";
+import YearEndTaxCalc from "@/components/calc/YearEndTaxCalc";
 import AdSlot from "@/components/AdSlot";
 
 export const revalidate = 86400; // 계산 로직은 바뀌지 않는다
@@ -33,6 +34,7 @@ const REGISTRY: Record<
   실업급여: { Calc: UnemploymentCalc, Guide: UnemploymentGuide },
   연차수당: { Calc: AnnualLeaveCalc, Guide: AnnualLeaveGuide },
   연금저축IRP세액공제: { Calc: PensionCreditCalc, Guide: PensionCreditGuide },
+  연말정산환급금: { Calc: YearEndTaxCalc, Guide: YearEndTaxGuide },
 };
 
 export function generateStaticParams() {
@@ -431,6 +433,64 @@ function PensionCreditGuide() {
         근로소득 외 소득이 있으면 총급여가 아니라 종합소득금액(4,500만원)이 기준이 된다.
         ISA 만기자금을 연금계좌로 옮기면 전환금액의 10%(최대 300만원)를 추가로
         공제받을 수 있으며, 위 계산에는 포함하지 않았다.
+      </p>
+    </article>
+  );
+}
+
+function YearEndTaxGuide() {
+  return (
+    <article className="calc-guide">
+      <h3>환급은 &lsquo;더 번 세금&rsquo;이 아니라 &lsquo;미리 걷은 세금&rsquo;의 차액이다</h3>
+      <p>
+        매달 월급에서 떼는 소득세는 국세청 <b>간이세액표</b>로 대충 걷은 금액이다.
+        연말정산은 실제로 쓴 신용카드, 부양가족, 연금저축 같은 공제를 반영해
+        <b> 진짜 내야 할 세금</b>을 다시 계산하는 절차다. 미리 걷은 돈이 진짜 세금보다
+        많았으면 환급, 적었으면 추가납부가 나온다. 13월의 월급이라 불리지만 사실은
+        내 돈을 미리 맡겼다가 돌려받는 것에 가깝다.
+      </p>
+
+      <h3>신용카드는 아무리 써도 25%까지는 공제가 0원이다</h3>
+      <p>
+        신용카드 등 소득공제는 <b>총급여의 25%를 넘겨 쓴 금액</b>부터 계산된다.
+        총급여 5,000만원이면 1,250만원까지는 아무리 카드를 써도 공제가 안 붙는다.
+        그리고 이 문턱을 넘긴 뒤부터는 <b>체크카드·현금영수증(30%)</b>이
+        <b>신용카드(15%)</b>보다 공제율이 두 배다. 문턱까지는 혜택 좋은 신용카드로,
+        넘긴 뒤부터는 체크카드로 갈아타는 게 최적 전략이다.
+      </p>
+
+      <h3>인적공제와 자녀세액공제는 다른 항목이다</h3>
+      <p>
+        부양가족 1명당 <b>150만원씩 소득에서 빼주는 것</b>(인적공제)과, 8~20세
+        자녀 수에 따라 <b>세금 자체를 깎아주는 것</b>(자녀세액공제)은 별개로
+        중복 적용된다. 자녀가 어리면 인적공제만 받고, 8세를 넘는 순간부터
+        세액공제까지 추가로 붙는다 — 아이가 초등학교에 들어가는 해에 환급액이
+        한 번 더 뛰는 이유다.
+      </p>
+
+      <h3>연금저축·IRP는 환급 계산에서 제일 손대기 쉬운 변수다</h3>
+      <p>
+        총급여나 부양가족 수는 이미 정해져 바꿀 수 없지만, 연금저축·IRP 납입액은
+        연말까지 스스로 조절할 수 있는 몇 안 되는 항목이다. 900만원 한도까지
+        채우면 총급여에 따라 <b>119만~148만원</b>이 그대로 세액공제로 붙는다.
+        위 계산기의 &lsquo;연금저축+IRP 납입액&rsquo;을 0에서 900만원으로 바꿔보면
+        환급액이 얼마나 뛰는지 바로 보인다. 자세한 한도 배분은
+        연금저축·IRP 세액공제 계산기에서 따로 확인할 수 있다.
+      </p>
+
+      <h3>추가납부가 나왔다고 손해를 본 건 아니다</h3>
+      <p>
+        추가납부는 원천징수가 적었다는 뜻이지, 세금을 더 많이 낸다는 뜻이 아니다.
+        오히려 그동안 원천징수를 적게 떼여 그만큼의 돈을 <b>미리 손에 쥐고 있었던
+        것</b>과 같다. 다만 매달 그 차이가 쌓이지 않도록, 연금저축 납입이나
+        신용카드 사용 비중을 다음 해에 조정해두면 정산 시점의 부담을 줄일 수 있다.
+      </p>
+
+      <p className="calc-src">
+        위 계산은 인적공제·4대보험료공제·신용카드등공제·연금계좌세액공제·
+        자녀세액공제만 반영한 단순화된 값이다. 의료비·교육비·기부금·월세·주택자금
+        공제까지 정확히 보려면 국세청 홈택스의 <b>연말정산 미리보기</b> 서비스로
+        확인하는 것이 정확하다.
       </p>
     </article>
   );
