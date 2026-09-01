@@ -76,8 +76,15 @@ const CURSOR_MAX_ITEMS = 4800;
 /**
  * 한 회차 전체 실행 예산(분). 작업 스케줄러의 ExecutionTimeLimit(1시간)보다
  * 넉넉히 짧게 잡아, 강제 종료당하지 않고 스스로 정리하고 끝내게 한다.
+ *
+ * 2026-09-02: 종료 경로를 고치기 전에는 모든 회차가 일을 끝내고도 이 타이머로
+ * 정리됐다(43/43). 이제 실측 회차는 2~4분이므로 35 → 20분으로 줄였다.
+ * 로그의 [요약] 소요 값이 안정되면 15분까지 더 줄여도 된다.
  */
-const RUN_BUDGET_MIN = 35;
+const RUN_BUDGET_MIN = 20;
+
+/** 회차 시작 시각 — [요약] 줄의 소요 시간 계산에 쓴다 */
+const RUN_STARTED_AT = Date.now();
 
 /** 쉐어링크 어드민의 카테고리 필터 항목 (사이트 카테고리와는 별개) */
 const TOSS_FILTER_CATEGORIES = [
@@ -101,7 +108,20 @@ const CATEGORIES = [
   "홈인테리어", "스포츠/레저", "육아", "반려동물", "기타",
 ];
 
-const rl = createInterface({ input: process.stdin, output: process.stdout });
+// 대화형 질문에만 쓰는 readline. 모듈 최상단에서 미리 만들면 stdin에 data 리스너가
+// 붙어 이벤트 루프가 비지 않는다 — 자동 회차가 일을 다 끝내고도 종료하지 못하고
+// 35분 감시 타이머로 정리되던 원인이었다(2026-09-02). 필요할 때만 만든다.
+let _rl = null;
+const rl = {
+  question(q) {
+    if (!_rl) _rl = createInterface({ input: process.stdin, output: process.stdout });
+    return _rl.question(q);
+  },
+  close() {
+    if (_rl) _rl.close();
+    _rl = null;
+  },
+};
 
 /* ---------- 설정 / 사이트 API ---------- */
 
@@ -420,6 +440,12 @@ async function openCatalogPage(page, cat) {
 }
 
 /** 카탈로그 페이지 전체 수집 (페이지명 포함, 제목으로 중복 제거) */
+/**
+ * 직전 crawlCatalog() 결과의 메타. 페이지가 스스로 알려주는 총계가
+ * 그 회차의 '정답지'라서 건강 검사·요약 줄이 이걸 기준으로 판단한다.
+ */
+let lastCrawlMeta = { reportedTotal: 0, maxCursor: 0, metaOk: false, collected: 0 };
+
 async function crawlCatalog(page) {
   const catalog = [];
   const seen = new Set();
@@ -452,6 +478,7 @@ async function crawlCatalog(page) {
   const meta = await fetchCatalogMeta(page, CURSOR_MAX_ITEMS);
   const total = meta.total ?? CURSOR_FALLBACK_TOTAL;
   const maxCursor = Math.min(total, CURSOR_MAX_ITEMS);
+  lastCrawlMeta = { reportedTotal: total, maxCursor, metaOk: meta.total != null, collected: 0 };
   const catNames = meta.categories || {};
   console.log(
     `  [상품조회] 카탈로그 총 ${total}개 — cursor로 ${maxCursor}개까지 수집` +
@@ -491,6 +518,7 @@ async function crawlCatalog(page) {
       if (++emptyStreak >= 3) break;
     }
   }
+  lastCrawlMeta.collected = catalog.length;
   return catalog;
 }
 
@@ -509,18 +537,21 @@ async function crawlCatalog(page) {
  * 로 판정해 예외를 던진다. 예외는 상위에서 '오류:'로 찍히고 exit 1이 되므로
  * 로그와 스케줄러 LastTaskResult 양쪽에 남는다.
  */
-const CATALOG_HEALTH_PATH = path.join(__dirname, ".catalog-health.json");
-const CATALOG_MIN_RATIO = 0.2;
+const CATALOG_MIN_HARVEST = 0.5;
 
+/**
+ * 그 회차에 실제로 걷은 양이 페이지가 알려준 총계에 비해 말이 되는지 본다.
+ *
+ * 이전에는 '직전 정상 수집량의 20%'를 하한으로 썼는데, 토스 카탈로그 자체가
+ * 2,028(8/31) → 4,600(9/1) → 1,967(9/2)처럼 2배씩 흔들려서 기준으로 쓸 수 없었다.
+ * 게다가 부분 실패가 하한을 통과하면 그 값이 다음 회차의 기준이 되어 계단식으로
+ * 흘러내린다. 페이지가 스스로 알려주는 총계는 그 회차의 정답지라 히스토리가 필요 없다.
+ *
+ * 예외는 상위에서 '오류:'로 찍히고 exit 1이 되므로 로그와 스케줄러
+ * LastTaskResult 양쪽에 남는다.
+ */
 function assertCatalogHealthy(catalog) {
-  let last = 0;
-  try {
-    if (existsSync(CATALOG_HEALTH_PATH)) {
-      last = JSON.parse(readFileSync(CATALOG_HEALTH_PATH, "utf8")).lastGood || 0;
-    }
-  } catch {
-    last = 0;
-  }
+  const { reportedTotal, maxCursor, metaOk } = lastCrawlMeta;
 
   if (catalog.length === 0) {
     throw new Error(
@@ -528,21 +559,24 @@ function assertCatalogHealthy(catalog) {
         "       확인:  node scripts/toss-login.mjs  (로그인 후 창을 닫으면 저장)"
     );
   }
-  const floor = Math.floor(last * CATALOG_MIN_RATIO);
-  if (last > 0 && catalog.length < floor) {
+
+  // 총계조차 못 읽으면 fallback(1200)이 쓰인다. 세션이 반쯤 풀린 상태의 지문이라
+  // 수집량이 얼마든 이 회차의 결과는 믿을 수 없다.
+  if (!metaOk) {
     throw new Error(
-      `카탈로그 수집량이 비정상입니다 — 이번 ${catalog.length}개 / 직전 정상 ${last}개.\n` +
-        "       어드민이 느리거나 세션이 불안정한 상태일 수 있어 이번 회차를 중단합니다.\n" +
-        "       토스 카탈로그가 실제로 줄어든 것이라면 기준선을 지우세요:\n" +
-        `       del "${CATALOG_HEALTH_PATH}"`
+      `카탈로그 총계를 읽지 못했습니다 (fallback ${CURSOR_FALLBACK_TOTAL}개로 진행됨).\n` +
+        "       세션이 반쯤 풀린 상태일 수 있어 이번 회차를 중단합니다.\n" +
+        "       확인:  node scripts/toss-login.mjs"
     );
   }
-  // 최댓값이 아니라 '가장 최근 정상 회차'를 기준선으로 둔다.
-  // 최댓값으로 두면 토스 카탈로그가 실제로 줄었을 때 영영 실패하게 된다.
-  try {
-    writeFileSync(CATALOG_HEALTH_PATH, JSON.stringify({ lastGood: catalog.length }, null, 2) + "\n");
-  } catch {
-    /* 기록 실패는 회차를 막을 이유가 아니다 */
+
+  const harvest = catalog.length / Math.max(maxCursor, 1);
+  if (harvest < CATALOG_MIN_HARVEST) {
+    throw new Error(
+      `카탈로그 수집률이 비정상입니다 — ${catalog.length}개 / 총 ${reportedTotal}개 ` +
+        `(수집률 ${Math.round(harvest * 100)}%, 하한 ${CATALOG_MIN_HARVEST * 100}%).\n` +
+        "       어드민이 느리거나 세션이 불안정한 상태일 수 있어 이번 회차를 중단합니다."
+    );
   }
 }
 
@@ -960,6 +994,20 @@ async function runImport(config, page) {
   console.log(`\n✔ ${data.created}개 상품 등록 완료!`);
 }
 
+/**
+ * 회차 한 줄 요약. 로그가 회차당 40줄씩 쌓여 이상을 눈으로 찾기 어려워서,
+ * 이 줄만 grep하면 회차 상태를 한눈에 볼 수 있게 한다.
+ *   grep "\[요약\]" scripts/toss-auto.log
+ */
+function printRunSummary(mode, r, created, updated) {
+  const sec = Math.round((Date.now() - RUN_STARTED_AT) / 1000);
+  const { collected, reportedTotal } = lastCrawlMeta;
+  console.log(
+    `[요약] 모드=${mode} 카탈로그=${collected}/${reportedTotal} ` +
+      `매칭=${r?.added ?? 0} 신규=${created} 가격갱신=${updated} 소요=${sec}초`
+  );
+}
+
 /* ---------- 메인 ---------- */
 
 async function main() {
@@ -970,10 +1018,13 @@ async function main() {
   // 제한 시간 전에 스스로 끝내 로그를 남기고 다음 회차에 자리를 넘긴다.
   if (!process.argv.includes("--no-watchdog")) {
     const wd = setTimeout(() => {
-      console.log(
-        `\n[감시] ${RUN_BUDGET_MIN}분을 초과해 실행을 중단합니다 (다음 회차에서 이어서 진행).`
+      console.error(
+        `\n[감시] ${RUN_BUDGET_MIN}분을 초과했습니다 — 어딘가에서 실제로 매달려 있습니다.\n` +
+          "       (2026-09-02에 종료 경로를 고쳤으므로 이 줄이 보이면 진짜 이상 신호다)"
       );
-      process.exit(0); // 0으로 끝내야 스케줄러가 실패로 기록하지 않는다
+      // 이전에는 exit 0이라 '일 다 하고 잔류한 회차'와 구분이 안 됐다.
+      // 잔류가 사라진 지금은 발화 자체가 이상이므로 스케줄러에도 실패로 남긴다.
+      process.exit(1);
     }, RUN_BUDGET_MIN * 60 * 1000);
     wd.unref(); // 정상 종료를 막지 않도록
   }
@@ -1030,10 +1081,13 @@ async function main() {
       console.log(`\n[매칭 전용 실행] ${new Date().toLocaleString("ko-KR")}`);
       const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
       const r = await runMatch(config, page, { auto: true });
+      let created = 0;
+      let updated = 0;
       if (r) {
-        await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
-        await runPriceRefresh(config, r.catalog, r.products);
+        created = await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
+        updated = await runPriceRefresh(config, r.catalog, r.products);
       }
+      printRunSummary("match-only", r, created, updated);
       console.log("[매칭 전용 실행] 완료\n");
       return;
     }
@@ -1043,9 +1097,11 @@ async function main() {
       console.log(`\n[자동 실행] ${new Date().toLocaleString("ko-KR")}`);
       const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
       const r = await runMatch(config, page, { auto: true });
+      let created = 0;
+      let updated = 0;
       if (r) {
-        await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
-        await runPriceRefresh(config, r.catalog, r.products);
+        created = await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
+        updated = await runPriceRefresh(config, r.catalog, r.products);
       }
       // 그날 데이터로 블로그 리포트 자동 발행 (하루 1개, 이미 있으면 건너뜀)
       try {
@@ -1061,6 +1117,7 @@ async function main() {
       } catch (e) {
         console.log(`[알림] 실패: ${e.message}`);
       }
+      printRunSummary("auto", r, created, updated);
       console.log("[자동 실행] 완료\n");
       return;
     }
@@ -1089,11 +1146,17 @@ async function main() {
       "-Command",
       "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*.toss-profile*' -and $_.ProcessId -ne $PID } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }",
     ], { timeout: 20000 });
+    rl.close(); // 대화형에서 물어봤다면 stdin을 놓아준다
   }
   process.exit(0);
 }
 
-main().catch((e) => {
-  console.error("오류:", e.message || e);
-  process.exit(1);
-});
+// --auto·--match-only·--crawl-test는 try 블록 안에서 return하므로 main() 말미의
+// process.exit(0)에 도달하지 않는다. 어느 경로로 끝나든 여기서 명시적으로 끝낸다.
+main().then(
+  () => process.exit(0),
+  (e) => {
+    console.error("오류:", e.message || e);
+    process.exit(1);
+  }
+);
