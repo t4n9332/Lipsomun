@@ -13,6 +13,22 @@ export const revalidate = 1800; // 사이트맵
  */
 const enc = (slug: string) => encodeURIComponent(slug);
 
+/**
+ * IndexNow(scripts/indexnow.mjs)는 sitemap의 <lastmod> 값이 바뀐 URL만 재제출한다.
+ * 허브 페이지에 lastModified가 없으면 값이 늘 빈 문자열이라 "" === ""이 되어
+ * 최초 1회 제출 뒤 영영 재제출되지 않는다 — 홈·기획전·카테고리 16개가 그 상태였다
+ * (2026-09-02 확인. 제품·블로그 852개는 updatedAt이 있어 정상 동작 중이었다).
+ *
+ * 다만 매 요청마다 값이 흔들리면 하루 8회차마다 같은 URL을 재제출하게 되므로
+ * 한국시간 자정 기준으로 하루 한 번만 바뀌도록 끊는다.
+ * calc·tools처럼 내용이 코드와 함께만 바뀌는 페이지는 일부러 빼뒀다 —
+ * 그쪽은 최초 1회 제출로 충분하다.
+ */
+function kstToday(): Date {
+  const kst = new Date(Date.now() + 9 * 3600 * 1000);
+  return new Date(Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate()));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.SITE_URL || "https://example.com";
   let products: { slug: string; updatedAt: Date }[] = [];
@@ -27,13 +43,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch {
     // DB 미연결 시 기본 페이지만
   }
+  const today = kstToday();
   return [
-    { url: base, changeFrequency: "daily", priority: 1 },
-    { url: `${base}/compare`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/deals`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/ranking`, changeFrequency: "daily", priority: 0.8 },
-    { url: `${base}/pick`, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/blog`, changeFrequency: "daily", priority: 0.8 },
+    { url: base, lastModified: today, changeFrequency: "daily", priority: 1 },
+    { url: `${base}/compare`, lastModified: today, changeFrequency: "daily", priority: 0.9 },
+    { url: `${base}/deals`, lastModified: today, changeFrequency: "daily", priority: 0.9 },
+    { url: `${base}/ranking`, lastModified: today, changeFrequency: "daily", priority: 0.8 },
+    { url: `${base}/pick`, lastModified: today, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/blog`, lastModified: today, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/calc`, changeFrequency: "monthly", priority: 0.8 },
     ...CALCULATORS.map((c) => ({
       url: `${base}/calc/${encodeURIComponent(c.slug)}`,
@@ -49,6 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // '기타'는 게시 상품 0개 유지가 원칙이라 빈 페이지 색인을 막기 위해 제외
     ...CATEGORIES.filter((c) => c !== "기타").map((c) => ({
       url: `${base}/category/${encodeURIComponent(c)}`,
+      lastModified: today,
       changeFrequency: "daily" as const,
       priority: 0.8,
     })),
