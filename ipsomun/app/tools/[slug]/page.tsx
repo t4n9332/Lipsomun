@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { TOOLS, getTool } from "@/lib/tools";
 import PdfMergeTool from "@/components/tools/PdfMergeTool";
 import AdSlot from "@/components/AdSlot";
+import { toolAdSlot } from "@/lib/adSlots";
 
 export const revalidate = 86400;
 
@@ -60,7 +61,7 @@ export default async function ToolPage({
 
       <Tool />
 
-      <AdSlot slot="1234567890" />
+      <AdSlot slot={toolAdSlot(t.slug)} />
 
       <Guide />
 

@@ -175,3 +175,37 @@ export const pensionCreditRate = (gross: number) =>
   gross <= PENSION_CREDIT.highRateGrossLimit
     ? PENSION_CREDIT.highRate
     : PENSION_CREDIT.lowRate;
+
+/* ---------- 종합소득세 (프리랜서 · 사업소득) ---------- */
+
+/**
+ * 프리랜서 원천징수율 3.3%.
+ * 소득세 3% + 지방소득세 0.3%로 이미 지방소득세까지 떼간 값이다.
+ * 그래서 환급액을 낼 때는 '결정세액 + 지방소득세'와 비교해야 앞뒤가 맞는다.
+ */
+export const WITHHOLDING_FREELANCE = 0.033;
+
+/** 근로소득이 없는 종합소득자의 표준세액공제 (근로소득자는 13만원으로 다르다) */
+export const STANDARD_TAX_CREDIT_NO_EARNED = 70_000;
+
+/**
+ * 단순경비율을 쓸 수 있는 직전연도 수입금액 한도 (서비스업·인적용역 기준).
+ * 이 선을 넘으면 기준경비율 대상이 되어 경비 인정 방식이 완전히 달라진다.
+ * 업종마다 한도가 다르고(도소매 6,000만 / 제조·음식숙박 3,600만) 신규사업자는
+ * 예외가 있어, 계산에 반영하지 않고 경고만 띄운다.
+ */
+export const SIMPLE_EXPENSE_LIMIT_SERVICE = 24_000_000;
+
+/**
+ * 노란우산공제(소기업·소상공인 공제부금) 소득공제 한도.
+ * 사업소득금액 구간에 따라 달라진다 — 프리랜서가 쓸 수 있는 거의 유일한
+ * 큰 폭의 소득공제라 계산기에 넣을 값어치가 있다.
+ */
+export function noranUmbrellaCap(businessIncome: number) {
+  if (businessIncome <= 40_000_000) return 5_000_000;
+  if (businessIncome <= 100_000_000) return 3_000_000;
+  return 2_000_000;
+}
+
+/** 기본공제 — 본인·부양가족 1명당 */
+export const BASIC_DEDUCTION_PER_PERSON = 1_500_000;
