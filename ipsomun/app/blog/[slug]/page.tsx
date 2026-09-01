@@ -120,7 +120,14 @@ export default async function BlogPostPage({
           <b>🔥 오늘 역대 최저가 진입</b>
           {data.lows.map((l) => (
             <Link key={l.slug} href={`/p/${l.slug}`}>
-              {l.title.slice(0, 45)} — <b>{won(l.price ?? 0)}</b>
+              {/* 가격이 없을 때 `?? 0`이면 "0원"이 그대로 노출된다 — 가격만 뺀다 */}
+              {l.title.slice(0, 45)}
+              {l.price != null && (
+                <>
+                  {" — "}
+                  <b>{won(l.price)}</b>
+                </>
+              )}
             </Link>
           ))}
         </div>

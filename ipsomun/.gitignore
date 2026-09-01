@@ -13,3 +13,5 @@ next-env.d.ts
 scripts/toss-auto.log
 scripts/.discover-tried.json
 scripts/.indexnow-submitted.json
+# 카탈로그 수집량 기준선 (회차마다 갱신되는 실행 상태)
+scripts/.catalog-health.json

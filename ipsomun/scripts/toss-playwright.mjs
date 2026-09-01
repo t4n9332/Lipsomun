@@ -31,6 +31,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { siteCategoryFor } from "./lib-category.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROFILE_DIR = path.join(__dirname, ".toss-profile");
@@ -59,38 +60,6 @@ const TRIED_PATH = path.join(__dirname, ".discover-tried.json");
 /** 역매칭 실패 상품 재시도 유예기간(일) — 이 기간이 지나면 다시 후보에 오른다 */
 const DISCOVER_RETRY_DAYS = 14;
 
-/**
- * 토스 카탈로그의 카테고리명을 사이트 카테고리 10종으로 접는 규칙.
- *
- * 토스가 주는 categoryName은 '양념/가공육', '팩트 하이라이터', '국산생수'처럼
- * 매우 세분화된 말단 분류라 1:1 표로는 감당이 안 된다. 키워드 규칙으로 접고,
- * 카테고리명으로 판정이 안 되면 상품명으로 한 번 더 시도한다.
- * 순서가 중요하다 — 위에서부터 먼저 맞는 규칙을 쓴다
- * (예: '강아지 간식'은 '간식'(식품)보다 '강아지'(반려동물)가 먼저여야 한다).
- */
-const CATEGORY_RULES = [
-  ["반려동물", /강아지|고양이|반려|애완|펫|사료|캣|독\b/],
-  ["육아", /유아|아기|기저귀|분유|이유식|아동|신생아|출산|어린이|베이비|유모차|젖병/],
-  ["뷰티", /화장|스킨|로션|에멀젼|크림|세럼|앰플|에센스|클렌징|마스크팩|선크림|자외선|립|아이섀도|섀도|하이라이터|팩트|파운데이션|쿠션|매니큐어|네일|향수|샴푸|린스|트리트먼트|헤어|바디워시|바디로션|면도|제모|미용|뷰티|비누/],
-  ["주방용품", /주방|냄비|프라이팬|후라이팬|밀폐|도마|칼\b|수저|식기|그릇|컵\b|텀블러|보온병|조리|국자|채반|주걱|랩\b|호일|위생장갑|수세미|행주/],
-  ["가전/디지털", /가전|전자|디지털|노트북|모니터|키보드|마우스|충전기|케이블|이어폰|헤드폰|스피커|카메라|tv\b|티비|냉장고|세탁기|청소기|에어컨|선풍기|공기청정|드라이어|면도기|전동칫솔|배터리|건전지|스마트폰|태블릿|공유기|ssd|usb/i],
-  ["스포츠/레저", /스포츠|레저|레져|운동|헬스|요가|필라테스|등산|캠핑|낚시|자전거|골프|수영|런닝|러닝|덤벨|아령|매트|텐트|보호대/],
-  ["패션", /의류|패션|티셔츠|셔츠|바지|청바지|원피스|치마|자켓|재킷|코트|패딩|니트|맨투맨|후드|양말|속옷|언더웨어|브라|팬티|신발|운동화|구두|슬리퍼|샌들|부츠|가방|백팩|지갑|벨트|모자|장갑|스카프|목도리|시계|주얼리|액세서리/],
-  ["홈인테리어", /인테리어|가구|홈데코|침대|매트리스|이불|베개|커튼|russ|러그|카펫|소파|의자|책상|선반|수납|정리함|조명|스탠드|액자|화분|디퓨저|캔들|수건|타월/],
-  ["식품", /식품|음료|과자|간식|커피|차\b|생수|물\b|주스|우유|두유|요거트|라면|면\b|밥\b|즉석|가공육|생고기|고기|육류|정육|수산|생선|해산|과일|채소|야채|쌀\b|잡곡|견과|건과|김치|반찬|소스|양념|장류|기름|올리브유|설탕|소금|밀가루|빵\b|떡\b|만두|탕\b|찌개|국\b|죽\b|햄|소시지|어묵|계란|달걀|치즈|버터|아이스크림|초콜릿|사탕|젤리|영양제|비타민|유산균|홍삼|효소|단백질|프로틴|건강기능/],
-  ["생활용품", /생활|세제|섬유유연제|표백|청소|욕실|화장지|휴지|물티슈|기저귀커버|쓰레기봉투|봉투|건조대|빨래|세탁|제습|방향|탈취|해충|모기|살충|마스크|밴드|의약외품|공구|철물|문구|사무|필기|노트|테이프|차량|자동차|타이어|워셔/],
-];
-
-/** 토스 카테고리명·상품명으로 사이트 카테고리를 정한다 */
-function siteCategoryFor(tossCategoryName, title) {
-  for (const source of [tossCategoryName, title]) {
-    if (!source) continue;
-    for (const [siteCat, re] of CATEGORY_RULES) {
-      if (re.test(source)) return siteCat;
-    }
-  }
-  return "기타";
-}
 
 /** 상품 조회 페이지 — 카테고리 필터를 적용해 카탈로그를 넓히는 데 쓴다 */
 const FILTER_PAGE_URL = "https://sharelink.toss.im/links/recommended-products";
@@ -525,6 +494,58 @@ async function crawlCatalog(page) {
   return catalog;
 }
 
+/**
+ * 카탈로그 수집이 사실상 실패했는데 조용히 넘어가는 걸 막는다.
+ *
+ * ensureLoggedIn()은 '실적 대시보드' 글자만 보므로, 세션이 반쯤 풀렸거나
+ * 어드민이 느릴 때는 통과해버린다. 그 뒤 수집이 0개로 끝나도 매칭·역매칭이
+ * "일치 없음 / 후보 0개"를 찍고 '완료'로 exit 0 한다.
+ * 실제로 2026-08-28~30 사이 여러 회차가 이 상태로 아무 것도 못 했는데
+ * 로그만 봐서는 정상 회차와 구분이 안 됐다.
+ *
+ * 그래서 마지막으로 성공한 수집량을 기록해두고,
+ *   - 0개면 무조건 실패
+ *   - 직전 성공의 20% 미만이면 실패 (부분 수집도 놓치지 않기 위함)
+ * 로 판정해 예외를 던진다. 예외는 상위에서 '오류:'로 찍히고 exit 1이 되므로
+ * 로그와 스케줄러 LastTaskResult 양쪽에 남는다.
+ */
+const CATALOG_HEALTH_PATH = path.join(__dirname, ".catalog-health.json");
+const CATALOG_MIN_RATIO = 0.2;
+
+function assertCatalogHealthy(catalog) {
+  let last = 0;
+  try {
+    if (existsSync(CATALOG_HEALTH_PATH)) {
+      last = JSON.parse(readFileSync(CATALOG_HEALTH_PATH, "utf8")).lastGood || 0;
+    }
+  } catch {
+    last = 0;
+  }
+
+  if (catalog.length === 0) {
+    throw new Error(
+      "카탈로그를 한 개도 수집하지 못했습니다 — 로그인 세션이 풀렸을 가능성이 큽니다.\n" +
+        "       확인:  node scripts/toss-login.mjs  (로그인 후 창을 닫으면 저장)"
+    );
+  }
+  const floor = Math.floor(last * CATALOG_MIN_RATIO);
+  if (last > 0 && catalog.length < floor) {
+    throw new Error(
+      `카탈로그 수집량이 비정상입니다 — 이번 ${catalog.length}개 / 직전 정상 ${last}개.\n` +
+        "       어드민이 느리거나 세션이 불안정한 상태일 수 있어 이번 회차를 중단합니다.\n" +
+        "       토스 카탈로그가 실제로 줄어든 것이라면 기준선을 지우세요:\n" +
+        `       del "${CATALOG_HEALTH_PATH}"`
+    );
+  }
+  // 최댓값이 아니라 '가장 최근 정상 회차'를 기준선으로 둔다.
+  // 최댓값으로 두면 토스 카탈로그가 실제로 줄었을 때 영영 실패하게 된다.
+  try {
+    writeFileSync(CATALOG_HEALTH_PATH, JSON.stringify({ lastGood: catalog.length }, null, 2) + "\n");
+  } catch {
+    /* 기록 실패는 회차를 막을 이유가 아니다 */
+  }
+}
+
 /* ---------- 모드 1: 쿠팡 상품 매칭 (핵심) ---------- */
 
 async function runMatch(config, page, opts = {}) {
@@ -545,6 +566,7 @@ async function runMatch(config, page, opts = {}) {
     catalog = await crawlCatalog(page);
   }
   console.log(`카탈로그 상품 총 ${catalog.length}개\n`);
+  assertCatalogHealthy(catalog);
   if (targets.length === 0) {
     console.log("매칭할 상품이 없습니다.");
     return { products, catalog, added: 0 };
