@@ -1326,3 +1326,11 @@ html { scroll-behavior: smooth; }
 .farm-btns { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
 .farm-btns .btn { text-align: center; }
 .btn.farm-naver { background: #03c75a; color: #fff; }
+/* 산지직송 가로 탭 (2026-09-04) — 분류가 늘어도 한 줄에서 옆으로 넘긴다 */
+.farm-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 10px; margin: 28px 0 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.farm-tabs::-webkit-scrollbar { display: none; }
+.farm-tabs button { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.farm-tabs button .n { font-size: 11.5px; font-weight: 700; color: var(--ink-faint); }
+.farm-tabs button.on { background: #2f7d4f; border-color: #2f7d4f; color: #fff; }
+.farm-tabs button.on .n { color: rgba(255,255,255,0.8); }
+.farm-panel { margin-top: 12px; }

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import farm from "@/data/farm.json";
-import FarmCard, { type FarmItem } from "@/components/FarmCard";
+import { type FarmItem } from "@/components/FarmCard";
+import FarmTabs from "@/components/FarmTabs";
 
 // 산지직송 코너 — 입소문 운영자가 직접 파는 농수산물 (제휴 링크 아님).
 //
 // 데이터는 다른 프로젝트(witak-auto)의 `python run.py farm-export --push` 가
 // data/farm.json 을 갈아끼우고 푸시하면 Vercel 이 다시 빌드한다. 매일 17:10 자동.
 // 이 페이지는 그 JSON 을 읽어 그리기만 한다 — DB 도, 관리자 화면도 쓰지 않는다.
+// 분류는 가로 탭(FarmTabs)으로 나눈다 — 상품이 늘어도 세로 스크롤이 길어지지 않게.
 export const dynamic = "force-static";
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function FarmPage() {
   const items = farm.items as FarmItem[];
-  const groups = ORDER.map((c) => [c, items.filter((i) => i.category === c)] as const).filter(
+  const groups = ORDER.map((c) => [c, items.filter((i) => i.category === c)] as [string, FarmItem[]]).filter(
     ([, v]) => v.length > 0
   );
   const updated = (farm.generated_at || "").replace("T", " ").slice(0, 16);
@@ -56,19 +58,7 @@ export default function FarmPage() {
       {groups.length === 0 ? (
         <div className="empty">지금은 판매 중인 상품이 없습니다. 곧 다시 채워 넣을게요.</div>
       ) : (
-        groups.map(([cat, list]) => (
-          <section className="section" key={cat} id={cat}>
-            <div className="section-head">
-              <h2>{cat}</h2>
-              <span className="sub">{list.length}개</span>
-            </div>
-            <div className="grid">
-              {list.map((p) => (
-                <FarmCard key={p.id} p={p} />
-              ))}
-            </div>
-          </section>
-        ))
+        <FarmTabs groups={groups} />
       )}
 
       <p className="vs-note">
