@@ -10,6 +10,8 @@ import {
 import ProductCard from "@/components/ProductCard";
 import CompareCard, { comparePrices } from "@/components/CompareCard";
 import { TELEGRAM_CHANNEL_URL, imgUrl } from "@/lib/util";
+import farm from "@/data/farm.json";
+import FarmCard, { type FarmItem } from "@/components/FarmCard";
 
 export const revalidate = 300; // 홈 — 딜·가격 자주 변동
 
@@ -73,6 +75,23 @@ export default async function Home() {
         </span>
         <span className="tg-cta">무료 구독 →</span>
       </a>
+
+      {farm.items.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>🥬 산지직송</h2>
+            <span className="sub">입소문이 직접 운영하는 농수산물 스토어 · 산지에서 바로 발송</span>
+            <Link className="more" href="/farm">
+              전체보기 →
+            </Link>
+          </div>
+          <div className="grid">
+            {(farm.items as FarmItem[]).slice(0, 8).map((p) => (
+              <FarmCard key={p.id} p={p} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section">
         <div className="section-head">

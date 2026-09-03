@@ -1,5 +1,7 @@
 # 입소문 — 제휴 링크 큐레이션 사이트
 
+> ⚠️ **2026-09-03 — 다른 프로젝트(witak-auto)가 이 저장소에 손댔습니다.** `/farm` 산지직송 코너(`data/farm.json`·`app/farm`·`components/FarmCard.tsx`·홈 섹션·메뉴·사이트맵)가 그것입니다. `data/farm.json` 은 그쪽이 매일 17:10 자동으로 갈아끼우니 **손으로 고치지 마세요.** 자세한 것은 맨 아래 "산지직송 코너" 절.
+
 여러 쇼핑 플랫폼(쿠팡, 네이버, 토스쇼핑, 11번가, 오늘의집 등)의 제휴 링크를 모아 수익화하는 사이트입니다.
 
 ## 구성
@@ -153,3 +155,19 @@ node scripts/toss-playwright.mjs  # 매칭/등록 도구 실행
 
 - 사이트 하단과 상품 상세에 쿠팡파트너스 필수 문구("이 포스팅은 쿠팡 파트너스 활동의 일환으로...")가 이미 포함되어 있습니다.
 - 제휴 링크에는 `rel="nofollow sponsored"`가 적용되어 있습니다.
+
+## 산지직송 코너 (`/farm`) — 다른 프로젝트가 관리합니다 (2026-09-03 추가)
+
+**이 코너는 제휴 링크가 아니라 운영자가 직접 파는 농수산물**(네이버 스마트스토어 '백납')입니다.
+`witak-auto` 프로젝트(`02 농축수산물/' 직원 . skill/witak-auto`)의 세션이 이 저장소에 **따로 손을 댔습니다.**
+
+| 무엇 | 어디 | 누가 관리 |
+|---|---|---|
+| 데이터 | `data/farm.json` | **witak-auto** — `python run.py farm-export --push` 가 갈아끼우고 커밋·푸시. 매일 17:10 자동(`witak-listing`). **손으로 고치지 마세요** (다음 푸시에 덮입니다) |
+| 페이지·카드 | `app/farm/page.tsx` · `components/FarmCard.tsx` · `globals.css` 맨 아래 `.farm-*` | 이 저장소 |
+| 홈 노출 · 메뉴 · 사이트맵 | `app/page.tsx`(🥬 산지직송 8개) · `app/layout.tsx` · `app/sitemap.ts` | 이 저장소 |
+
+- 품절·비진열·중복 상품은 JSON 에 아예 안 실립니다(`witak-auto/core/farmexport.py` 가 거릅니다). 사이트에서 따로 거를 필요 없습니다.
+- JSON 이 비면(`items: []`) 홈 섹션은 사라지고 `/farm` 은 "판매 중인 상품이 없습니다" 를 보여줍니다. witak-auto 는 0개일 때 푸시하지 않습니다.
+- 가격·링크가 이상하면 이 저장소가 아니라 **witak-auto 쪽에서** `python run.py farm-export` 로 다시 뽑아 보세요.
+- 코너를 내리려면: 메뉴·홈 섹션·사이트맵 줄을 지우고 `data/farm.json` 을 `{"items":[]}` 로 두면 됩니다. witak-auto 의 `AUTO_PROFILES["listing"]` 에서 `farm-export` 도 빼야 다시 푸시되지 않습니다.

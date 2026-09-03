@@ -1310,3 +1310,19 @@ html { scroll-behavior: smooth; }
   .tool-drop { padding: 26px 14px; }
   .tool-actions { flex-direction: column; }
 }
+
+/* ---------- 산지직송 코너 (/farm) — 운영자 직접 판매, 데이터는 witak-auto farm-export ---------- */
+.farm-hero p { max-width: 640px; }
+.farm-sub { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; font-size: 13.5px; color: var(--ink-faint); }
+.farm-sub a { color: var(--accent); margin-left: auto; }
+.badge.farm { background: #2f7d4f; }
+.farm-card .thumb { display: block; }
+.farm-opts { list-style: none; margin: 4px 0 6px; padding: 0; display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; }
+.farm-opts li { display: flex; align-items: baseline; gap: 6px; color: var(--ink-soft); }
+.farm-opts li b { margin-left: auto; font-weight: 600; color: var(--ink); }
+.farm-opts li em { font-style: normal; font-size: 11px; color: #c9302c; }
+.farm-opts li.soldout span, .farm-opts li.soldout b { text-decoration: line-through; color: var(--ink-faint); }
+.farm-card .price-row .meta { font-size: 12px; }
+.farm-btns { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.farm-btns .btn { text-align: center; }
+.btn.farm-naver { background: #03c75a; color: #fff; }

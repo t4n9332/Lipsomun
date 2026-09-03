@@ -88,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/deals">오늘의 딜</Link>
               <Link href="/ranking">랭킹</Link>
               <Link href="/pick">기획전</Link>
+              <Link href="/farm">산지직송</Link>
               {/* 정보 축 — 성격이 다르므로 선으로 갈라준다.
                   섞어두면 계산기가 쇼핑 메뉴에 얹힌 남의 물건처럼 보인다. */}
               <span className="nav-div" aria-hidden />
