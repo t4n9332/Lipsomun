@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-04T07:11+09:00",
+ "generated_at": "2026-09-04T07:17+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -4465,6 +4465,31 @@
     7,
     8
    ],
+   "created_at": "2026-09-04"
+  },
+  {
+   "id": "13685176762",
+   "group_id": "G10000266",
+   "title": "프리미엄 멸치 액젓 1.8L",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10000266_thumb.jpg",
+   "price_from": 18700,
+   "options": [
+    {
+     "name": "1.8L",
+     "price": 18700,
+     "soldout": false
+    },
+    {
+     "name": "1.8L x 2개×2박스",
+     "price": 32600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13745838528",
+   "coupang_url": "https://www.coupang.com/vp/products/16370937986",
+   "season_kind": "상시",
+   "peak_months": [],
    "created_at": "2026-09-04"
   }
  ]
