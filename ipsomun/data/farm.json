@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-04T09:53+09:00",
+ "generated_at": "2026-09-04T09:57+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -4826,7 +4826,7 @@
    "id": "13685218549",
    "group_id": "G10000105",
    "title": "해신탕 밀키트 (L)",
-   "category": "기타",
+   "category": "밀키트",
    "image": "https://t4n9332.github.io/witak-images/images/G10000105_thumb.jpg",
    "price_from": 40100,
    "options": [
@@ -5076,7 +5076,7 @@
    "id": "13685247410",
    "group_id": "G10001477",
    "title": "원양산(급냉)한입 한치",
-   "category": "기타",
+   "category": "수산물",
    "image": "https://t4n9332.github.io/witak-images/images/G10001477_thumb.jpg",
    "price_from": 20200,
    "options": [
@@ -5176,7 +5176,7 @@
    "id": "13685258742",
    "group_id": "G10000764",
    "title": "국내산(급냉)한입한치",
-   "category": "기타",
+   "category": "수산물",
    "image": "https://t4n9332.github.io/witak-images/images/G10000764_thumb.jpg",
    "price_from": 13300,
    "options": [
@@ -5265,7 +5265,7 @@
    "id": "13685270393",
    "group_id": "G10000125",
    "title": "쭈삼새 밀키트 [L]",
-   "category": "기타",
+   "category": "밀키트",
    "image": "https://t4n9332.github.io/witak-images/images/G10000125_thumb.jpg",
    "price_from": 29500,
    "options": [
@@ -5354,7 +5354,7 @@
    "id": "13685281365",
    "group_id": "G10000127",
    "title": "소고기 샤브샤브 밀키트 [L]",
-   "category": "수산물",
+   "category": "밀키트",
    "image": "https://t4n9332.github.io/witak-images/images/G10000127_thumb.jpg",
    "price_from": 28500,
    "options": [
@@ -5374,7 +5374,7 @@
    "id": "13685286738",
    "group_id": "G10000126",
    "title": "알탕 밀키트 [L]",
-   "category": "기타",
+   "category": "밀키트",
    "image": "https://t4n9332.github.io/witak-images/images/G10000126_thumb.jpg",
    "price_from": 28700,
    "options": [
