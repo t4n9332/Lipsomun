@@ -164,7 +164,7 @@ node scripts/toss-playwright.mjs  # 매칭/등록 도구 실행
 | 무엇 | 어디 | 누가 관리 |
 |---|---|---|
 | 데이터 | `data/farm.json` | **witak-auto** — `python run.py farm-export --push` 가 갈아끼우고 커밋·푸시. 매일 17:10 자동(`witak-listing`). **손으로 고치지 마세요** (다음 푸시에 덮입니다) |
-| 페이지·카드 | `app/farm/page.tsx` · `components/FarmCard.tsx` · `globals.css` 맨 아래 `.farm-*` | 이 저장소 |
+| 페이지·카드·탭 | `app/farm/page.tsx` · `components/FarmCard.tsx` · `components/FarmTabs.tsx`(분류 가로 탭, 2026-09-04) · `globals.css` 맨 아래 `.farm-*` | 이 저장소 |
 | 홈 노출 · 메뉴 · 사이트맵 | `app/page.tsx`(🥬 산지직송 8개) · `app/layout.tsx` · `app/sitemap.ts` | 이 저장소 |
 
 - 품절·비진열·중복 상품은 JSON 에 아예 안 실립니다(`witak-auto/core/farmexport.py` 가 거릅니다). 사이트에서 따로 거를 필요 없습니다.
