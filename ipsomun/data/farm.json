@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-04T10:53+09:00",
+ "generated_at": "2026-09-04T17:14+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -452,7 +452,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732215207",
-   "coupang_url": "https://www.coupang.com/vp/products/16366149945",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     8,
@@ -481,7 +481,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732215218",
-   "coupang_url": "https://www.coupang.com/vp/products/16366149945",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     8,
@@ -1851,7 +1851,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13741854394",
-   "coupang_url": "https://www.coupang.com/vp/products/16368878361",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-02"
@@ -1871,7 +1871,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13741854422",
-   "coupang_url": "https://www.coupang.com/vp/products/16368878361",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-02"
@@ -1891,7 +1891,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13741854454",
-   "coupang_url": "https://www.coupang.com/vp/products/16368878361",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-02"
@@ -4513,31 +4513,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685195372",
-   "group_id": "G10001415",
-   "title": "1++ 한우 등심 + 갈비살 선물세트",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001415_thumb.jpg",
-   "price_from": 216800,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 216800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745857282",
-   "coupang_url": "https://www.coupang.com/vp/products/16370962014",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685196400",
    "group_id": "G10004776",
    "title": "명품3호 일 선물세트(애플망고 애플망고 샤인머스켓) 혼합과 [보자기 동봉]",
@@ -4683,31 +4658,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745870327",
    "coupang_url": "https://www.coupang.com/vp/products/16370976346",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685210135",
-   "group_id": "G10001413",
-   "title": "1+ 한우 등심 + 갈비살 선물세트",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001413_thumb.jpg",
-   "price_from": 209900,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 209900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745872192",
-   "coupang_url": "https://www.coupang.com/vp/products/16370978203",
    "season_kind": "시즌",
    "peak_months": [
     1,
@@ -5574,26 +5524,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685307744",
-   "group_id": "G10001194",
-   "title": "국내산(생물)오징어",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001194_thumb.jpg",
-   "price_from": 23800,
-   "options": [
-    {
-     "name": "1kg (5미)",
-     "price": 23800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745970651",
-   "coupang_url": "https://www.coupang.com/vp/products/16371073141",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685308203",
    "group_id": "G10001604",
    "title": "오징어 입",
@@ -5786,31 +5716,6 @@
    "coupang_url": "https://www.coupang.com/vp/products/16371089492",
    "season_kind": "상시",
    "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685325381",
-   "group_id": "G10001436",
-   "title": "LA갈비 선물세트 [냉동]",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001436_thumb.jpg",
-   "price_from": 93700,
-   "options": [
-    {
-     "name": "1.5kg",
-     "price": 93700,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745988399",
-   "coupang_url": "https://www.coupang.com/vp/products/16371090944",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
    "created_at": "2026-09-04"
   },
   {
