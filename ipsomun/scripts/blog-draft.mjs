@@ -40,12 +40,74 @@ function loadDone() {
   }
 }
 
+async function fetchPriceStats(id) {
+  try {
+    const res = await fetch(`${config.siteUrl}/api/admin/price-stats?id=${encodeURIComponent(id)}`, {
+      headers: { Cookie: `ipsomun_admin=${token}` },
+    });
+    const data = await res.json();
+    return data.stats || null; // { minPrice, maxPrice, days } | null
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 제목의 용량/수량 표기를 읽어 단가를 계산한다. "20g, 30개"처럼 개당 중량과
+ * 묶음 수량이 콤마로 분리된 경우 곱해서 총량을 구한다 — 첫 숫자만 읽으면
+ * (예: 20g만 보고 30개를 무시) 단가가 30배 틀어지므로 파트별로 따로 찾는다.
+ * 파싱이 애매하면 null — 억지로 끼워맞추지 않는다.
+ */
+function unitPrice(title, price) {
+  if (!price) return null;
+  const parts = title.split(",").map((s) => s.trim());
+  let weightValue = null;
+  let weightUnit = null; // "g" | "ml"
+  let count = null;
+  for (const part of parts) {
+    const w = part.match(/^(\d+(?:\.\d+)?)\s*(kg|g|ml|l|리터)$/i);
+    if (w && weightValue == null) {
+      weightValue = Number(w[1]);
+      weightUnit = w[2].toLowerCase();
+      if (weightUnit === "kg") { weightValue *= 1000; weightUnit = "g"; }
+      if (weightUnit === "l" || weightUnit === "리터") { weightValue *= 1000; weightUnit = "ml"; }
+      continue;
+    }
+    const c = part.match(/^(\d+)\s*(개|매|정|캡슐|포|봉|팩)$/i);
+    if (c && count == null) count = Number(c[1]);
+  }
+
+  if (weightValue != null && weightValue > 0) {
+    const total = weightValue * (count || 1);
+    const per = (price / total) * 100;
+    return `100${weightUnit}당 ${won(Math.round(per))}`;
+  }
+  if (count != null && count > 0) {
+    return `1개당 ${won(Math.round(price / count))}`;
+  }
+  return null;
+}
+
+/** 같은 카테고리 상품 중 가격 순위 (전체 대비 상위 %) — 지어내지 않는 사이트 자체 데이터 */
+function categoryRank(p, cPrice, rows) {
+  if (!p.category || p.category === "기타" || cPrice == null) return null;
+  const peers = rows
+    .filter((x) => x.p.category === p.category && x.cPrice != null)
+    .map((x) => x.cPrice)
+    .sort((a, b) => a - b);
+  if (peers.length < 5) return null; // 표본이 너무 적으면 순위가 의미 없다
+  const rank = peers.findIndex((price) => price >= cPrice) + 1;
+  const percentile = Math.round((rank / peers.length) * 100);
+  return { rank, total: peers.length, percentile };
+}
+
 /**
  * 토스 링크가 없는 인기 상품용 단일 소개 글.
- * 가격비교가 성립하지 않으므로 '가격 추이 + 구매 판단' 쪽으로 각을 잡는다.
- * 네이버는 정형화된 글을 싫어하므로 비교 글과 구조를 일부러 다르게 둔다.
+ * 가격비교가 성립하지 않으므로 '가격 추이 + 단가 계산' 쪽으로 각을 잡는다.
+ * 써본 경험을 지어내지 않는다(blog-money-ops 절대 규칙) — 대신 사이트가 이미
+ * 갖고 있는 가격 히스토리·카테고리 데이터로 고유성 블록을 채운다.
  */
-function draftSingle(p, cPrice) {
+async function draftSingle(p, cPrice, rows) {
   const url = `https://lipsomun.co.kr/p/${encodeURIComponent(p.slug)}`;
   const shortName = p.title.split(",")[0].trim();
   const cat = p.category && p.category !== "기타" ? p.category : null;
@@ -53,6 +115,30 @@ function draftSingle(p, cPrice) {
     p.rating && p.ratingCount
       ? `\n실구매자 평점은 **${p.rating}점(리뷰 ${Number(p.ratingCount).toLocaleString("ko-KR")}개)** 입니다.\n`
       : "";
+
+  const stats = await fetchPriceStats(p.id);
+  const up = unitPrice(p.title, cPrice);
+  const rank = categoryRank(p, cPrice, rows);
+
+  const priceDataLines = [];
+  if (stats && stats.days >= 3) {
+    const vsLow = cPrice - stats.minPrice;
+    if (vsLow <= 0) {
+      priceDataLines.push(`- 최근 **${stats.days}일 중 오늘이 최저가**입니다 (역대 최저 ${won(stats.minPrice)})`);
+    } else {
+      const pct = Math.round((vsLow / stats.minPrice) * 100);
+      priceDataLines.push(
+        `- 최근 ${stats.days}일 기록상 최저가는 ${won(stats.minPrice)} — 지금은 그보다 **${won(vsLow)}(${pct}%) 높은 가격**입니다`
+      );
+    }
+    priceDataLines.push(`- 같은 기간 최고가는 ${won(stats.maxPrice)}였습니다`);
+  }
+  if (up) priceDataLines.push(`- 단가로 환산하면 **${up}**입니다`);
+  if (rank) priceDataLines.push(`- ${cat} 카테고리 판매 상품 중 가격 기준 상위 **${rank.percentile}%**(${rank.total}개 중 ${rank.rank}위)`);
+
+  const priceDataBlock = priceDataLines.length
+    ? `## 가격 데이터로 보면\n\n${priceDataLines.join("\n")}\n`
+    : "";
 
   return `# [자동 초안 ${today}] ${shortName} — 살까 말까 정리
 
@@ -63,23 +149,20 @@ function draftSingle(p, cPrice) {
 
 ---
 
-(💡 첫 문단은 직접 쓰세요 — 왜 이걸 찾아봤는지, 어떤 상황이었는지 2~3줄.
-네이버는 도입부의 실제 경험 유무로 글의 성격을 판단합니다. 이 블록을 비워두고
-발행하면 상위 노출이 거의 안 됩니다.)
+(💡 첫 문단에 왜 이 상품을 찾아봤는지 2~3줄 적으면 좋지만, 필수는 아닙니다.
+아래 "가격 데이터로 보면" 항목이 이 글의 핵심 근거입니다.)
 
 ## 오늘 가격
 
 **${p.title}**
 현재 쿠팡 기준 **${won(cPrice)}** 입니다.${ratingLine}
 
-생필품은 가격이 자주 흔들려서, 평소 가격을 알아두면 지금이 살 때인지 판단하기 쉽습니다.
+${priceDataBlock}
 아래 페이지에 이 상품의 가격 변동 그래프와 역대 최저가를 정리해뒀습니다.
 
 👉 **${shortName} 가격 확인**: ${url}
 
 ## 살 때 확인할 것
-
-(💡 아래 3줄은 직접 겪은 내용으로 바꾸면 글의 질이 크게 올라갑니다)
 
 - 용량·수량 단위가 다른 상품이 섞여 있으니 개당 가격으로 비교하세요
 - 쿠폰 적용가는 계정마다 다를 수 있어 결제 직전 금액을 확인하세요
@@ -92,8 +175,8 @@ ${cat ? `\n${cat} 카테고리의 다른 인기 상품도 모아뒀습니다: ht
 `;
 }
 
-function draft(p, cPrice, tPrice) {
-  if (tPrice == null) return draftSingle(p, cPrice);
+async function draft(p, cPrice, tPrice, rows) {
+  if (tPrice == null) return draftSingle(p, cPrice, rows);
   const cheaperName = tPrice < cPrice ? "토스쇼핑" : "쿠팡";
   const low = Math.min(cPrice, tPrice);
   const high = Math.max(cPrice, tPrice);
@@ -202,7 +285,7 @@ async function main() {
     let safe = base;
     for (let n = 2; existsSync(path.join(BLOG_DIR, `자동초안-${today}-${safe}.md`)); n++) safe = `${base}-${n}`;
     const file = path.join(BLOG_DIR, `자동초안-${today}-${safe}.md`);
-    writeFileSync(file, draft(p, cPrice, tPrice), "utf8");
+    writeFileSync(file, await draft(p, cPrice, tPrice, rows), "utf8");
     done.push(p.slug);
     console.log(`✔ 초안 생성: ${file}`);
   }
