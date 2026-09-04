@@ -15,3 +15,5 @@ scripts/.discover-tried.json
 scripts/.indexnow-submitted.json
 # 카탈로그 수집량 기준선 (회차마다 갱신되는 실행 상태)
 scripts/.catalog-health.json
+# 토스 세션 만료 텔레그램 알림 중복 방지 마커
+scripts/.toss-login-alert-sent

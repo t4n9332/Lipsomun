@@ -28,7 +28,7 @@
 import { createInterface } from "node:readline/promises";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { siteCategoryFor } from "./lib-category.mjs";
@@ -36,6 +36,9 @@ import { siteCategoryFor } from "./lib-category.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROFILE_DIR = path.join(__dirname, ".toss-profile");
 const CONFIG_PATH = path.join(__dirname, ".toss-config.json");
+// 세션 만료 텔레그램 알림을 회차마다(하루 8번) 반복 발송하지 않기 위한 마커.
+// 로그인 성공 시 지워지므로, 끊긴 뒤 최초 1회만 알림이 간다.
+const LOGIN_ALERT_MARKER = path.join(__dirname, ".toss-login-alert-sent");
 const SHARELINK_RE = /https:\/\/toss\.im\/_m\/[A-Za-z0-9]+/;
 
 /** 카탈로그를 수집할 어드민 페이지들 */
@@ -156,6 +159,20 @@ async function siteApi(config, method, apiPath, body) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(`사이트 API ${apiPath} 오류(${res.status}): ${data.error || "?"}`);
   return data;
+}
+
+/** 세션 만료를 최초 1회만 텔레그램으로 알림 (config가 없으면 조용히 포기) */
+async function alertLoginExpired() {
+  if (existsSync(LOGIN_ALERT_MARKER) || !existsSync(CONFIG_PATH)) return;
+  try {
+    const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+    await siteApi(config, "POST", "/api/admin/alert", {
+      text: "토스 쉐어링크 세션이 만료됐습니다. 로컬에서 node scripts/toss-login.mjs 실행 후 재로그인해주세요.",
+    });
+    writeFileSync(LOGIN_ALERT_MARKER, new Date().toISOString());
+  } catch {
+    // 알림 발송 실패는 원래 오류(로그인 만료)를 가리지 않도록 무시
+  }
 }
 
 /* ---------- 제목 유사도 (동일 상품 판별) ---------- */
@@ -1059,7 +1076,13 @@ async function main() {
   const page = context.pages()[0] || (await context.newPage());
 
   try {
-    await ensureLoggedIn(page);
+    try {
+      await ensureLoggedIn(page);
+      if (existsSync(LOGIN_ALERT_MARKER)) unlinkSync(LOGIN_ALERT_MARKER); // 복구됐으니 다음 만료 때 다시 알릴 수 있게
+    } catch (e) {
+      if (crawlTest || auto || matchOnly) await alertLoginExpired();
+      throw e;
+    }
 
     if (crawlTest) {
       console.log("\n[카탈로그 수집 테스트]");
