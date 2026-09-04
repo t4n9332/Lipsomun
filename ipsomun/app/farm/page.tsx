@@ -12,7 +12,8 @@ import FarmTabs from "@/components/FarmTabs";
 export const dynamic = "force-static";
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
-const ORDER = ["과일", "채소", "수산물", "축산물", "건어물", "김치·반찬", "기타"];
+// farm.json 의 category 값과 같아야 한다(witak-auto core/farmexport.py 의 _RULES). 없는 분류는 표시되지 않는다.
+const ORDER = ["과일", "채소", "수산물", "축산물", "건어물", "김치·반찬", "밀키트", "기타"];
 
 export const metadata: Metadata = {
   title: "산지직송 농수산물",
