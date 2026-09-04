@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-04T10:47+09:00",
+ "generated_at": "2026-09-04T10:53+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -5961,6 +5961,91 @@
     11,
     12
    ],
+   "created_at": "2026-09-04"
+  },
+  {
+   "id": "13685360402",
+   "group_id": "G10004904",
+   "title": "허니듀 메론 선물세트",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10004904_thumb.jpg",
+   "price_from": 31900,
+   "options": [
+    {
+     "name": "(G)허니듀 메론 선물세트(2수) (2수)",
+     "price": 31900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13746023691",
+   "coupang_url": "https://www.coupang.com/vp/products/16371128536",
+   "season_kind": "시즌",
+   "peak_months": [
+    1,
+    2,
+    9,
+    10
+   ],
+   "created_at": "2026-09-04"
+  },
+  {
+   "id": "13685360595",
+   "group_id": "G10001697",
+   "title": "원양산(급냉)손질오징어 600- (2미 대왕특대)",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001697_thumb.jpg",
+   "price_from": 18600,
+   "options": [
+    {
+     "name": "(늘)원양산(급냉)손질오징어 600-",
+     "price": 18600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13746023884",
+   "coupang_url": "https://www.coupang.com/vp/products/16371128760",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-09-04"
+  },
+  {
+   "id": "13685360759",
+   "group_id": "G10002448",
+   "title": "원양산(급냉)손질오징어 500- (2미 왕특대)",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002448_thumb.jpg",
+   "price_from": 17800,
+   "options": [
+    {
+     "name": "(늘)원양산(급냉)손질오징어 500-",
+     "price": 17800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13746024050",
+   "coupang_url": "https://www.coupang.com/vp/products/16371128975",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-09-04"
+  },
+  {
+   "id": "13685360949",
+   "group_id": "G10002449",
+   "title": "원양산(급냉)손질오징어 400- (2미 특대)",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002449_thumb.jpg",
+   "price_from": 17000,
+   "options": [
+    {
+     "name": "(늘)원양산(급냉)손질오징어 400-",
+     "price": 17000,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13746024244",
+   "coupang_url": "https://www.coupang.com/vp/products/16371129186",
+   "season_kind": "상시",
+   "peak_months": [],
    "created_at": "2026-09-04"
   }
  ]
