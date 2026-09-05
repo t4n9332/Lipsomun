@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-04T17:14+09:00",
+ "generated_at": "2026-09-05T19:00+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -103,7 +103,7 @@
    "price_from": 17400,
    "options": [
     {
-     "name": "1kg (10-15미)",
+     "name": "1kg (10미내외)",
      "price": 17400,
      "soldout": false
     }
@@ -1707,11 +1707,11 @@
    "title": "서해안 숫꽃게 [무배] 1kg",
    "category": "수산물",
    "image": "https://t4n9332.github.io/witak-images/images/G10004835_thumb.jpg",
-   "price_from": 19300,
+   "price_from": 19700,
    "options": [
     {
      "name": "1kg (2-3미)",
-     "price": 19300,
+     "price": 19700,
      "soldout": false
     }
    ],
@@ -1732,11 +1732,11 @@
    "title": "서해안 숫꽃게 [무배] 4kg",
    "category": "수산물",
    "image": "https://t4n9332.github.io/witak-images/images/G10004835_thumb.jpg",
-   "price_from": 63000,
+   "price_from": 73000,
    "options": [
     {
      "name": "4kg (2-3미)",
-     "price": 63000,
+     "price": 73000,
      "soldout": false
     }
    ],
@@ -1757,11 +1757,11 @@
    "title": "서해안 숫꽃게 [무배] 10kg",
    "category": "수산물",
    "image": "https://t4n9332.github.io/witak-images/images/G10004835_thumb.jpg",
-   "price_from": 149300,
+   "price_from": 169200,
    "options": [
     {
      "name": "10kg (2-3미)",
-     "price": 149300,
+     "price": 169200,
      "soldout": false
     }
    ],
@@ -1842,11 +1842,11 @@
    "title": "맵싹 배추김치 1kg",
    "category": "김치·반찬",
    "image": "https://t4n9332.github.io/witak-images/images/G10000346_thumb.jpg",
-   "price_from": 14500,
+   "price_from": 15000,
    "options": [
     {
      "name": "1kg",
-     "price": 14500,
+     "price": 15000,
      "soldout": false
     }
    ],
@@ -1862,11 +1862,11 @@
    "title": "맵싹 배추김치 3kg",
    "category": "김치·반찬",
    "image": "https://t4n9332.github.io/witak-images/images/G10000346_thumb.jpg",
-   "price_from": 31300,
+   "price_from": 32600,
    "options": [
     {
      "name": "3kg",
-     "price": 31300,
+     "price": 32600,
      "soldout": false
     }
    ],
@@ -1882,11 +1882,11 @@
    "title": "맵싹 배추김치 10kg",
    "category": "김치·반찬",
    "image": "https://t4n9332.github.io/witak-images/images/G10000346_thumb.jpg",
-   "price_from": 81800,
+   "price_from": 83600,
    "options": [
     {
      "name": "10kg",
-     "price": 81800,
+     "price": 83600,
      "soldout": false
     }
    ],
@@ -2028,16 +2028,16 @@
    "title": "배추김치 (익일발송) 1kg·3kg",
    "category": "김치·반찬",
    "image": "https://t4n9332.github.io/witak-images/images/G10000268_thumb.jpg",
-   "price_from": 12900,
+   "price_from": 13200,
    "options": [
     {
      "name": "1kg",
-     "price": 12900,
+     "price": 13200,
      "soldout": false
     },
     {
      "name": "3kg",
-     "price": 24900,
+     "price": 25400,
      "soldout": false
     }
    ],
@@ -2053,11 +2053,11 @@
    "title": "배추김치 (익일발송) 10kg",
    "category": "김치·반찬",
    "image": "https://t4n9332.github.io/witak-images/images/G10000268_thumb.jpg",
-   "price_from": 63000,
+   "price_from": 64700,
    "options": [
     {
      "name": "10kg",
-     "price": 63000,
+     "price": 64700,
      "soldout": false
     }
    ],
@@ -2351,16 +2351,16 @@
    "title": "맛김치 1kg·3kg",
    "category": "김치·반찬",
    "image": "https://t4n9332.github.io/witak-images/images/G10000273_thumb.jpg",
-   "price_from": 12900,
+   "price_from": 13200,
    "options": [
     {
      "name": "1kg",
-     "price": 12900,
+     "price": 13200,
      "soldout": false
     },
     {
      "name": "3kg",
-     "price": 24900,
+     "price": 25400,
      "soldout": false
     }
    ],
@@ -2376,11 +2376,11 @@
    "title": "맛김치 10kg",
    "category": "김치·반찬",
    "image": "https://t4n9332.github.io/witak-images/images/G10000273_thumb.jpg",
-   "price_from": 63000,
+   "price_from": 64700,
    "options": [
     {
      "name": "10kg",
-     "price": 63000,
+     "price": 64700,
      "soldout": false
     }
    ],
@@ -2511,11 +2511,11 @@
    "title": "석박지 1kg·3kg",
    "category": "김치·반찬",
    "image": "https://t4n9332.github.io/witak-images/images/G10002067_thumb.jpg",
-   "price_from": 11100,
+   "price_from": 11300,
    "options": [
     {
      "name": "1kg",
-     "price": 11100,
+     "price": 11300,
      "soldout": false
     },
     {
@@ -2825,16 +2825,16 @@
    "title": "절임배추 (익일발송) 1kg·3kg",
    "category": "채소",
    "image": "https://t4n9332.github.io/witak-images/images/G10000334_thumb.jpg",
-   "price_from": 10500,
+   "price_from": 11400,
    "options": [
     {
      "name": "1kg",
-     "price": 10500,
+     "price": 11400,
      "soldout": false
     },
     {
      "name": "3kg",
-     "price": 19500,
+     "price": 21700,
      "soldout": false
     }
    ],
@@ -2852,11 +2852,11 @@
    "title": "절임배추 (익일발송) 10kg",
    "category": "채소",
    "image": "https://t4n9332.github.io/witak-images/images/G10000334_thumb.jpg",
-   "price_from": 51000,
+   "price_from": 57400,
    "options": [
     {
      "name": "10kg",
-     "price": 51000,
+     "price": 57400,
      "soldout": false
     }
    ],
@@ -4359,16 +4359,16 @@
    "title": "머스크 메론 2kg·4kg",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10003906_thumb.jpg",
-   "price_from": 17000,
+   "price_from": 18500,
    "options": [
     {
      "name": "2kg (2수)",
-     "price": 17000,
+     "price": 18500,
      "soldout": false
     },
     {
      "name": "4kg (2수)",
-     "price": 24700,
+     "price": 26200,
      "soldout": false
     }
    ],
@@ -4384,11 +4384,11 @@
    "title": "머스크 메론 8kg",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10003906_thumb.jpg",
-   "price_from": 44800,
+   "price_from": 47800,
    "options": [
     {
      "name": "8kg (4수)",
-     "price": 44800,
+     "price": 47800,
      "soldout": false
     }
    ],
@@ -5952,6 +5952,66 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
+  },
+  {
+   "id": "13687309751",
+   "group_id": "G10000351",
+   "title": "맵싹 맛김치 1kg",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10000351_thumb.jpg",
+   "price_from": 15000,
+   "options": [
+    {
+     "name": "1kg",
+     "price": 15000,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13747995895",
+   "coupang_url": "https://www.coupang.com/vp/products/16371533044",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-09-05"
+  },
+  {
+   "id": "13687309758",
+   "group_id": "G10000351",
+   "title": "맵싹 맛김치 3kg",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10000351_thumb.jpg",
+   "price_from": 32600,
+   "options": [
+    {
+     "name": "3kg",
+     "price": 32600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13747995902",
+   "coupang_url": "https://www.coupang.com/vp/products/16371533044",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-09-05"
+  },
+  {
+   "id": "13687309768",
+   "group_id": "G10000351",
+   "title": "맵싹 맛김치 10kg",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10000351_thumb.jpg",
+   "price_from": 83600,
+   "options": [
+    {
+     "name": "10kg",
+     "price": 83600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13747995912",
+   "coupang_url": "https://www.coupang.com/vp/products/16371533044",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-09-05"
   }
  ]
 }
