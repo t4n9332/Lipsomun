@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLink, trackClick } from "@/lib/db";
+import { getLink, trackClick, trackClickSource } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +12,20 @@ export const dynamic = "force-dynamic";
  */
 const BOT_UA =
   /bot|crawler|spider|crawling|slurp|facebookexternalhit|facebot|whatsapp|telegram|discord|slack|twitter|kakao|line-poker|embedly|quora|pinterest|redditbot|applebot|bingpreview|yeti|daum|python-requests|curl|wget|okhttp|axios|node-fetch|go-http|java\/|headless|phantom|puppeteer|playwright|lighthouse|gtmetrix|pingdom|uptime|monitor|scan|preview|fetcher|archiver|semrush|ahrefs|mj12|dotbot|petalbot|bytespider|gptbot|claudebot|ccbot/i;
+
+/** 같은 브라우저의 같은 링크 재클릭은 1시간 동안 집계하지 않는다 (순위 조작·더블클릭 방지) */
+const CLICK_DEDUPE_SEC = 3600;
+
+/** ViewTracker가 utm_source를 담아두는 쿠키 (7일) — 채널별 클릭 집계에 쓴다 */
+const SOURCE_COOKIE = "ipsomun_src";
+
+function readCookie(header: string, name: string): string | null {
+  for (const part of header.split(";")) {
+    const [k, ...v] = part.trim().split("=");
+    if (k === name) return decodeURIComponent(v.join("=") || "");
+  }
+  return null;
+}
 
 export async function GET(
   req: Request,
@@ -27,10 +41,26 @@ export async function GET(
   // UA가 아예 없는 요청도 정상 브라우저가 아니다
   const isBot = !ua || BOT_UA.test(ua);
 
+  const cookieHeader = req.headers.get("cookie") || "";
+  const dedupeName = `c_${link.id.slice(0, 8)}`;
+  const recently = readCookie(cookieHeader, dedupeName) != null;
+
+  const res = NextResponse.redirect(link.url, 302);
+
   // 클릭 수 집계 (실패해도 리다이렉트는 진행)
-  if (!isBot) {
-    await trackClick(link.id, link.productId).catch(() => {});
+  if (!isBot && !recently) {
+    const source = readCookie(cookieHeader, SOURCE_COOKIE) || "direct";
+    await Promise.allSettled([
+      trackClick(link.id, link.productId),
+      trackClickSource(source, link.platform),
+    ]);
+    res.cookies.set(dedupeName, "1", {
+      maxAge: CLICK_DEDUPE_SEC,
+      path: "/go",
+      sameSite: "lax",
+      httpOnly: true,
+    });
   }
 
-  return NextResponse.redirect(link.url, 302);
+  return res;
 }

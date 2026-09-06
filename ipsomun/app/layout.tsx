@@ -5,6 +5,7 @@ import { CATEGORIES, TELEGRAM_CHANNEL_URL } from "@/lib/util";
 import UserMenu from "@/components/UserMenu";
 import SearchBar from "@/components/SearchBar";
 import InstallPrompt from "@/components/InstallPrompt";
+import SourceTracker from "@/components/SourceTracker";
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 
@@ -21,6 +22,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     images: ["/og-default.png"],
+  },
+  // 구글 디스커버·리치결과 전제 조건 (큰 이미지 미리보기 허용)
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
+  alternates: {
+    types: { "application/rss+xml": [{ url: "/feed.xml", title: "입소문 — 특가·가격비교 RSS" }] },
   },
 };
 
@@ -113,6 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <main className="container">{children}</main>
 
+        <SourceTracker />
         <InstallPrompt />
 
         <footer className="site-footer">
@@ -150,7 +161,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <p>© {new Date().getFullYear()} 입소문</p>
           </div>
         </footer>
-        <InstallPrompt />
       </body>
     </html>
   );

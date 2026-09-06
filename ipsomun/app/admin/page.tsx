@@ -6,6 +6,7 @@ import {
   adminCategoryStats,
   adminTopProducts,
   adminPlatformStats,
+  adminSourceStats,
 } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { platformName, platformColor } from "@/lib/util";
@@ -20,13 +21,26 @@ export const metadata = { title: "관리자" };
 export default async function AdminPage() {
   if (!(await isAdmin())) redirect("/admin/login");
 
-  const [products, stats, catStats, topProducts, platformStats] = await Promise.all([
-    adminListProducts(600),
+  const [products, stats, catStats, topProducts, platformStats, sourceStats] = await Promise.all([
+    adminListProducts(2000),
     adminStats(),
     adminCategoryStats(),
     adminTopProducts(10),
     adminPlatformStats().catch(() => []),
+    adminSourceStats(30).catch(() => []),
   ]);
+  const SOURCE_LABEL: Record<string, string> = {
+    direct: "직접 방문·기타",
+    telegram: "텔레그램",
+    threads: "스레드",
+    naver: "네이버",
+    google: "구글",
+    push: "웹푸시",
+    share: "공유 버튼",
+    instagram: "인스타그램",
+    daum: "다음",
+    bing: "빙",
+  };
 
   return (
     <div className="admin-wrap" style={{ maxWidth: 1000 }}>
@@ -108,6 +122,46 @@ export default async function AdminPage() {
           </p>
         </div>
       )}
+
+      <div className="admin-card">
+        <h2>📣 채널별 제휴 클릭 (최근 30일)</h2>
+        {sourceStats.length === 0 ? (
+          <div className="empty">
+            아직 채널 데이터가 없어요. 텔레그램·스레드·네이버 링크에 붙은 utm_source와
+            검색 유입(referrer)을 기준으로 /go 클릭이 쌓이면 여기 표시됩니다.
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>채널</th>
+                <th>클릭</th>
+                <th>토스</th>
+                <th>쿠팡</th>
+                <th>비중</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(() => {
+                const total = sourceStats.reduce((s, r) => s + r.clicks, 0);
+                return sourceStats.map((r) => (
+                  <tr key={r.source}>
+                    <td><b style={{ fontSize: 13 }}>{SOURCE_LABEL[r.source] || r.source}</b></td>
+                    <td><b>{r.clicks.toLocaleString()}</b></td>
+                    <td>{r.toss.toLocaleString()}</td>
+                    <td>{r.coupang.toLocaleString()}</td>
+                    <td>{total > 0 ? ((r.clicks / total) * 100).toFixed(1) + "%" : "—"}</td>
+                  </tr>
+                ));
+              })()}
+            </tbody>
+          </table>
+        )}
+        <p style={{ fontSize: 12, color: "#8a867f", margin: "10px 0 0" }}>
+          매일 손으로 하는 스레드·네이버 발행 중 어느 쪽이 실제 수익 클릭을 만드는지 여기서
+          판단하세요. 직접 방문은 주소 직접 입력·북마크·PWA·출처 없는 앱 링크입니다.
+        </p>
+      </div>
 
       <div className="dash-2col">
         <div className="admin-card">
