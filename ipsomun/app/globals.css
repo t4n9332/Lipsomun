@@ -240,6 +240,10 @@ button { font-family: inherit; }
 .detail .price-block .price { font-size: 28px; font-weight: 900; }
 .detail .price-block .discount { color: var(--brand); font-size: 24px; font-weight: 900; margin-right: 8px; }
 .detail .price-block .original { color: var(--ink-faint); text-decoration: line-through; font-size: 15px; margin-left: 8px; }
+.detail .price-block .price-sub { font-size: 13px; font-weight: 700; margin-left: 8px; }
+/* 가격 신호 한 줄 — 평균 대비·역대최저 대비 (구매 결정 순간의 클릭 유도) */
+.price-signal { margin-top: 8px; font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
+.price-signal.good { color: #1a7f37; font-weight: 600; }
 .buy-buttons { display: flex; flex-direction: column; gap: 10px; }
 .buy-btn {
   display: flex;
@@ -826,6 +830,50 @@ html { scroll-behavior: smooth; }
   .header-links > * { flex-shrink: 0; }
   .user-chip { flex-shrink: 0; }
 
+  /* 3줄 헤더(로고+검색 / 메뉴 / 카테고리 ≈150px)가 667px 화면의 23%를 영구 점유해
+     상품 카드가 한 화면에 3~4개로 줄고 구매 버튼이 더 늦게 나타났다. 모바일은 흐름에 둔다. */
+  .site-header { position: static; }
+  /* 메뉴가 오른쪽으로 더 있음을 알리는 페이드 (스크롤바를 숨겨 단서가 없었다) */
+  .header-links {
+    mask-image: linear-gradient(90deg, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent);
+  }
+}
+
+/* ---------- 모바일 고정 구매 바 (상품 상세) ---------- */
+.buy-sticky, .buy-sticky-spacer { display: none; }
+@media (max-width: 760px) {
+  .buy-sticky-spacer { display: block; height: 84px; }
+  .buy-sticky {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -4px 20px rgba(20, 15, 5, 0.08);
+  }
+  .buy-sticky .bs-info { display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 1px; }
+  .buy-sticky .bs-price { font-size: 19px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+  .buy-sticky .bs-price .lowest-chip { background: #fff1e8; color: #c9302c; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
+  .buy-sticky .bs-sub { font-size: 11.5px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .buy-sticky .bs-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    height: 46px;
+    padding: 0 18px;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 800;
+    font-size: 14.5px;
+    white-space: nowrap;
+  }
 }
 
 /* iOS는 글자 16px 미만 입력창에 포커스하면 화면을 강제로 확대한다.

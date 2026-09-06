@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const DISMISS_KEY = "ipsomun_a2hs_dismissed";
-const DISMISS_DAYS = 1; // 닫기 누르면 24시간 동안 다시 안 보임
+const DISMISS_COUNT_KEY = "ipsomun_a2hs_dismiss_n";
+const PV_KEY = "ipsomun_pv";
+const DISMISS_DAYS = 7; // 닫기 누르면 7일 동안 다시 안 보임 (두 번째부터 30일)
 
 type BipEvent = Event & {
   prompt: () => Promise<void>;
@@ -19,7 +22,25 @@ function markDismissed(days: number) {
   } catch {}
 }
 
+function dismissDays(): number {
+  try {
+    const n = Number(localStorage.getItem(DISMISS_COUNT_KEY) || 0) + 1;
+    localStorage.setItem(DISMISS_COUNT_KEY, String(n));
+    return n >= 2 ? 30 : DISMISS_DAYS;
+  } catch {
+    return DISMISS_DAYS;
+  }
+}
+
+/**
+ * 홈 화면 추가 배너.
+ * - 첫 페이지뷰에서는 띄우지 않는다 (검색·SNS로 처음 들어온 사람이 상품을 보기도 전에
+ *   설치 배너를 보면 닫기만 누른다). 세션 내 2번째 페이지뷰부터.
+ * - 상품 페이지(/p/)에서는 띄우지 않는다 — 하단은 고정 구매 바가 쓴다.
+ * - 서비스워커 등록은 배너와 무관하게 항상 한다 (푸시 수신용).
+ */
 export default function InstallPrompt() {
+  const pathname = usePathname();
   const [deferred, setDeferred] = useState<BipEvent | null>(null);
   const [show, setShow] = useState(false);
   const [isIos, setIsIos] = useState(false);
@@ -42,6 +63,14 @@ export default function InstallPrompt() {
       if (until && Date.now() < until) return;
     } catch {}
 
+    // 세션 첫 페이지뷰·상품 페이지에서는 표시하지 않음
+    let pv = 1;
+    try {
+      pv = Number(sessionStorage.getItem(PV_KEY) || 1);
+    } catch {}
+    const onProduct = pathname?.startsWith("/p/");
+    if (pv < 2 || onProduct) return;
+
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
     setIsIos(ios);
 
@@ -61,13 +90,13 @@ export default function InstallPrompt() {
       window.removeEventListener("beforeinstallprompt", onBip);
       if (timer) clearTimeout(timer);
     };
-  }, []);
+  }, [pathname]);
 
   if (!show) return null;
 
   const close = () => {
     setShow(false);
-    markDismissed(DISMISS_DAYS);
+    markDismissed(dismissDays());
   };
 
   const install = async () => {
@@ -99,7 +128,7 @@ export default function InstallPrompt() {
         ) : (
           <>
             <strong>입소문을 홈 화면에 추가</strong>
-            <span>앱처럼 바로 접속하고 특가 알림도 받아보세요</span>
+            <span>찜한 상품 가격이 내려가면 알려드려요</span>
           </>
         )}
       </div>
