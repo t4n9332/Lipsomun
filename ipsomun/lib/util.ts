@@ -70,6 +70,93 @@ export function imgUrl(src: string | null | undefined, width = 480): string {
   return `https://wsrv.nl/?url=${encodeURIComponent(src)}&w=${width}&output=webp&q=80&we`;
 }
 
+/* ---------- 수수료율 · 구매 버튼 우선순위 ---------- */
+
+/**
+ * 플랫폼별 대략적인 수수료율. 토스 10%는 프로모션(TOSS_PROMO_END까지)이고
+ * 그 뒤에는 쿠팡보다 낮아질 수 있어 날짜로 분기한다.
+ * 토스 정책 리스크가 현실화되면 toss를 0으로 두면 토스 버튼이 항상 2순위가 된다.
+ */
+export const PLATFORM_RATE: Record<string, number> = { coupang: 0.03, toss: 0.1 };
+export const TOSS_PROMO_END = "2026-09-25";
+export const TOSS_RATE_AFTER_PROMO = 0.02;
+
+export function rateOf(platform: string, at: Date = new Date()): number {
+  if (platform === "toss") {
+    const kst = new Date(at.getTime() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+    return kst > TOSS_PROMO_END ? TOSS_RATE_AFTER_PROMO : PLATFORM_RATE.toss;
+  }
+  return PLATFORM_RATE[platform] ?? 0;
+}
+
+export interface PricedLink {
+  id: string;
+  platform: string;
+  price: number | null;
+}
+
+/** 링크의 실효 가격 — 쿠팡 링크에 개별 가격이 없으면 상품 가격(쿠팡에서 가져온 값) */
+export function effLinkPrice(l: PricedLink, productPrice: number | null | undefined): number | null {
+  return l.price ?? (l.platform === "coupang" ? (productPrice ?? null) : null);
+}
+
+/**
+ * 구매 버튼 우선순위를 한 곳에서 결정한다 (상세·카드·알림이 모두 이 규칙을 쓴다).
+ *  1) 가격이 싼 쪽 먼저
+ *  2) 가격이 같거나 1% 이내면 수수료율이 높은 쪽 먼저
+ *  3) 가격 정보가 없는 링크는 뒤로 (쿠팡·토스 → 나머지)
+ * lowest는 가격을 아는 링크가 2개 이상일 때만 (칩은 '엄격히 더 싼 쪽'에만 붙는다).
+ */
+export function pickPrimary<L extends PricedLink>(
+  links: L[],
+  productPrice: number | null | undefined,
+  at: Date = new Date()
+): { ordered: L[]; primary: L | null; lowest: number | null; priceOf: (l: L) => number | null } {
+  const priceOf = (l: L) => effLinkPrice(l, productPrice);
+  const priced = links.map(priceOf).filter((p): p is number => p != null);
+  const lowest = priced.length >= 2 ? Math.min(...priced) : null;
+  const base = (l: L) => (l.platform === "coupang" || l.platform === "toss" ? 0 : 1);
+  const ordered = [...links].sort((a, b) => {
+    if (base(a) !== base(b)) return base(a) - base(b);
+    const pa = priceOf(a);
+    const pb = priceOf(b);
+    if (pa == null && pb == null) return 0;
+    if (pa == null) return 1;
+    if (pb == null) return -1;
+    const near = Math.abs(pa - pb) <= Math.min(pa, pb) * 0.01;
+    if (!near) return pa - pb;
+    return rateOf(b.platform, at) - rateOf(a.platform, at);
+  });
+  return { ordered, primary: ordered[0] ?? null, lowest, priceOf };
+}
+
+/* ---------- 채널 측정 ---------- */
+
+/**
+ * 외부 채널(텔레그램·스레드·네이버·푸시)로 내보내는 링크에 UTM을 붙인다.
+ * GA4가 자동 집계하고, ViewTracker가 utm_source를 쿠키로 남겨 /go 클릭까지 출처를 잇는다.
+ * ISR 페이지는 searchParams를 읽지 않으므로 캐시에 영향이 없다.
+ */
+export function withUtm(url: string, source: string, medium = "social", campaign?: string): string {
+  const u = new URL(url, "https://lipsomun.co.kr");
+  u.searchParams.set("utm_source", source);
+  u.searchParams.set("utm_medium", medium);
+  if (campaign) u.searchParams.set("utm_campaign", campaign);
+  return u.toString();
+}
+
+/**
+ * JSON-LD를 <script>에 넣을 때 쓴다. JSON.stringify는 '<'를 이스케이프하지 않아
+ * 외부에서 받아온 상품명·리뷰에 '</script>'가 들어오면 스크립트가 닫혀버린다(저장형 XSS).
+ * 유니코드 이스케이프는 JSON 의미가 같으므로 구글 리치결과에 영향이 없다.
+ */
+export function jsonLdString(obj: unknown): string {
+  return JSON.stringify(obj)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
 export function slugify(title: string): string {
   const base = title
     .toLowerCase()

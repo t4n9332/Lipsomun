@@ -166,7 +166,21 @@ CREATE TABLE IF NOT EXISTS collection_items (
   position INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (collection_id, product_id)
 );
+CREATE TABLE IF NOT EXISTS click_sources (
+  day DATE NOT NULL,
+  source TEXT NOT NULL,
+  platform TEXT NOT NULL,
+  clicks INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (day, source, platform)
+);
 `;
+
+/**
+ * 상품의 '실효 최저가' SQL 식 — 쿠팡 가격(products.price)과 토스 링크 가격 중 낮은 쪽.
+ * LEAST는 NULL을 무시하므로 토스 링크가 없으면 쿠팡 가격 그대로다.
+ * 상세 대표가·역대최저가·찜 가격인하·스냅샷이 모두 이 식을 써야 토스 쪽 하락도 신호가 된다.
+ */
+const EFFECTIVE_PRICE_SQL = `LEAST(p.price, (SELECT MIN(l.price) FROM affiliate_links l WHERE l.product_id = p.id AND l.platform = 'toss' AND l.price > 0))`;
 
 async function ready(): Promise<void> {
   if (!globalStore.__schemaReady) {
@@ -407,6 +421,40 @@ export async function trackClick(linkId: string, productId: string): Promise<voi
   ]);
 }
 
+/** 유입 채널(utm_source 쿠키)별 /go 클릭 집계 — 어느 채널이 수익 클릭을 만드는지 보기 위함 */
+export async function trackClickSource(source: string, platform: string): Promise<void> {
+  await q(
+    `INSERT INTO click_sources (day, source, platform, clicks) VALUES ($1::date, $2, $3, 1)
+     ON CONFLICT (day, source, platform) DO UPDATE SET clicks = click_sources.clicks + 1`,
+    [kstToday(), source.slice(0, 40), platform.slice(0, 20)]
+  );
+}
+
+export interface SourceStat {
+  source: string;
+  clicks: number;
+  toss: number;
+  coupang: number;
+}
+
+/** 최근 N일 채널별 클릭 (관리자 대시보드) */
+export async function adminSourceStats(days = 30): Promise<SourceStat[]> {
+  const rows = await q(
+    `SELECT source, SUM(clicks)::int AS clicks,
+            COALESCE(SUM(clicks) FILTER (WHERE platform = 'toss'), 0)::int AS toss,
+            COALESCE(SUM(clicks) FILTER (WHERE platform = 'coupang'), 0)::int AS coupang
+     FROM click_sources WHERE day >= ($1::date - ($2 || ' days')::interval)
+     GROUP BY source ORDER BY clicks DESC`,
+    [kstToday(), String(days)]
+  );
+  return rows.map((r) => ({
+    source: r.source,
+    clicks: r.clicks,
+    toss: r.toss,
+    coupang: r.coupang,
+  }));
+}
+
 /**
  * 클릭·조회 통계 초기화.
  * 봇 필터를 넣기 전 집계된 수치는 크롤러가 링크를 하나씩 따라간 값이 섞여 있어
@@ -438,12 +486,17 @@ export async function resetStats(): Promise<{
 
 /* ---------- 관리자 ---------- */
 
-export async function adminListProducts(limit = 200): Promise<ProductWithLinks[]> {
+export async function adminListProducts(limit = 200, offset = 0): Promise<ProductWithLinks[]> {
   const rows = await q(
-    `SELECT * FROM products ORDER BY created_at DESC LIMIT $1`,
-    [limit]
+    `SELECT * FROM products ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
+    [limit, offset]
   );
   return attachLinks(rows.map(rowToProduct));
+}
+
+export async function adminCountProducts(): Promise<number> {
+  const rows = await q(`SELECT COUNT(*)::int AS n FROM products`);
+  return rows[0]?.n ?? 0;
 }
 
 export async function adminStats(): Promise<{ clicks: number; views: number }> {
@@ -486,6 +539,15 @@ export async function createPost(
     `INSERT INTO posts (id, slug, title, content) VALUES ($1,$2,$3,$4)
      ON CONFLICT (slug) DO NOTHING RETURNING id`,
     [crypto.randomUUID(), slug, title, content]
+  );
+  return rows.length > 0;
+}
+
+/** 기존 글의 제목·본문 갱신 (같은 URL 유지 — 근중복 새 글 대신 최신 글을 덮어쓸 때) */
+export async function updatePost(slug: string, title: string, content: string): Promise<boolean> {
+  const rows = await q(
+    `UPDATE posts SET title = $2, content = $3, updated_at = now() WHERE slug = $1 RETURNING id`,
+    [slug, title, content]
   );
   return rows.length > 0;
 }
@@ -827,7 +889,8 @@ export async function getPushSubscriptionsByUsers(
 export async function getPushSubscriptions(): Promise<
   { endpoint: string; data: string }[]
 > {
-  return q(`SELECT endpoint, data FROM push_subscriptions LIMIT 5000`);
+  // 최신 구독자 우선 — 상한에 걸려도 오래된(대개 만료된) 구독이 먼저 빠진다
+  return q(`SELECT endpoint, data FROM push_subscriptions ORDER BY created_at DESC LIMIT 5000`);
 }
 
 export async function deletePushSubscription(endpoint: string): Promise<void> {
@@ -838,9 +901,11 @@ export async function deletePushSubscription(endpoint: string): Promise<void> {
 
 /** 오늘(KST) 기준 전 상품 가격 스냅샷 저장. 저장된 행 수 반환 */
 export async function snapshotPrices(): Promise<number> {
+  // 쿠팡·토스 중 낮은 가격을 저장 — 토스 쪽 하락도 역대최저가·가격인하 신호가 되게
   const rows = await q(
     `INSERT INTO price_history (product_id, day, price)
-     SELECT id, $1::date, price FROM products WHERE price IS NOT NULL
+     SELECT p.id, $1::date, ${EFFECTIVE_PRICE_SQL} FROM products p
+     WHERE ${EFFECTIVE_PRICE_SQL} IS NOT NULL
      ON CONFLICT (product_id, day) DO UPDATE SET price = EXCLUDED.price
      RETURNING product_id`,
     [kstToday()]
@@ -869,35 +934,41 @@ export async function getPriceHistory(
 export interface PriceStats {
   minPrice: number;
   maxPrice: number;
+  avgPrice: number;
   days: number;
 }
 
 export async function getPriceStats(productId: string): Promise<PriceStats | null> {
   const rows = await q(
-    `SELECT MIN(price)::int AS min, MAX(price)::int AS max, COUNT(*)::int AS days
+    `SELECT MIN(price)::int AS min, MAX(price)::int AS max, AVG(price)::int AS avg, COUNT(*)::int AS days
      FROM price_history WHERE product_id = $1`,
     [productId]
   );
   if (!rows.length || !rows[0].days) return null;
-  return { minPrice: rows[0].min, maxPrice: rows[0].max, days: rows[0].days };
+  return {
+    minPrice: rows[0].min,
+    maxPrice: rows[0].max,
+    avgPrice: rows[0].avg,
+    days: rows[0].days,
+  };
 }
 
-/** 오늘 역대 최저가에 진입한 상품 (히스토리 5일 이상, 이전 최저가보다 낮아진 것) */
+/** 오늘 역대 최저가에 진입한 상품 (히스토리 5일 이상, 이전 최저가보다 낮아진 것). price는 실효 최저가 */
 export async function getAllTimeLows(limit = 10): Promise<Product[]> {
   const rows = await q(
-    `SELECT p.* FROM products p
+    `SELECT p.*, ${EFFECTIVE_PRICE_SQL} AS eff_price FROM products p
      JOIN (
        SELECT product_id, MIN(price)::int AS prev_min, COUNT(*)::int AS days
        FROM price_history WHERE day < $1::date
        GROUP BY product_id
      ) h ON h.product_id = p.id
-     WHERE p.is_published AND p.price IS NOT NULL
-       AND h.days >= 5 AND p.price < h.prev_min
-     ORDER BY (h.prev_min - p.price)::float / h.prev_min DESC
+     WHERE p.is_published AND ${EFFECTIVE_PRICE_SQL} IS NOT NULL
+       AND h.days >= 5 AND ${EFFECTIVE_PRICE_SQL} < h.prev_min
+     ORDER BY (h.prev_min - ${EFFECTIVE_PRICE_SQL})::float / h.prev_min DESC
      LIMIT $2`,
     [kstToday(), limit]
   );
-  return rows.map(rowToProduct);
+  return rows.map((r) => ({ ...rowToProduct(r), price: r.eff_price ?? r.price }));
 }
 
 /** 리뷰 콘텐츠만 부분 업데이트 (AI 리뷰 보강용 — 다른 필드는 건드리지 않음) */
@@ -934,11 +1005,11 @@ export async function getFavoritePriceDrops(): Promise<FavoriteDrop[]> {
        FROM price_history WHERE day < $1::date
        ORDER BY product_id, day DESC
      )
-     SELECT f.user_id, p.title, p.slug, p.price, prev.price AS prev_price
+     SELECT f.user_id, p.title, p.slug, ${EFFECTIVE_PRICE_SQL} AS price, prev.price AS prev_price
      FROM favorites f
-     JOIN products p ON p.id = f.product_id AND p.is_published AND p.price IS NOT NULL
+     JOIN products p ON p.id = f.product_id AND p.is_published AND ${EFFECTIVE_PRICE_SQL} IS NOT NULL
      JOIN prev ON prev.product_id = p.id
-     WHERE p.price < prev.price
+     WHERE ${EFFECTIVE_PRICE_SQL} < prev.price
      LIMIT 2000`,
     [kstToday()]
   );
