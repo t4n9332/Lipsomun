@@ -1,0 +1,18 @@
+:root{--fg:#1a1a1c;--mut:#5a5c60;--line:#e3e4e7;--bg:#fff;--acc:#2b6cb0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.75 -apple-system,"Segoe UI","Malgun Gothic",sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:56px 24px 80px}
+h1{font-size:26px;line-height:1.35;margin:0 0 8px}
+h2{font-size:18px;margin:36px 0 10px;padding-top:20px;border-top:1px solid var(--line)}
+p,li{color:var(--fg)}
+.sub{color:var(--mut);margin:0 0 32px;font-size:15px}
+ul{padding-left:20px}
+li{margin:6px 0}
+a{color:var(--acc)}
+code{background:#f4f5f7;padding:2px 6px;border-radius:4px;font-size:14px}
+footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);
+  color:var(--mut);font-size:14px}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#fafafb;white-space:nowrap}
