@@ -108,7 +108,7 @@ function categoryRank(p, cPrice, rows) {
  * 갖고 있는 가격 히스토리·카테고리 데이터로 고유성 블록을 채운다.
  */
 async function draftSingle(p, cPrice, rows) {
-  const url = `https://lipsomun.co.kr/p/${encodeURIComponent(p.slug)}`;
+  const url = shortUrl(p);
   const shortName = p.title.split(",")[0].trim();
   const cat = p.category && p.category !== "기타" ? p.category : null;
   const ratingLine =
@@ -181,8 +181,7 @@ async function draft(p, cPrice, tPrice, rows) {
   const low = Math.min(cPrice, tPrice);
   const high = Math.max(cPrice, tPrice);
   const savings = high - low;
-  // 슬러그가 한글이라 인코딩하지 않으면 붙여넣었을 때 깨지거나 400이 난다
-  const url = `https://lipsomun.co.kr/p/${encodeURIComponent(p.slug)}`;
+  const url = shortUrl(p);
   const shortName = p.title.split(",")[0].trim();
   const ratingLine =
     p.rating && p.ratingCount
@@ -217,7 +216,7 @@ ${ratingLine}## 실시간 가격은 여기서
 
 👉 **${shortName} 쿠팡 vs 토스 실시간 가격비교**: ${url}
 
-다른 인기 상품들의 가격비교도 모아뒀습니다: https://lipsomun.co.kr/compare
+다른 인기 상품들의 가격비교도 모아뒀습니다: https://lipsomun.co.kr/compare?utm_source=naver&utm_medium=blog
 
 ## 정리
 
@@ -232,12 +231,23 @@ ${ratingLine}## 실시간 가격은 여기서
 `;
 }
 
+/**
+ * 블로그에 붙이는 상품 링크. 슬러그가 한글이라 /p/ 주소는 퍼센트 인코딩 190자짜리가 되어
+ * 독자 클릭도 낮고 스팸 필터에도 불리하다. /r/<id>는 60자 안팎이고 utm으로 네이버 유입을 센다.
+ */
+function shortUrl(p) {
+  return `https://lipsomun.co.kr/r/${p.id}?utm_source=naver&utm_medium=blog`;
+}
+
 async function main() {
-  const res = await fetch(`${config.siteUrl}/api/admin/products?limit=1000`, {
+  const res = await fetch(`${config.siteUrl}/api/admin/products?limit=10000`, {
     headers: { Cookie: `ipsomun_admin=${token}` },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `API 오류 ${res.status}`);
+  if (data.total != null && data.products.length < data.total) {
+    console.log(`⚠ 상품 목록이 잘렸습니다: 전체 ${data.total}개 중 ${data.products.length}개 수신`);
+  }
 
   const done = loadDone();
   const rows = data.products

@@ -43,7 +43,34 @@ const HOOKS = [
   (n, s) => `${n}, 늘 사던 곳이 최저가일까요? 오늘은 ${s} 차이입니다.`,
 ];
 
-function captionText({ title, coupang, toss, savings, slug }) {
+/**
+ * 캡션은 스레드용·인스타용을 나눠 만든다.
+ * - 스레드: 토픽 태그 1개만 지원(나머지는 클릭 안 되는 노이즈), 링크는 https 스킴 붙은
+ *   ASCII 주소 하나(/r/<id>)만 — 링크가 두 개면 미리보기 카드가 첫 것에만 붙는다.
+ *   첫 줄에 숫자를 앞세워 피드 잘림 구간에서 훅이 보이게 한다.
+ * - 인스타: 본문 링크가 클릭되지 않으므로 '프로필 링크' 안내 + 해시태그 7개.
+ */
+function captionThreads({ title, coupang, toss, savings, id }) {
+  const shortName = title.split(",")[0].trim();
+  const cheaper = toss < coupang ? "토스쇼핑" : "쿠팡";
+  const dayIdx = Number(today.replaceAll("-", "")) % HOOKS.length;
+  const hook = HOOKS[dayIdx](shortName, won(savings));
+  return `${won(savings)} 차이 — ${hook}
+
+쿠팡 ${won(coupang)} vs 토스쇼핑 ${won(toss)}
+→ 오늘은 ${cheaper}이 ${won(savings)} 저렴
+
+사기 전 30초 실시간 비교 👇
+https://lipsomun.co.kr/r/${id}?utm_source=threads&utm_medium=social
+
+매일 특가 브리핑은 텔레그램 t.me/cheapicker (프로필 참고)
+쿠팡 파트너스·토스쇼핑 쉐어링크 활동으로 수수료를 받을 수 있습니다. 가격은 작성 시점 기준입니다.
+
+#가격비교
+`;
+}
+
+function captionInstagram({ title, coupang, toss, savings }) {
   const shortName = title.split(",")[0].trim();
   const cheaper = toss < coupang ? "토스쇼핑" : "쿠팡";
   const dayIdx = Number(today.replaceAll("-", "")) % HOOKS.length;
@@ -53,8 +80,7 @@ function captionText({ title, coupang, toss, savings, slug }) {
 쿠팡 ${won(coupang)} vs 토스쇼핑 ${won(toss)}
 → 오늘은 ${cheaper}이 ${won(savings)} 저렴
 
-사기 전 30초 실시간 비교
-lipsomun.co.kr/p/${slug}
+사기 전 30초 실시간 비교는 프로필 링크(lipsomun.co.kr)에서
 
 매일 특가 브리핑 받기
 t.me/cheapicker
@@ -108,11 +134,14 @@ function cardHtml({ title, imageUrl, coupang, toss, savings }) {
 }
 
 async function main() {
-  const res = await fetch(`${config.siteUrl}/api/admin/products?limit=1000`, {
+  const res = await fetch(`${config.siteUrl}/api/admin/products?limit=10000`, {
     headers: { Cookie: `ipsomun_admin=${token}` },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `API 오류 ${res.status}`);
+  if (data.total != null && data.products.length < data.total) {
+    console.log(`⚠ 상품 목록이 잘렸습니다: 전체 ${data.total}개 중 ${data.products.length}개 수신`);
+  }
 
   const done = loadDone();
   const candidates = data.products
@@ -166,22 +195,16 @@ async function main() {
     for (let n = 2; existsSync(path.join(OUT_DIR, `카드-${today}-${safe}.png`)); n++) safe = `${base}-${n}`;
     const out = path.join(OUT_DIR, `카드-${today}-${safe}.png`);
     await page.screenshot({ path: out });
-    // 스레드/인스타용 캡션 텍스트 (복붙용 — 링크는 주소 그대로 적어야 클릭됨)
+    // 스레드/인스타용 캡션 텍스트 (복붙용) — 플랫폼 규격이 달라 둘로 나눈다
+    const capArgs = { title: p.title, coupang, toss, savings: Math.abs(coupang - toss), id: p.id };
     const capPath = path.join(OUT_DIR, `캡션-${today}-${safe}.txt`);
-    writeFileSync(
-      capPath,
-      captionText({
-        title: p.title,
-        coupang,
-        toss,
-        savings: Math.abs(coupang - toss),
-        slug: p.slug,
-      }),
-      "utf8"
-    );
+    const capInstaPath = path.join(OUT_DIR, `캡션-인스타-${today}-${safe}.txt`);
+    writeFileSync(capPath, captionThreads(capArgs), "utf8");
+    writeFileSync(capInstaPath, captionInstagram(capArgs), "utf8");
     done.push(p.slug);
     console.log(`✔ 카드 생성: ${out}`);
     console.log(`✔ 캡션 생성: ${capPath}`);
+    console.log(`✔ 캡션(인스타) 생성: ${capInstaPath}`);
   }
   await browser.close();
   writeFileSync(DONE_PATH, JSON.stringify(done, null, 2));

@@ -26,7 +26,7 @@ const headers = { "Content-Type": "application/json", Cookie: `ipsomun_admin=${t
 
 async function main() {
   const map = JSON.parse(readFileSync(MAP_PATH, "utf8"));
-  const res = await fetch(`${config.siteUrl}/api/admin/products?limit=1000`, { headers });
+  const res = await fetch(`${config.siteUrl}/api/admin/products?limit=10000`, { headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `API 오류 ${res.status}`);
   const bySlug = new Map(data.products.map((p) => [p.slug, p]));

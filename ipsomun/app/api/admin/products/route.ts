@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   adminListProducts,
+  adminCountProducts,
   createProduct,
   updateProduct,
   type ProductInput,
@@ -10,14 +11,24 @@ import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
-/** 제품 목록 조회 (토스 매칭 도구 등 외부 스크립트용) */
+/**
+ * 제품 목록 조회 (토스 매칭 도구 등 외부 스크립트용)
+ * ?limit=N&offset=M — 응답의 total로 잘림 여부를 알 수 있다.
+ * 상한이 1,000이던 때 상품이 928개까지 차서, 넘는 순간 오래된 상품이 가격갱신·
+ * 중복검사·초안 후보에서 조용히 빠질 뻔했다(2026-09-05). 상한을 넉넉히 올렸다.
+ */
 export async function GET(req: Request) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "권한 없음" }, { status: 401 });
   }
   const url = new URL(req.url);
-  const limit = Math.min(Number(url.searchParams.get("limit") || 500), 1000);
-  const products = (await adminListProducts(limit)).map((p) => ({
+  const limit = Math.min(Number(url.searchParams.get("limit") || 500), 20000);
+  const offset = Math.max(Number(url.searchParams.get("offset") || 0), 0);
+  const [total, list] = await Promise.all([
+    adminCountProducts(),
+    adminListProducts(limit, offset),
+  ]);
+  const products = list.map((p) => ({
     id: p.id,
     title: p.title,
     slug: p.slug,
@@ -32,7 +43,7 @@ export async function GET(req: Request) {
       price: l.price,
     })),
   }));
-  return NextResponse.json({ products });
+  return NextResponse.json({ products, total, limit, offset });
 }
 
 /** 제품 생성 (단건 또는 배열 일괄 등록) */

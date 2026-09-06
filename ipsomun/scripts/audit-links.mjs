@@ -80,7 +80,7 @@ async function removeTossLink(productId) {
 }
 
 async function main() {
-  const res = await fetch(`${config.siteUrl}/api/admin/products?limit=1000`, { headers });
+  const res = await fetch(`${config.siteUrl}/api/admin/products?limit=10000`, { headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `API 오류 ${res.status}`);
 

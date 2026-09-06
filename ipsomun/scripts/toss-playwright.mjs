@@ -161,18 +161,41 @@ async function siteApi(config, method, apiPath, body) {
   return data;
 }
 
-/** 세션 만료를 최초 1회만 텔레그램으로 알림 (config가 없으면 조용히 포기) */
-async function alertLoginExpired() {
+/**
+ * 세션 만료를 최초 1회만 텔레그램으로 알림 (config가 없으면 조용히 포기).
+ * ensureLoggedIn 실패뿐 아니라 '반쯤 만료'(어드민 화면은 뜨는데 카탈로그 0개·총계 못 읽음)도
+ * 같은 경로로 알린다 — 실제로 가장 흔한 만료 형태인데 9/4 15:38 이후 5회차 연속 무알림이었다.
+ */
+async function alertLoginExpired(reason = "") {
   if (existsSync(LOGIN_ALERT_MARKER) || !existsSync(CONFIG_PATH)) return;
   try {
     const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+    const when = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
+    const why = reason ? `\n원인: ${String(reason).split("\n")[0].slice(0, 120)}` : "";
     await siteApi(config, "POST", "/api/admin/alert", {
-      text: "토스 쉐어링크 세션이 만료됐습니다. 로컬에서 node scripts/toss-login.mjs 실행 후 재로그인해주세요.",
+      text:
+        `토스 쉐어링크 세션이 만료됐습니다 (${when} 회차).${why}\n` +
+        "로컬에서 node scripts/toss-login.mjs 실행 후 재로그인하면 곧바로 보충 회차가 1회 돕니다. " +
+        "재로그인 전까지 2시간마다 오는 회차는 전부 실패합니다.",
     });
     writeFileSync(LOGIN_ALERT_MARKER, new Date().toISOString());
   } catch {
     // 알림 발송 실패는 원래 오류(로그인 만료)를 가리지 않도록 무시
   }
+}
+
+/** 정상 회차(카탈로그 건강 검사 통과)에서만 '복구'로 보고 마커를 지운다 */
+function clearLoginAlertMarker() {
+  try {
+    if (existsSync(LOGIN_ALERT_MARKER)) unlinkSync(LOGIN_ALERT_MARKER);
+  } catch {}
+}
+
+/** 세션 만료 계열 오류 표시 — 상위 핸들러가 텔레그램 알림 여부를 이걸로 판단한다 */
+function sessionError(message) {
+  const e = new Error(message);
+  e.sessionExpired = true;
+  return e;
 }
 
 /* ---------- 제목 유사도 (동일 상품 판별) ---------- */
@@ -246,7 +269,7 @@ async function ensureLoggedIn(page) {
   await page.waitForTimeout(4000);
   const ok = await page.evaluate(() => document.body.innerText.includes("실적 대시보드"));
   if (!ok) {
-    throw new Error(
+    throw sessionError(
       "쉐어링크 어드민 로그인이 안 되어 있습니다. 먼저 실행하세요:  node scripts/toss-login.mjs"
     );
   }
@@ -571,7 +594,7 @@ function assertCatalogHealthy(catalog) {
   const { reportedTotal, maxCursor, metaOk } = lastCrawlMeta;
 
   if (catalog.length === 0) {
-    throw new Error(
+    throw sessionError(
       "카탈로그를 한 개도 수집하지 못했습니다 — 로그인 세션이 풀렸을 가능성이 큽니다.\n" +
         "       확인:  node scripts/toss-login.mjs  (로그인 후 창을 닫으면 저장)"
     );
@@ -580,7 +603,7 @@ function assertCatalogHealthy(catalog) {
   // 총계조차 못 읽으면 fallback(1200)이 쓰인다. 세션이 반쯤 풀린 상태의 지문이라
   // 수집량이 얼마든 이 회차의 결과는 믿을 수 없다.
   if (!metaOk) {
-    throw new Error(
+    throw sessionError(
       `카탈로그 총계를 읽지 못했습니다 (fallback ${CURSOR_FALLBACK_TOTAL}개로 진행됨).\n` +
         "       세션이 반쯤 풀린 상태일 수 있어 이번 회차를 중단합니다.\n" +
         "       확인:  node scripts/toss-login.mjs"
@@ -602,7 +625,12 @@ function assertCatalogHealthy(catalog) {
 async function runMatch(config, page, opts = {}) {
   const auto = !!opts.auto;
   console.log("\n사이트에서 상품 목록을 가져오는 중...");
-  const { products } = await siteApi(config, "GET", "/api/admin/products?limit=1000");
+  const listing = await siteApi(config, "GET", "/api/admin/products?limit=10000");
+  const { products } = listing;
+  if (listing.total != null && products.length < listing.total) {
+    // 잘리면 오래된 상품이 가격갱신·중복검사에서 조용히 빠진다 — 눈에 보이게
+    console.log(`  ⚠ 상품 목록이 잘렸습니다: 전체 ${listing.total}개 중 ${products.length}개 수신`);
+  }
   const targets = products.filter(
     (p) =>
       p.isPublished &&
@@ -618,6 +646,7 @@ async function runMatch(config, page, opts = {}) {
   }
   console.log(`카탈로그 상품 총 ${catalog.length}개\n`);
   assertCatalogHealthy(catalog);
+  clearLoginAlertMarker(); // 여기까지 왔으면 세션이 진짜 살아 있다 — 다음 만료 때 다시 알릴 수 있게
   if (targets.length === 0) {
     console.log("매칭할 상품이 없습니다.");
     return { products, catalog, added: 0 };
@@ -784,24 +813,29 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
         "GET",
         `/api/admin/coupang/search?keyword=${encodeURIComponent(keyword)}&limit=5`
       );
-      let best = null;
-      let bestScore = 0;
-      for (const f of found || []) {
-        const s = similarity(c.title, f.productName);
-        if (s > bestScore) {
-          bestScore = s;
-          best = f;
-        }
-      }
-      if (!best || bestScore < 0.45) {
-        console.log(`  ↷ [${c.title.slice(0, 34)}] 쿠팡에서 동일 상품 못 찾음 (${(bestScore * 100).toFixed(0)}%)`);
+      // 유사도 1등이 '같은 상품의 다른 묶음'(20병 vs 60병)이라 가격 가드에 걸리면 그 검색은
+      // 통째로 버려졌다(4일치 478회 중 81회, 17%). 문턱을 넘는 후보 가운데 가격이 말이 되는
+      // 것을 고른다 — 검색 1회(시간당 10회뿐)에서 건질 수 있는 건 다 건진다.
+      const scored = (found || [])
+        .map((f) => ({ f, s: similarity(c.title, f.productName) }))
+        .sort((a, b) => b.s - a.s);
+      const top = scored[0];
+      if (!top || top.s < 0.45) {
+        console.log(`  ↷ [${c.title.slice(0, 34)}] 쿠팡에서 동일 상품 못 찾음 (${((top?.s ?? 0) * 100).toFixed(0)}%)`);
         continue;
       }
-      if (priceRatioSuspicious(best.productPrice, c.price)) {
+      const pick = scored.find((x) => x.s >= 0.45 && !priceRatioSuspicious(x.f.productPrice, c.price));
+      if (!pick) {
         console.log(
-          `  ⚠ [${c.title.slice(0, 34)}] 가격차 과다로 제외 (쿠팡 ${best.productPrice?.toLocaleString("ko-KR")}원 vs 토스 ${c.price?.toLocaleString("ko-KR")}원)`
+          `  ⚠ [${c.title.slice(0, 34)}] 가격차 과다로 제외 (쿠팡 ${top.f.productPrice?.toLocaleString("ko-KR")}원 vs 토스 ${c.price?.toLocaleString("ko-KR")}원)`
         );
         continue;
+      }
+      const best = pick.f;
+      if (pick !== top) {
+        console.log(
+          `  · [${c.title.slice(0, 34)}] 유사도 1등(${(top.s * 100).toFixed(0)}%)은 가격차 과다 → ${(pick.s * 100).toFixed(0)}% 후보 채택`
+        );
       }
       // 토스 쉐어링크 발급 (필터로 수집한 상품이면 같은 필터를 다시 적용)
       const rows = await openCatalogPage(page, c);
@@ -1016,13 +1050,27 @@ async function runImport(config, page) {
  * 이 줄만 grep하면 회차 상태를 한눈에 볼 수 있게 한다.
  *   grep "\[요약\]" scripts/toss-auto.log
  */
-function printRunSummary(mode, r, created, updated) {
+function printRunSummary(mode, r, created, updated, status = "정상") {
   const sec = Math.round((Date.now() - RUN_STARTED_AT) / 1000);
   const { collected, reportedTotal } = lastCrawlMeta;
   console.log(
-    `[요약] 모드=${mode} 카탈로그=${collected}/${reportedTotal} ` +
+    `[요약] 모드=${mode} 상태=${status} 카탈로그=${collected}/${reportedTotal} ` +
       `매칭=${r?.added ?? 0} 신규=${created} 가격갱신=${updated} 소요=${sec}초`
   );
+}
+
+/** 실행 모드 이름 (회차 헤더·요약·알림에 공통으로 쓴다) */
+function runMode() {
+  if (process.argv.includes("--auto")) return "auto";
+  if (process.argv.includes("--match-only")) return "match-only";
+  if (process.argv.includes("--crawl-test")) return "crawl-test";
+  return "interactive";
+}
+
+/** 한국시간 15시 이후 회차는 '저녁' — 텔레그램 브리핑을 아침과 다르게 보낸다 */
+function notifySlot() {
+  const kstHour = (new Date().getUTCHours() + 9) % 24;
+  return kstHour >= 15 ? "evening" : "morning";
 }
 
 /* ---------- 메인 ---------- */
@@ -1076,13 +1124,14 @@ async function main() {
   const page = context.pages()[0] || (await context.newPage());
 
   try {
-    try {
-      await ensureLoggedIn(page);
-      if (existsSync(LOGIN_ALERT_MARKER)) unlinkSync(LOGIN_ALERT_MARKER); // 복구됐으니 다음 만료 때 다시 알릴 수 있게
-    } catch (e) {
-      if (crawlTest || auto || matchOnly) await alertLoginExpired();
-      throw e;
+    // 회차 헤더는 로그인 확인보다 먼저 — 로그인 실패 회차가 헤더도 없이 '오류:' 한 줄만
+    // 남아 언제 어떤 회차가 죽었는지 grep으로 잡히지 않았다.
+    if (crawlTest || auto || matchOnly) {
+      const label = auto ? "자동 실행" : matchOnly ? "매칭 전용 실행" : "카탈로그 수집 테스트";
+      console.log(`\n[${label}] ${new Date().toLocaleString("ko-KR")}`);
     }
+    // 실패 시 알림·마커 처리는 main().then 거부 핸들러에서 (반쯤 만료된 경우까지 한 곳에서)
+    await ensureLoggedIn(page);
 
     if (crawlTest) {
       console.log("\n[카탈로그 수집 테스트]");
@@ -1101,7 +1150,6 @@ async function main() {
     if (matchOnly) {
       // 매칭·역매칭·가격갱신만 실행 (블로그 발행·텔레그램 발송 없음).
       // 하루 중 여러 번 돌려 가격비교 상품을 늘리는 용도.
-      console.log(`\n[매칭 전용 실행] ${new Date().toLocaleString("ko-KR")}`);
       const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
       const r = await runMatch(config, page, { auto: true });
       let created = 0;
@@ -1117,14 +1165,22 @@ async function main() {
 
     if (auto) {
       // 완전 자동: ① 기존 쿠팡 상품 매칭 → ② 토스 인기상품 쿠팡 역매칭 신규 등록
-      console.log(`\n[자동 실행] ${new Date().toLocaleString("ko-KR")}`);
       const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
-      const r = await runMatch(config, page, { auto: true });
+      // 토스 단계가 (세션 만료 등으로) 죽어도 블로그 발행·텔레그램 브리핑은 서버 DB만
+      // 읽으므로 그대로 돌린다. 전에는 세션이 죽은 날 아침·저녁 브리핑이 모두 끊겼다.
+      let r = null;
       let created = 0;
       let updated = 0;
-      if (r) {
-        created = await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
-        updated = await runPriceRefresh(config, r.catalog, r.products);
+      let tossError = null;
+      try {
+        r = await runMatch(config, page, { auto: true });
+        if (r) {
+          created = await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
+          updated = await runPriceRefresh(config, r.catalog, r.products);
+        }
+      } catch (e) {
+        tossError = e;
+        console.log(`[토스 단계 실패] ${String(e.message || e).split("\n")[0]} — 블로그·알림은 계속 진행`);
       }
       // 그날 데이터로 블로그 리포트 자동 발행 (하루 1개, 이미 있으면 건너뜀)
       try {
@@ -1133,13 +1189,14 @@ async function main() {
       } catch (e) {
         console.log(`[블로그] 발행 실패: ${e.message}`);
       }
-      // 텔레그램 다이제스트 + 역대최저가 푸시
+      // 텔레그램 다이제스트 + 역대최저가 푸시 (저녁 회차는 바뀐 것만, 없으면 발송 안 함)
       try {
-        const n = await siteApi(config, "GET", "/api/cron/notify");
+        const n = await siteApi(config, "GET", `/api/cron/notify?slot=${notifySlot()}`);
         console.log(`[알림] ${n.message}`);
       } catch (e) {
         console.log(`[알림] 실패: ${e.message}`);
       }
+      if (tossError) throw tossError; // exit 1 유지 — 스케줄러·[요약]에 실패로 남긴다
       printRunSummary("auto", r, created, updated);
       console.log("[자동 실행] 완료\n");
       return;
@@ -1178,8 +1235,16 @@ async function main() {
 // process.exit(0)에 도달하지 않는다. 어느 경로로 끝나든 여기서 명시적으로 끝낸다.
 main().then(
   () => process.exit(0),
-  (e) => {
+  async (e) => {
     console.error("오류:", e.message || e);
+    const mode = runMode();
+    // 세션 만료 계열(로그인 안 됨·카탈로그 0개·총계 못 읽음)은 텔레그램으로 최초 1회 알림
+    if (e?.sessionExpired && mode !== "interactive") {
+      await alertLoginExpired(e.message);
+    }
+    // 실패도 [요약] 한 줄로 — grep "\[요약\]" 하나로 성공률·실패 사유를 볼 수 있게
+    const reason = String(e?.message || e).split("\n")[0].slice(0, 80);
+    printRunSummary(mode, null, 0, 0, `실패(${reason})`);
     process.exit(1);
   }
 );
