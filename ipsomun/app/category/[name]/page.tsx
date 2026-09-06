@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getByCategory } from "@/lib/db";
-import { CATEGORIES } from "@/lib/util";
+import { CATEGORIES, jsonLdString } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
 
 export const revalidate = 600; // 카테고리 목록
@@ -60,7 +60,7 @@ export default async function CategoryPage({
     <section className="section">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
       <div className="section-head">
         <h2>

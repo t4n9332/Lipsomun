@@ -7,7 +7,7 @@ import {
   tossConfigured,
 } from "@/lib/toss";
 import { createProduct, findBySourceTitle } from "@/lib/db";
-import { isAdmin } from "@/lib/auth";
+import { isAdmin, notCrossSite } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -23,7 +23,8 @@ const SOURCE = "toss-best";
  * (관리자 로그인 필요. 같은 제목의 기존 상품은 건너뜀)
  */
 export async function GET(req: Request) {
-  if (!(await isAdmin())) {
+  // 상품 대량 생성 라우트 — 다른 사이트의 링크 클릭(CSRF)으로는 못 부르게
+  if (!notCrossSite(req) || !(await isAdmin())) {
     return NextResponse.json({ error: "권한 없음" }, { status: 401 });
   }
   if (!tossConfigured()) {

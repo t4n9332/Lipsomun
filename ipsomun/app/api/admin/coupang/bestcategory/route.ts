@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { bestCategoryProducts } from "@/lib/coupang";
 import { createProduct, findBySourceTitle } from "@/lib/db";
-import { isAdmin } from "@/lib/auth";
+import { isAdmin, notCrossSite } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -12,7 +12,7 @@ export const maxDuration = 60;
  * (관리자 로그인 필요. 이미 등록된 상품(같은 제목)은 건너뜀)
  */
 export async function GET(req: Request) {
-  if (!(await isAdmin())) {
+  if (!notCrossSite(req) || !(await isAdmin())) {
     return NextResponse.json({ error: "권한 없음" }, { status: 401 });
   }
   const url = new URL(req.url);

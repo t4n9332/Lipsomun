@@ -14,6 +14,23 @@ const nextConfig = {
       { protocol: "http", hostname: "**" },
     ],
   },
+  async headers() {
+    // 보안 응답 헤더. 관리자 화면이 서버 액션 폼이라 투명 iframe(클릭재킹)으로
+    // 삭제·토글을 대신 누르게 할 수 있었다. 공개 페이지도 프레임 허용이 필요 없다.
+    // 전체 CSP(script-src 등)는 애드센스·GA·jsdelivr 폰트 때문에 frame-ancestors만 건다.
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

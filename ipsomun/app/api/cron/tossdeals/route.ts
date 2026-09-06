@@ -6,7 +6,7 @@ import {
   reviveDeal,
   unsetDealsBySource,
 } from "@/lib/db";
-import { isAdmin } from "@/lib/auth";
+import { cronOrAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -20,10 +20,7 @@ const SOURCE = "toss-todaydeal";
  * - vercel.json의 crons 설정으로 매일 아침 자동 실행, 관리자 수동 실행도 가능
  */
 export async function GET(req: Request) {
-  const auth = req.headers.get("authorization") || "";
-  const cronOk =
-    !!process.env.CRON_SECRET && auth === `Bearer ${process.env.CRON_SECRET}`;
-  if (!cronOk && !(await isAdmin())) {
+  if (!(await cronOrAdmin(req))) {
     return NextResponse.json({ error: "권한 없음" }, { status: 401 });
   }
 

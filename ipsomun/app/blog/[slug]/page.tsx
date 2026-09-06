@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPostBySlug, getPosts } from "@/lib/db";
-import { won } from "@/lib/util";
+import { won, jsonLdString } from "@/lib/util";
 
 export const revalidate = 1800; // 블로그 본문 — 발행 후 거의 불변
 
@@ -109,7 +109,7 @@ export default async function BlogPostPage({
     <article className="post-article">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
       <p className="post-date">{`${y}년 ${m}월 ${d}일 · 자동 가격비교 리포트`}</p>
       <h1>{post.title}</h1>

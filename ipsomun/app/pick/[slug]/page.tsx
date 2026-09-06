@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getCollectionBySlug } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
+import { jsonLdString } from "@/lib/util";
 
 export const revalidate = 1800; // 기획전 상세
 
@@ -68,7 +69,7 @@ export default async function PickPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
       <section className="hero pick-hero">
         <h1>
