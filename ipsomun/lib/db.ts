@@ -437,9 +437,16 @@ export async function getRelated(
   return rows.map(rowToProduct);
 }
 
+/**
+ * 사이트맵에 실을 상품 — 리뷰 본문이 있는 것만.
+ * 제목·사진·가격·구매버튼뿐인 페이지를 색인에 밀어 넣으면 thin affiliate content로
+ * 평가돼 사이트 전체 품질을 끌어내린다(2026-09-07 기준 공개 994개 중 396개가 그 상태).
+ * 리뷰를 채우면 그 상품은 자동으로 다시 사이트맵과 색인에 들어온다 — 손댈 필요 없다.
+ */
 export async function getAllSlugs(): Promise<{ slug: string; updatedAt: Date }[]> {
   const rows = await q(
-    `SELECT slug, updated_at FROM products WHERE is_published LIMIT 5000`
+    `SELECT slug, updated_at FROM products
+     WHERE is_published AND btrim(review) <> '' LIMIT 5000`
   );
   return rows.map((r) => ({ slug: r.slug, updatedAt: r.updated_at }));
 }

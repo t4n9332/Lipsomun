@@ -62,10 +62,16 @@ export async function generateMetadata({
   // (퍼센트 인코딩된 형태)와 달라진다.
   const url = `${SITE}/p/${encodeURIComponent(product.slug)}`;
 
+  // 리뷰 본문이 없는 상품은 색인에서 뺀다. 제목·사진·가격·버튼뿐인 페이지는
+  // thin affiliate content로 평가돼 사이트 전체를 끌어내린다. 링크는 따라가게 둬서
+  // 내부 순회는 막지 않는다. 리뷰를 채우면 자동으로 다시 색인 대상이 된다.
+  const thin = !product.review?.trim() && !product.pros?.trim() && !product.cons?.trim();
+
   return {
     title,
     description: desc,
     alternates: { canonical: url },
+    ...(thin ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title,
       description: desc,
