@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-06T17:13+09:00",
+ "generated_at": "2026-09-07T17:18+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -1133,36 +1133,6 @@
    "created_at": "2026-08-24"
   },
   {
-   "id": "13671698775",
-   "group_id": "G10004462",
-   "title": "활 전복",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004462_thumb.jpg",
-   "price_from": 33700,
-   "options": [
-    {
-     "name": "1kg (13~15미)",
-     "price": 33700,
-     "soldout": false
-    },
-    {
-     "name": "2kg (26-30미 / 1kg×2박스)",
-     "price": 61300,
-     "soldout": false
-    },
-    {
-     "name": "2kg (14-16미 / 1kg×2박스)",
-     "price": 83000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732216265",
-   "coupang_url": "https://www.coupang.com/vp/products/16366155475",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-08-24"
-  },
-  {
    "id": "13671698904",
    "group_id": "G10004263",
    "title": "제주 하우스 감귤 로얄과 [박스포함 무게] 3kg·5kg",
@@ -1269,51 +1239,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732216456",
    "coupang_url": "https://www.coupang.com/vp/products/16366156927",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-08-24"
-  },
-  {
-   "id": "13671699008",
-   "group_id": "G10000984",
-   "title": "무농약 블루베리 (16-18mm) 0.2kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000984_thumb.jpg",
-   "price_from": 26300,
-   "options": [
-    {
-     "name": "0.2kg (100g×2팩)",
-     "price": 26300,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732216498",
-   "coupang_url": "https://www.coupang.com/vp/products/16366157166",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-08-24"
-  },
-  {
-   "id": "13671699013",
-   "group_id": "G10000984",
-   "title": "무농약 블루베리 (16-18mm) 0.6kg·1kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000984_thumb.jpg",
-   "price_from": 55500,
-   "options": [
-    {
-     "name": "0.6kg (100g×6팩)",
-     "price": 55500,
-     "soldout": false
-    },
-    {
-     "name": "1kg (100g×10팩)",
-     "price": 79800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732216503",
-   "coupang_url": "https://www.coupang.com/vp/products/16366157166",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-08-24"
@@ -4668,66 +4593,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685213331",
-   "group_id": "G10000840",
-   "title": "울금 청란 계란 40구",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000840_thumb.jpg",
-   "price_from": 50600,
-   "options": [
-    {
-     "name": "(팜)울금 청란 계란 40구",
-     "price": 50600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745875424",
-   "coupang_url": "https://www.coupang.com/vp/products/16370979538",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685213352",
-   "group_id": "G10002353",
-   "title": "맑은숲 계란 유정란 60구(난각번호 1번)",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002353_thumb.jpg",
-   "price_from": 43000,
-   "options": [
-    {
-     "name": "(오)맑은숲 계란 유정란 60구(난각",
-     "price": 43000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745875445",
-   "coupang_url": "https://www.coupang.com/vp/products/16370979896",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685213389",
-   "group_id": "G10000841",
-   "title": "울금 청란 계란 60구",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000841_thumb.jpg",
-   "price_from": 70900,
-   "options": [
-    {
-     "name": "(팜)울금 청란 계란 60구",
-     "price": 70900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745875482",
-   "coupang_url": "https://www.coupang.com/vp/products/16370979446",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685214172",
    "group_id": "G10004783",
    "title": "프리미엄1호 일 선물세트(사과 배 샤인 애플망고 애플망고) 혼합과 [보자기 동봉]",
@@ -4853,26 +4718,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745887715",
    "coupang_url": "https://www.coupang.com/vp/products/16370991218",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685230386",
-   "group_id": "G10002352",
-   "title": "맑은숲 계란 유정란 40구(난각번호 1번)",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002352_thumb.jpg",
-   "price_from": 30000,
-   "options": [
-    {
-     "name": "(오)맑은숲 계란 유정란 40구(난각",
-     "price": 30000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745892714",
-   "coupang_url": "https://www.coupang.com/vp/products/16370995442",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -5539,26 +5384,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745971109",
    "coupang_url": "https://www.coupang.com/vp/products/16371073614",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685308462",
-   "group_id": "G10001331",
-   "title": "맑은숲 계란 유정란 20구(난각번호 1번)",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001331_thumb.jpg",
-   "price_from": 17200,
-   "options": [
-    {
-     "name": "(오)맑은숲 계란 유정란 20구(난각",
-     "price": 17200,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745971370",
-   "coupang_url": "https://www.coupang.com/vp/products/16371073841",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
