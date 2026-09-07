@@ -6,7 +6,7 @@ import {
   type ProductWithLinks,
 } from "@/lib/db";
 import { cronOrAdmin } from "@/lib/auth";
-import { sendTelegram, escHtml, telegramConfigured } from "@/lib/telegram";
+import { sendTelegram, escHtml, escAttr, telegramConfigured } from "@/lib/telegram";
 import { sendPushToAll } from "@/lib/push";
 import { won, withUtm, pickPrimary } from "@/lib/util";
 
@@ -98,7 +98,7 @@ export async function GET(req: Request) {
         lines.push(`<b>🔥 역대 최저가 진입!</b>`);
         for (const p of lows) {
           lines.push(
-            `· <a href="${link(p.slug)}">${escHtml(p.title.slice(0, 45))}</a> — <b>${won(p.price)}</b>`
+            `· <a href="${escAttr(link(p.slug))}">${escHtml(p.title.slice(0, 45))}</a> — <b>${won(p.price)}</b>`
           );
         }
       }
@@ -109,7 +109,7 @@ export async function GET(req: Request) {
           const { primary } = pickPrimary(p.links, p.price);
           const cheaper = primary?.platform === "toss" ? "토스" : "쿠팡";
           lines.push(
-            `· <a href="${link(p.slug)}">${escHtml(p.title.slice(0, 40))}</a> — ${cheaper} ${won(Math.min(coupang as number, toss as number))} (<b>${won(savings)} 저렴</b>)`
+            `· <a href="${escAttr(link(p.slug))}">${escHtml(p.title.slice(0, 40))}</a> — ${cheaper} ${won(Math.min(coupang as number, toss as number))} (<b>${won(savings)} 저렴</b>)`
           );
         }
       }
@@ -118,7 +118,7 @@ export async function GET(req: Request) {
         lines.push(`<b>⚡ 오늘의 딜</b>`);
         for (const p of deals.slice(0, 5)) {
           lines.push(
-            `· <a href="${link(p.slug)}">${escHtml(p.title.slice(0, 40))}</a>${p.price != null ? ` — ${won(p.price)}` : ""}`
+            `· <a href="${escAttr(link(p.slug))}">${escHtml(p.title.slice(0, 40))}</a>${p.price != null ? ` — ${won(p.price)}` : ""}`
           );
         }
       }
