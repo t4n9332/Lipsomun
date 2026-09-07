@@ -1,0 +1,42 @@
+# 블로그 발행·텔레그램 브리핑 안전망
+#
+# 이 둘은 로컬 PC의 작업 스케줄러가 scripts/toss-playwright.mjs 를 돌릴 때만 호출된다
+# (vercel.json 의 크론은 goldbox·tossdeals 두 개뿐이다). 즉 PC가 꺼져 있으면 그날은
+# 블로그도 안 나가고 텔레그램도 안 나간다 — 유일한 자체 유통 경로가 조용히 멈춘다.
+#
+# 그래서 로컬 아침 회차(약 09:30 KST)가 지난 뒤 한 번 더 두드린다.
+# 두 엔드포인트 모두 '오늘 이미 했으면 건너뜀'이라 중복 발행·중복 발송이 생기지 않는다:
+#   - blogpost : 같은 날짜 슬러그(compare-YYYY-MM-DD)가 있으면 건너뜀
+#   - notify   : cron_runs 표식으로 회차당 한 통 (lib/db.ts claimDailyRun)
+# 그러니 PC가 정상이면 이 워크플로는 "건너뜀" 두 줄만 남기고 끝난다.
+#
+# 필요한 설정: 저장소 Settings → Secrets and variables → Actions 에 CRON_SECRET 추가
+#              (Vercel 환경변수의 CRON_SECRET 과 같은 값)
+#
+# 주의: GitHub의 예약 실행은 몇 분~수십 분 밀릴 수 있고, 저장소가 60일간 활동이 없으면
+#       자동 비활성화된다. 어디까지나 안전망이지 주 경로가 아니다.
+
+name: 일일 안전망 (블로그·텔레그램)
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # 13:00 KST
+  workflow_dispatch: # 수동 실행 버튼
+
+jobs:
+  fallback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 블로그 리포트 발행 (이미 있으면 건너뜀)
+        run: |
+          curl -sS --fail-with-body -m 60 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://lipsomun.co.kr/api/cron/blogpost"
+          echo
+
+      - name: 텔레그램 브리핑 (오늘 이미 보냈으면 건너뜀)
+        run: |
+          curl -sS --fail-with-body -m 60 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://lipsomun.co.kr/api/cron/notify?slot=morning"
+          echo

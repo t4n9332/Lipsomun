@@ -3,6 +3,7 @@ import {
   getDeals,
   getPriceCompareProducts,
   getAllTimeLows,
+  claimDailyRun,
   type ProductWithLinks,
 } from "@/lib/db";
 import { cronOrAdmin } from "@/lib/auth";
@@ -42,6 +43,20 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const evening = url.searchParams.get("slot") === "evening";
   const campaign = kstDate();
+
+  // 회차당 한 통. 자동 배치는 하루 여러 번 도는데 아침 회차에는 중복 방어가 없어
+  // 같은 브리핑이 반복 발송될 수 있었다(2026-09-01 로그: 하루 12통 — 구독자 이탈 요인).
+  // 이 표식 덕에 로컬 PC가 꺼진 날 뒤늦게 도는 안전망이 중복 없이 대신 보낼 수도 있다.
+  // ?force=1 은 관리자가 일부러 다시 보낼 때만.
+  const force = url.searchParams.get("force") === "1";
+  const job = `notify:${evening ? "evening" : "morning"}`;
+  if (!force && !(await claimDailyRun(job).catch(() => true))) {
+    return NextResponse.json({
+      ok: true,
+      skipped: true,
+      message: `${evening ? "저녁" : "아침"} 회차 — 오늘 이미 발송해 건너뜀`,
+    });
+  }
   const link = (slug: string) =>
     withUtm(`${SITE}/p/${encodeURIComponent(slug)}`, "telegram", "social", campaign);
 

@@ -37,6 +37,10 @@ export async function GET(req: Request) {
     isPublished: p.isPublished,
     clicks: p.clicks,
     views: p.views,
+    // 리뷰 유무만 — 본문까지 실으면 응답이 수 MB가 된다.
+    // 리뷰 없는 상품(제목·사진·가격·버튼뿐인 얇은 페이지)을 골라내는 데 쓴다.
+    hasReview: !!(p.review && p.review.trim()),
+    reviewLen: (p.review || "").trim().length,
     links: p.links.map((l) => ({
       platform: l.platform,
       url: l.url,

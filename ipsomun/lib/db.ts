@@ -109,6 +109,15 @@ CREATE TABLE IF NOT EXISTS affiliate_links (
   product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE
 );
 ALTER TABLE affiliate_links ADD COLUMN IF NOT EXISTS price INTEGER;
+-- 상품 하나에 같은 플랫폼 링크는 하나뿐이다. 제약이 없어 upsertLink가 DELETE→INSERT로
+-- 흉내내고 있었는데, 그 사이에 오류가 나면 상품이 구매 링크를 통째로 잃는다.
+-- 제약을 걸면 한 문장 upsert(ON CONFLICT)로 원자적으로 처리할 수 있다.
+-- 인덱스 생성이 기존 중복 때문에 실패하면 스키마 초기화 전체가 죽으므로 먼저 정리한다
+-- (2026-09-07 확인 시점 중복 0건이라 무동작이다).
+DELETE FROM affiliate_links a USING affiliate_links b
+  WHERE a.product_id = b.product_id AND a.platform = b.platform AND a.ctid > b.ctid;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_links_product_platform
+  ON affiliate_links (product_id, platform);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_deal ON products(is_deal);
 CREATE INDEX IF NOT EXISTS idx_links_product ON affiliate_links(product_id);
@@ -166,6 +175,12 @@ CREATE TABLE IF NOT EXISTS collection_items (
   position INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (collection_id, product_id)
 );
+CREATE TABLE IF NOT EXISTS cron_runs (
+  day DATE NOT NULL,
+  job TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (day, job)
+);
 CREATE TABLE IF NOT EXISTS click_sources (
   day DATE NOT NULL,
   source TEXT NOT NULL,
@@ -200,6 +215,32 @@ export async function q<T = any>(sql: string, params: unknown[] = []): Promise<T
   await ready();
   const res = await pool().query(sql, params as never[]);
   return res.rows as T[];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Run = (sql: string, params?: unknown[]) => Promise<any[]>;
+
+/**
+ * 한 커넥션에서 BEGIN/COMMIT으로 묶어 실행한다.
+ * '링크를 지우고 다시 넣는' 류의 작업은 중간에 실패하면 상품이 구매 링크 없는 상태로
+ * 남는다 — 화면에 구매 버튼이 사라지고 수익이 그대로 끊긴다. 그런 자리에 쓴다.
+ */
+export async function tx<T>(fn: (run: Run) => Promise<T>): Promise<T> {
+  await ready();
+  const client = await pool().connect();
+  try {
+    await client.query("BEGIN");
+    const run: Run = async (sql, params = []) =>
+      (await client.query(sql, params as never[])).rows;
+    const out = await fn(run);
+    await client.query("COMMIT");
+    return out;
+  } catch (e) {
+    await client.query("ROLLBACK").catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
 }
 
 /* ---------- 매핑 ---------- */
@@ -621,7 +662,9 @@ function cleanLinks(links?: { platform: string; url: string; price?: number | nu
       url: l.url.trim(),
       price: typeof l.price === "number" && l.price > 0 ? Math.round(l.price) : null,
     }))
-    .slice(0, 10);
+    .slice(0, 10)
+    // 상품 하나에 같은 플랫폼 링크는 하나만 — 유니크 제약과 어긋나지 않게 앞의 것을 남긴다
+    .filter((l, i, arr) => arr.findIndex((o) => o.platform === l.platform) === i);
 }
 
 async function insertLinks(
@@ -646,12 +689,13 @@ export async function upsertLink(
   url: string,
   price?: number | null
 ): Promise<void> {
-  await q(`DELETE FROM affiliate_links WHERE product_id = $1 AND platform = $2`, [
-    productId,
-    platform,
-  ]);
+  // 예전에는 DELETE 후 INSERT였다. 그 사이 오류가 나면 링크가 사라진 채 남는다.
+  // 유니크 제약(uq_links_product_platform) 덕에 한 문장으로 원자적 처리가 된다.
   await q(
-    `INSERT INTO affiliate_links (id, platform, url, price, product_id) VALUES ($1,$2,$3,$4,$5)`,
+    `INSERT INTO affiliate_links (id, platform, url, price, product_id)
+     VALUES ($1,$2,$3,$4,$5)
+     ON CONFLICT (product_id, platform)
+     DO UPDATE SET url = EXCLUDED.url, price = EXCLUDED.price`,
     [crypto.randomUUID(), platform, url.trim(), price ?? null, productId]
   );
   await q(`UPDATE products SET updated_at = now() WHERE id = $1`, [productId]);
@@ -770,8 +814,18 @@ export async function updateProduct(input: ProductInput): Promise<Product | null
       input.ratingCount ?? null,
     ]
   );
-  await q(`DELETE FROM affiliate_links WHERE product_id = $1`, [input.id]);
-  await insertLinks(input.id, cleanLinks(input.links));
+  // 링크 전체 교체 — 중간에 실패하면 구매 버튼이 통째로 사라지므로 한 트랜잭션으로 묶는다
+  const links = cleanLinks(input.links);
+  const productId = input.id;
+  await tx(async (run) => {
+    await run(`DELETE FROM affiliate_links WHERE product_id = $1`, [productId]);
+    for (const l of links) {
+      await run(
+        `INSERT INTO affiliate_links (id, platform, url, price, product_id) VALUES ($1,$2,$3,$4,$5)`,
+        [crypto.randomUUID(), l.platform, l.url, l.price ?? null, productId]
+      );
+    }
+  });
   return rowToProduct(rows[0]);
 }
 
@@ -824,6 +878,24 @@ export function kstToday(): string {
 }
 
 /** 출석 도장 찍기. 이미 찍었으면 false */
+/**
+ * "오늘 이 작업을 아직 안 했으면 내가 한다"를 원자적으로 잡는다.
+ * 처음 잡은 호출에만 true, 이미 누가 했으면 false.
+ *
+ * 텔레그램 브리핑은 자동 배치가 하루 여러 회차 돌기 때문에 아침 회차마다 같은 내용이
+ * 다시 나갈 수 있었다(2026-09-01 로그: 하루 12통). 저녁 회차만 조건부였고 아침에는
+ * 구조적 방어가 없었다. 이 표식으로 하루 한 통을 보장하고, 동시에 로컬 PC가 꺼졌을 때
+ * 뒤늦게 도는 안전망(GitHub Actions)이 중복 발송 없이 대신 보낼 수 있게 된다.
+ */
+export async function claimDailyRun(job: string, day = kstToday()): Promise<boolean> {
+  const rows = await q(
+    `INSERT INTO cron_runs (day, job) VALUES ($1::date, $2)
+     ON CONFLICT (day, job) DO NOTHING RETURNING job`,
+    [day, job]
+  );
+  return rows.length > 0;
+}
+
 export async function stampAttendance(userId: string): Promise<boolean> {
   const rows = await q(
     `INSERT INTO attendance (user_id, day) VALUES ($1, $2)
