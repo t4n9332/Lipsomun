@@ -17,3 +17,5 @@ scripts/.indexnow-submitted.json
 scripts/.catalog-health.json
 # 토스 세션 만료 텔레그램 알림 중복 방지 마커
 scripts/.toss-login-alert-sent
+# 리뷰 없는 상품 목록 (생성물 — 매번 다시 뽑는다)
+scripts/.no-review.json
