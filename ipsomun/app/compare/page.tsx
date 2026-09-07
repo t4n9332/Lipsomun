@@ -6,6 +6,7 @@ export const metadata = {
   title: "쿠팡 vs 토스 가격비교",
   description:
     "같은 상품의 쿠팡·토스쇼핑 가격을 나란히 비교하고 더 싼 곳에서 구매하세요.",
+  alternates: { canonical: "/compare" },
 };
 
 export default async function ComparePage() {

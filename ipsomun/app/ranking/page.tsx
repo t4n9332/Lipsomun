@@ -2,7 +2,7 @@ import { getPopular } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 
 export const revalidate = 600; // 랭킹
-export const metadata = { title: "인기 랭킹" };
+export const metadata = { title: "인기 랭킹", alternates: { canonical: "/ranking" } };
 
 export default async function RankingPage() {
   const items = await getPopular(30);

@@ -15,6 +15,12 @@ import FarmCard, { type FarmItem } from "@/components/FarmCard";
 
 export const revalidate = 300; // 홈 — 딜·가격 자주 변동
 
+/**
+ * 정규 주소. 텔레그램·푸시·공유 버튼이 매일 `?utm_source=…`가 붙은 링크를 뿌리는데,
+ * canonical이 없으면 그 변종들이 저마다 다른 URL로 색인돼 색인이 희석된다.
+ */
+export const metadata = { alternates: { canonical: "/" } };
+
 export default async function Home() {
   const [deals, popular, recent, picks, compareRaw] = await Promise.all([
     getDeals(8),

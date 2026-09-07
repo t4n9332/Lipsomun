@@ -8,6 +8,7 @@ export const metadata = {
   title: "기획전",
   description:
     "주제별로 골라 담은 추천 제품 모음. 상황과 예산에 맞는 제품을 한 번에 확인하세요.",
+  alternates: { canonical: "/pick" },
 };
 
 export default async function PickListPage() {

@@ -7,6 +7,7 @@ export const metadata = {
   title: "가격비교 리포트",
   description:
     "매일 자동 발행되는 쿠팡 vs 토스쇼핑 최저가 비교 리포트. 오늘 어떤 상품이 얼마나 저렴한지 확인하세요.",
+  alternates: { canonical: "/blog" },
 };
 
 interface ParsedMeta {

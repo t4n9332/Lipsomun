@@ -4,7 +4,15 @@ import { CATEGORIES } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "검색" };
+/**
+ * 검색 결과는 색인하지 않는다. `?q=` 조합마다 URL이 생기는 무한 공간이고 내용이 얇아
+ * 색인 비대(index bloat)를 만든다. 링크는 따라가게 둬서 상품 페이지 발견에는 쓰이게 한다.
+ */
+export const metadata = {
+  title: "검색",
+  robots: { index: false, follow: true },
+  alternates: { canonical: "/search" },
+};
 
 const SORTS: { key: SearchSort; label: string }[] = [
   { key: "relevance", label: "인기순" },

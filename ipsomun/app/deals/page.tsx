@@ -2,7 +2,7 @@ import { getDeals } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 
 export const revalidate = 300; // 오늘의 딜
-export const metadata = { title: "오늘의 딜" };
+export const metadata = { title: "오늘의 딜", alternates: { canonical: "/deals" } };
 
 export default async function DealsPage() {
   const deals = await getDeals(60);
