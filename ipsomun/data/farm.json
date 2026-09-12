@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-10T17:13+09:00",
+ "generated_at": "2026-09-12T17:13+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2660,12 +2660,12 @@
    "title": "참외 중과 정품과 2kg·3kg",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10000584_thumb.jpg",
-   "price_from": 15400,
+   "price_from": 24100,
    "options": [
     {
      "name": "2kg (4-6과)",
      "price": 15400,
-     "soldout": false
+     "soldout": true
     },
     {
      "name": "3kg (9-12과)",
@@ -3301,12 +3301,12 @@
    "title": "참외 대과 정품과 2kg·3kg",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10000539_thumb.jpg",
-   "price_from": 14500,
+   "price_from": 22400,
    "options": [
     {
      "name": "2kg (3-5과)",
      "price": 14500,
-     "soldout": false
+     "soldout": true
     },
     {
      "name": "3kg (6-9과)",
@@ -3315,30 +3315,6 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745801741",
-   "coupang_url": "https://www.coupang.com/vp/products/16370918082",
-   "season_kind": "시즌",
-   "peak_months": [
-    5,
-    6,
-    7
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685140075",
-   "group_id": "G10000539",
-   "title": "참외 대과 정품과 10kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000539_thumb.jpg",
-   "price_from": 57000,
-   "options": [
-    {
-     "name": "10kg (20-30과)",
-     "price": 57000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745801752",
    "coupang_url": "https://www.coupang.com/vp/products/16370918082",
    "season_kind": "시즌",
    "peak_months": [
