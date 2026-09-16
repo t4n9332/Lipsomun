@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-15T17:13+09:00",
+ "generated_at": "2026-09-16T17:14+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2944,59 +2944,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685128286",
-   "group_id": "G10001231",
-   "title": "제주 청귤 로얄과 실중량 [실중량] 3kg·5kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001231_thumb.jpg",
-   "price_from": 17600,
-   "options": [
-    {
-     "name": "3kg (실중량)",
-     "price": 17600,
-     "soldout": false
-    },
-    {
-     "name": "5kg (실중량)",
-     "price": 22600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745789950",
-   "coupang_url": "https://www.coupang.com/vp/products/16370910641",
-   "season_kind": "시즌",
-   "peak_months": [
-    11,
-    12,
-    1
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685128295",
-   "group_id": "G10001231",
-   "title": "제주 청귤 로얄과 실중량 [실중량] 10kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001231_thumb.jpg",
-   "price_from": 38700,
-   "options": [
-    {
-     "name": "10kg (실중량)",
-     "price": 38700,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745789959",
-   "coupang_url": "https://www.coupang.com/vp/products/16370910641",
-   "season_kind": "시즌",
-   "peak_months": [
-    11,
-    12,
-    1
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685130800",
    "group_id": "G10004674",
    "title": "추희 자두 대과",
@@ -3194,7 +3141,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745797732",
-   "coupang_url": "https://www.coupang.com/vp/products/16370914982",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -3351,59 +3298,6 @@
     12,
     1,
     2
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685142609",
-   "group_id": "G10001234",
-   "title": "제주 청귤 혼합과 못난이 [실중량] 3kg·5kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001234_thumb.jpg",
-   "price_from": 14600,
-   "options": [
-    {
-     "name": "3kg (실중량)",
-     "price": 14600,
-     "soldout": false
-    },
-    {
-     "name": "5kg (실중량)",
-     "price": 19000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745804288",
-   "coupang_url": "https://www.coupang.com/vp/products/16370919529",
-   "season_kind": "시즌",
-   "peak_months": [
-    11,
-    12,
-    1
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685142615",
-   "group_id": "G10001234",
-   "title": "제주 청귤 혼합과 못난이 [실중량] 10kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001234_thumb.jpg",
-   "price_from": 30600,
-   "options": [
-    {
-     "name": "10kg (실중량)",
-     "price": 30600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745804294",
-   "coupang_url": "https://www.coupang.com/vp/products/16370919529",
-   "season_kind": "시즌",
-   "peak_months": [
-    11,
-    12,
-    1
    ],
    "created_at": "2026-09-04"
   },
@@ -4045,7 +3939,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745834699",
-   "coupang_url": "https://www.coupang.com/vp/products/16370937618",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -4065,7 +3959,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745834707",
-   "coupang_url": "https://www.coupang.com/vp/products/16370937618",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -4159,7 +4053,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745838528",
-   "coupang_url": "https://www.coupang.com/vp/products/16370937986",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -4244,7 +4138,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745861022",
-   "coupang_url": "https://www.coupang.com/vp/products/16370966321",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
