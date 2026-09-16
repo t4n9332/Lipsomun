@@ -27,16 +27,31 @@ jobs:
   fallback:
     runs-on: ubuntu-latest
     steps:
-      - name: 블로그 리포트 발행 (이미 있으면 건너뜀)
+      - name: CRON_SECRET 설정 확인
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -sS --fail-with-body -m 60 \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "https://lipsomun.co.kr/api/cron/blogpost"
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::저장소 Secret CRON_SECRET 이 비어 있습니다."
+            echo "Settings → Secrets and variables → Actions → New repository secret 에"
+            echo "이름 CRON_SECRET, 값은 Vercel 환경변수의 CRON_SECRET 과 같은 값으로 등록하세요."
+            exit 1
+          fi
+
+      - name: 블로그 리포트 발행 (이미 있으면 건너뜀)
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -sS --fail-with-body -m 60             -H "Authorization: Bearer $CRON_SECRET"             "https://lipsomun.co.kr/api/cron/blogpost"
           echo
 
+      # 두 엔드포인트는 서로 독립이다. 블로그가 실패했다고 텔레그램까지 건너뛰면
+      # 안전망이 한쪽 고장에 통째로 무력해진다 — always()로 반드시 시도한다.
       - name: 텔레그램 브리핑 (오늘 이미 보냈으면 건너뜀)
+        if: always()
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -sS --fail-with-body -m 60 \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "https://lipsomun.co.kr/api/cron/notify?slot=morning"
+          if [ -z "$CRON_SECRET" ]; then exit 1; fi
+          curl -sS --fail-with-body -m 60             -H "Authorization: Bearer $CRON_SECRET"             "https://lipsomun.co.kr/api/cron/notify?slot=morning"
           echo
