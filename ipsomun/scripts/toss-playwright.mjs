@@ -36,8 +36,9 @@ import { siteCategoryFor } from "./lib-category.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROFILE_DIR = path.join(__dirname, ".toss-profile");
 const CONFIG_PATH = path.join(__dirname, ".toss-config.json");
-// 세션 만료 텔레그램 알림을 회차마다(하루 8번) 반복 발송하지 않기 위한 마커.
-// 로그인 성공 시 지워지므로, 끊긴 뒤 최초 1회만 알림이 간다.
+// 세션 만료 텔레그램 알림 마커. 내용은 {first,last,count} JSON (구버전은 ISO 문자열 한 줄).
+// 로그인 성공 시 지워진다. 끊겨 있는 동안 24시간에 한 번 다시 알린다 — 최초 1회만 알리면
+// 그 한 통을 놓친 사람은 영영 모른다.
 const LOGIN_ALERT_MARKER = path.join(__dirname, ".toss-login-alert-sent");
 const SHARELINK_RE = /https:\/\/toss\.im\/_m\/[A-Za-z0-9]+/;
 
@@ -161,26 +162,73 @@ async function siteApi(config, method, apiPath, body) {
   return data;
 }
 
+/** 알림 마커 읽기 — 구버전(ISO 한 줄 문자열)도 그대로 받아준다 */
+function readLoginAlertMarker() {
+  try {
+    const raw = readFileSync(LOGIN_ALERT_MARKER, "utf8").trim();
+    if (!raw) return null;
+    if (raw.startsWith("{")) {
+      const o = JSON.parse(raw);
+      return o && o.first && o.last ? o : null;
+    }
+    return { first: raw, last: raw, count: 1 };
+  } catch {
+    return null;
+  }
+}
+
+/** 재알림 간격 — 끊겨 있는 동안 하루 한 번만 다시 알린다 */
+const LOGIN_REALERT_MS = 24 * 60 * 60 * 1000;
+
 /**
- * 세션 만료를 최초 1회만 텔레그램으로 알림 (config가 없으면 조용히 포기).
+ * 세션 만료를 텔레그램으로 알림 (config가 없으면 조용히 포기).
  * ensureLoggedIn 실패뿐 아니라 '반쯤 만료'(어드민 화면은 뜨는데 카탈로그 0개·총계 못 읽음)도
  * 같은 경로로 알린다 — 실제로 가장 흔한 만료 형태인데 9/4 15:38 이후 5회차 연속 무알림이었다.
+ *
+ * 회차마다(하루 8번) 보내면 소음이 돼 무시하게 되고, 최초 1회만 보내면 그 한 통을 놓쳤을 때
+ * 영영 모른다 — 2026-09-09에 끊긴 세션이 7일간 조용히 실패만 쌓였다.
+ * 그래서 끊겨 있는 동안 24시간에 한 번, 며칠째인지를 붙여 다시 보낸다.
  */
 async function alertLoginExpired(reason = "") {
-  if (existsSync(LOGIN_ALERT_MARKER) || !existsSync(CONFIG_PATH)) return;
+  if (!existsSync(CONFIG_PATH)) return;
+  const prev = readLoginAlertMarker();
+  const now = Date.now();
+  if (prev) {
+    const since = now - Date.parse(prev.last);
+    // Date.parse가 NaN이면 비교가 false가 되어 영영 안 보내게 되므로, 그때는 보내는 쪽으로 기운다
+    if (Number.isFinite(since) && since < LOGIN_REALERT_MS) return;
+  }
   try {
     const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
     const when = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
     const why = reason ? `\n원인: ${String(reason).split("\n")[0].slice(0, 120)}` : "";
+    const firstAt = prev ? Date.parse(prev.first) : now;
+    const days = Number.isFinite(firstAt) ? Math.floor((now - firstAt) / 86400000) + 1 : 1;
+    const repeat = Boolean(prev) && days > 1;
+    const head = repeat
+      ? `토스 쉐어링크 세션이 ${days}일째 만료 상태입니다 (${when} 회차).`
+      : `토스 쉐어링크 세션이 만료됐습니다 (${when} 회차).`;
+    const extra = repeat
+      ? "\n이 기간 동안 새 비교 상품이 들어오지 않아 블로그 새 글도 나가지 않습니다."
+      : "";
     await siteApi(config, "POST", "/api/admin/alert", {
       text:
-        `토스 쉐어링크 세션이 만료됐습니다 (${when} 회차).${why}\n` +
+        `${head}${why}\n` +
         "로컬에서 node scripts/toss-login.mjs 실행 후 재로그인하면 곧바로 보충 회차가 1회 돕니다. " +
-        "재로그인 전까지 2시간마다 오는 회차는 전부 실패합니다.",
+        "재로그인 전까지 2시간마다 오는 회차는 전부 실패합니다." +
+        extra,
     });
-    writeFileSync(LOGIN_ALERT_MARKER, new Date().toISOString());
+    writeFileSync(
+      LOGIN_ALERT_MARKER,
+      JSON.stringify({
+        first: prev ? prev.first : new Date(now).toISOString(),
+        last: new Date(now).toISOString(),
+        count: (prev?.count || 0) + 1,
+      })
+    );
   } catch {
-    // 알림 발송 실패는 원래 오류(로그인 만료)를 가리지 않도록 무시
+    // 알림 발송 실패는 원래 오류(로그인 만료)를 가리지 않도록 무시한다.
+    // 마커를 쓰지 않았으므로 다음 회차에 다시 시도한다.
   }
 }
 
