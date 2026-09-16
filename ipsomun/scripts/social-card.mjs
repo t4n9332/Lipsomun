@@ -168,7 +168,8 @@ async function main() {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1080, height: 1350 } });
 
-  for (const { p, coupang, toss } of candidates.slice(0, COUNT)) {
+  const picked = candidates.slice(0, COUNT);
+  for (const [idx, { p, coupang, toss }] of picked.entries()) {
     // 상품 이미지: 공개 상품 페이지의 og:image 사용 (GET API에는 이미지가 없음)
     let imageUrl = "";
     try {
@@ -205,6 +206,26 @@ async function main() {
     console.log(`✔ 카드 생성: ${out}`);
     console.log(`✔ 캡션 생성: ${capPath}`);
     console.log(`✔ 캡션(인스타) 생성: ${capInstaPath}`);
+
+    // 가장 절약액이 큰 첫 장만 텔레그램 채널에도 올린다 (여러 장이면 채널 도배라 1장만)
+    if (idx === 0) {
+      try {
+        const buf = readFileSync(out);
+        const form = new FormData();
+        form.set("photo", new Blob([buf], { type: "image/png" }), "card.png");
+        form.set("caption", captionThreads(capArgs).slice(0, 1024));
+        const r = await fetch(`${config.siteUrl}/api/admin/telegram-photo`, {
+          method: "POST",
+          headers: { Cookie: `ipsomun_admin=${token}` },
+          body: form,
+        });
+        const data = await r.json().catch(() => ({}));
+        if (data.ok) console.log("✔ 텔레그램 사진 발송 완료");
+        else console.error("텔레그램 사진 발송 실패:", data.error || `HTTP ${r.status}`);
+      } catch (e) {
+        console.error("텔레그램 사진 발송 실패:", e.message || e);
+      }
+    }
   }
   await browser.close();
   writeFileSync(DONE_PATH, JSON.stringify(done, null, 2));

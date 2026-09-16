@@ -104,10 +104,11 @@ export default function SearchBar() {
   const showDropdown = open && (showRecent || suggestions.length > 0);
 
   return (
-    <form className="search-form" action="/search" onSubmit={onSubmit} ref={wrapRef}>
+    <form className="search-form" action="/search" onSubmit={onSubmit} ref={wrapRef} role="search">
       <input
         name="q"
         placeholder="어떤 제품이 궁금하세요?"
+        aria-label="상품 검색"
         value={value}
         autoComplete="off"
         onChange={(e) => {

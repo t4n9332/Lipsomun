@@ -101,6 +101,34 @@ async function sendOne(text: string, preview: boolean): Promise<{ ok: boolean; e
   }
 }
 
+/**
+ * 사진 발송(sendPhoto) — social-card.mjs가 매일 만드는 카드 PNG를 채널에 올릴 때 쓴다.
+ * 캡션은 텔레그램 사진 캡션 한도(1,024자)에 맞춰 호출하는 쪽에서 잘라서 넘길 것.
+ */
+export async function sendTelegramPhoto(
+  photo: Blob,
+  caption: string
+): Promise<{ ok: boolean; error?: string }> {
+  if (!telegramConfigured()) {
+    return { ok: false, error: "TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID 미설정" };
+  }
+  try {
+    const form = new FormData();
+    form.set("chat_id", process.env.TELEGRAM_CHAT_ID!);
+    form.set("caption", caption);
+    form.set("photo", photo, "card.png");
+    const res = await fetch(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendPhoto`,
+      { method: "POST", body: form, cache: "no-store" }
+    );
+    const data = await res.json();
+    if (!data.ok) return { ok: false, error: data.description || `HTTP ${res.status}` };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "텔레그램 사진 발송 실패" };
+  }
+}
+
 /** 텍스트 노드용 이스케이프 */
 export function escHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

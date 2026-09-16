@@ -4,6 +4,7 @@ import "./globals.css";
 import { CATEGORIES, TELEGRAM_CHANNEL_URL } from "@/lib/util";
 import UserMenu from "@/components/UserMenu";
 import SearchBar from "@/components/SearchBar";
+import CatNav from "@/components/CatNav";
 import InstallPrompt from "@/components/InstallPrompt";
 import SourceTracker from "@/components/SourceTracker";
 
@@ -111,13 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </nav>
           </div>
           <div className="container">
-            <nav className="cat-nav">
-              {CATEGORIES.map((c) => (
-                <Link key={c} href={`/category/${encodeURIComponent(c)}`}>
-                  {c}
-                </Link>
-              ))}
-            </nav>
+            <CatNav categories={CATEGORIES} />
           </div>
         </header>
 

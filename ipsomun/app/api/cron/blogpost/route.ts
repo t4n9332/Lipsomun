@@ -99,7 +99,7 @@ export async function GET(req: Request) {
       } catch {}
       const fresh = items.filter((i) => !prevSlugs.has(i.slug)).length;
       if (prevSlugs.size > 0 && fresh < MIN_NEW_ITEMS) {
-        const updated = await updatePost(prev.slug, prev.title, content);
+        const updated = await updatePost(prev.slug, title, content);
         if (updated) {
           revalidatePath("/blog");
           revalidatePath(`/blog/${prev.slug}`);

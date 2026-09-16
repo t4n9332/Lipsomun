@@ -352,11 +352,11 @@ button { font-family: inherit; }
 /* ---------- Fav button ---------- */
 .fav-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   z-index: 3;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.92);
@@ -887,6 +887,8 @@ html { scroll-behavior: smooth; }
   /* 스크롤 영역 안에서 항목이 찌그러지지 않게 */
   .header-links > * { flex-shrink: 0; }
   .user-chip { flex-shrink: 0; }
+  /* 터치 타깃 44px 권장 — 텍스트 크기는 유지하고 세로 여백으로 확보 (user-chip은 이미 자체 패딩이 있어 제외) */
+  .header-links a:not(.user-chip) { display: inline-flex; align-items: center; padding: 11px 2px; }
 
   /* 3줄 헤더(로고+검색 / 메뉴 / 카테고리 ≈150px)가 667px 화면의 23%를 영구 점유해
      상품 카드가 한 화면에 3~4개로 줄고 구매 버튼이 더 늦게 나타났다. 모바일은 흐름에 둔다. */
