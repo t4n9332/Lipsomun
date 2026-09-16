@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getByCategory } from "@/lib/db";
+import { getByCategory, withLinks } from "@/lib/db";
 import { CATEGORIES, jsonLdString } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
 
@@ -42,7 +42,7 @@ export default async function CategoryPage({
 }) {
   const { name } = await params;
   const category = decodeURIComponent(name);
-  const items = await getByCategory(category, TOP);
+  const items = await withLinks(await getByCategory(category, TOP));
 
   const jsonLd = {
     "@context": "https://schema.org",

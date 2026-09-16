@@ -1,5 +1,6 @@
 import { getPriceCompareProducts } from "@/lib/db";
 import CompareCard, { comparePrices } from "@/components/CompareCard";
+import PushSubscribeButton from "@/components/PushSubscribeButton";
 
 export const revalidate = 300; // 가격비교 — 가격 자주 변동
 export const metadata = {
@@ -22,6 +23,10 @@ export default async function ComparePage() {
           같은 상품 {items.length}개 — 절약액이 큰 순서로 보여드려요
         </span>
       </div>
+      <PushSubscribeButton
+        label="🔔 가격 떨어지면 알림 받기"
+        hint="로그인 없이 · 찜한 상품이 내려가면 바로 알려드려요"
+      />
       {items.length === 0 ? (
         <div className="empty">비교 가능한 상품을 모으는 중입니다.</div>
       ) : (

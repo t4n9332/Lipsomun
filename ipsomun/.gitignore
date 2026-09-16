@@ -19,3 +19,5 @@ scripts/.catalog-health.json
 scripts/.toss-login-alert-sent
 # 리뷰 없는 상품 목록 (생성물 — 매번 다시 뽑는다)
 scripts/.no-review.json
+# 리뷰 대상 추출 스냅샷 (관리자 API에서 매번 새로 뽑는다 — 커밋하면 금방 낡는다)
+scripts/.no-review-live.json

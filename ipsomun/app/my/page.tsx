@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LEVELS } from "@/lib/levels";
+import PushSubscribeButton from "@/components/PushSubscribeButton";
 
 interface Me {
   user: { name: string; email: string; picture: string } | null;
@@ -14,9 +15,6 @@ export default function MyPage() {
   const [me, setMe] = useState<Me | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  const [pushState, setPushState] = useState<
-    "unsupported" | "off" | "on" | "denied"
-  >("off");
 
   async function load() {
     const r = await fetch("/api/me");
@@ -25,27 +23,17 @@ export default function MyPage() {
 
   useEffect(() => {
     load();
-    // 푸시 지원/구독 상태 확인
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      setPushState("unsupported");
-      return;
-    }
-    if (Notification.permission === "denied") {
-      setPushState("denied");
-      return;
-    }
+    // 비로그인 상태에서 만든 구독을 계정에 붙인다. 구독 UI 자체는
+    // PushSubscribeButton이 담당하고, 여기서는 연결만 다시 시도한다.
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
     navigator.serviceWorker.getRegistration().then(async (reg) => {
       const sub = await reg?.pushManager.getSubscription();
-      setPushState(sub ? "on" : "off");
-      // 이미 구독 중이면 서버에 다시 등록 — 로그인 상태라면 계정과 연결됨
-      // (찜한 상품 가격인하 알림이 이 연결을 통해 발송됨)
-      if (sub) {
-        fetch("/api/push/subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(sub.toJSON()),
-        }).catch(() => {});
-      }
+      if (!sub) return;
+      fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sub.toJSON()),
+      }).catch(() => {});
     });
   }, []);
 
@@ -64,39 +52,6 @@ export default function MyPage() {
       await load();
     } catch (e) {
       setMsg(e instanceof Error ? e.message : "출석 실패");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function enablePush() {
-    setBusy(true);
-    setMsg(null);
-    try {
-      const perm = await Notification.requestPermission();
-      if (perm !== "granted") {
-        setPushState("denied");
-        setMsg("브라우저 알림이 차단되어 있어요. 주소창의 자물쇠 아이콘에서 허용해 주세요.");
-        return;
-      }
-      const reg = await navigator.serviceWorker.register("/sw.js");
-      await navigator.serviceWorker.ready;
-      const keyRes = await fetch("/api/push/key");
-      const { key } = await keyRes.json();
-      if (!key) throw new Error("서버 푸시 설정이 아직 안 되어 있어요.");
-      const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: key,
-      });
-      await fetch("/api/push/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sub.toJSON()),
-      });
-      setPushState("on");
-      setMsg("알림 설정 완료! 매일 아침 7시 오늘의 특가를 보내드릴게요 🔔");
-    } catch (e) {
-      setMsg(e instanceof Error ? e.message : "알림 설정 실패");
     } finally {
       setBusy(false);
     }
@@ -198,25 +153,10 @@ export default function MyPage() {
 
       <div className="my-card">
         <h2 style={{ fontSize: 16, marginTop: 0 }}>🔔 특가 알림</h2>
-        {pushState === "on" ? (
-          <p style={{ fontSize: 14, color: "#2b8a3e", margin: 0 }}>
-            알림 설정 완료 — 매일 아침 오늘의 특가와, 찜한 상품의 가격 인하
-            소식을 보내드려요.
-          </p>
-        ) : pushState === "unsupported" ? (
-          <p style={{ fontSize: 13.5, color: "#8a867f", margin: 0 }}>
-            이 브라우저는 알림을 지원하지 않아요.
-          </p>
-        ) : (
-          <>
-            <p style={{ fontSize: 13.5, color: "#55524d", marginTop: 0 }}>
-              매일 아침 7시, 새 특가가 올라오면 알려드려요.
-            </p>
-            <button className="btn secondary" onClick={enablePush} disabled={busy}>
-              알림 켜기
-            </button>
-          </>
-        )}
+        <p style={{ fontSize: 13.5, color: "#55524d", marginTop: 0 }}>
+          매일 아침 7시 새 특가와, 찜한 상품의 가격 인하를 알려드려요.
+        </p>
+        <PushSubscribeButton label="알림 켜기" className="push-cta inline" />
       </div>
 
       <div className="my-card">

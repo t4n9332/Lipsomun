@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getCollectionBySlug } from "@/lib/db";
+import { getCollectionBySlug, withLinks } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 import { jsonLdString } from "@/lib/util";
 
@@ -51,6 +51,8 @@ export default async function PickPage({
   const { slug } = await params;
   const col = await getCollectionBySlug(decodeURIComponent(slug));
   if (!col) notFound();
+  // 목록 카드에서 바로 최저가·구매까지 가도록 링크를 덧댄다
+  const products = await withLinks(col.products);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -82,7 +84,7 @@ export default async function PickPage({
           <div className="empty">제품을 담는 중이에요. 곧 공개할게요!</div>
         ) : (
           <div className="grid">
-            {col.products.map((p, i) => (
+            {products.map((p, i) => (
               <ProductCard key={p.id} p={p} rank={i + 1} />
             ))}
           </div>

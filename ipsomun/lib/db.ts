@@ -292,6 +292,15 @@ function sortLinks(links: AffiliateLink[]): AffiliateLink[] {
   );
 }
 
+/**
+ * 목록 카드에서 가격비교·구매 직행을 보여주려면 링크가 필요하다.
+ * getDeals 등은 products 한 표만 읽으므로, 호출부에서 이 함수로 링크를 덧댄다
+ * (링크 질의는 id 배열 하나로 끝나므로 카드 수와 무관하게 쿼리 1회).
+ */
+export async function withLinks(products: Product[]): Promise<ProductWithLinks[]> {
+  return attachLinks(products);
+}
+
 async function attachLinks(products: Product[]): Promise<ProductWithLinks[]> {
   if (products.length === 0) return [];
   const ids = products.map((p) => p.id);

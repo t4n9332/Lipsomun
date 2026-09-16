@@ -19,6 +19,7 @@ import {
 import ProductCard from "@/components/ProductCard";
 import FavButton from "@/components/FavButton";
 import ShareButton from "@/components/ShareButton";
+import PushSubscribeButton from "@/components/PushSubscribeButton";
 import Stars from "@/components/Stars";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
 import ViewTracker from "@/components/ViewTracker";
@@ -297,6 +298,12 @@ export default async function ProductPage({
               <FavButton slug={product.slug} big />
               <ShareButton title={product.title} text={shareText} url={shareUrl} />
             </div>
+            {/* 찜만 하고 떠나는 사람이 다시 돌아올 통로 — 로그인 없이 구독된다 */}
+            <PushSubscribeButton
+              label="🔔 이 가격 내려가면 알림"
+              hint="로그인 없이 · 브라우저 알림"
+              className="push-cta inline"
+            />
             {(product.review || product.pros || product.cons) && (
               <a href="#review" className="review-jump">
                 ✍️ 입소문 리뷰 바로 보기 ↓

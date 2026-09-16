@@ -174,6 +174,60 @@ button { font-family: inherit; }
 .card .price { font-weight: 800; font-size: 15.5px; }
 .card .original { color: var(--ink-faint); font-size: 12.5px; text-decoration: line-through; }
 .card .meta { font-size: 12px; color: var(--ink-faint); }
+/* 카드 본문 클릭 영역 — .card가 <a>에서 <div>로 바뀌면서(구매 버튼을 품기 위해)
+   세로 배치·링크 색 상속을 이쪽이 이어받는다. */
+.card-hit {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+}
+/* 목록 카드 안의 축약 가격비교 — 상세로 안 들어가도 어디가 싼지 보인다 */
+.card-vs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.card-vs .vs-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  background: #f4f2ef;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+.card-vs .vs-chip em { font-style: normal; font-weight: 700; opacity: 0.75; }
+.card-vs .vs-chip.win {
+  color: #fff;
+  background: var(--brand);
+  border-color: transparent;
+}
+/* 구매 직행 버튼 — 목록에서 상세를 거치지 않고 제휴 링크로 바로 나간다 */
+.card-buy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 11px 12px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13.5px;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+}
+.card-buy:hover { filter: brightness(1.08); }
+.card-buy .chip {
+  font-size: 10.5px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  padding: 1px 6px;
+}
+.card-buy small { opacity: 0.85; }
 .badge {
   position: absolute;
   top: 10px;
@@ -785,6 +839,10 @@ html { scroll-behavior: smooth; }
   .card .discount { font-size: 12.5px; }
   .card .price { font-size: 13.5px; }
   .card .original { font-size: 11px; }
+  /* 2열이라 폭이 좁다 — 비교 칩은 한 줄에 둘까지, 버튼은 터치 44px 유지 */
+  .card-vs { gap: 3px; margin-top: 4px; }
+  .card-vs .vs-chip { font-size: 10px; padding: 1px 5px; gap: 3px; }
+  .card-buy { font-size: 12.5px; padding: 10px 8px; min-height: 44px; }
   .badge { font-size: 10px; padding: 2px 7px; top: 8px; left: 8px; }
   .hero { padding: 24px 20px; border-radius: 16px; }
   .hero h1 { font-size: 22px; }
@@ -1382,3 +1440,37 @@ html { scroll-behavior: smooth; }
 .farm-tabs button.on { background: #2f7d4f; border-color: #2f7d4f; color: #fff; }
 .farm-tabs button.on .n { color: rgba(255,255,255,0.8); }
 .farm-panel { margin-top: 12px; }
+
+/* ---------- 웹푸시 구독 CTA (로그인 없이 구독) ---------- */
+.push-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  background: #fff6ef;
+  border: 1px solid #f3d9c4;
+  border-radius: var(--radius);
+}
+/* 상세·마이페이지처럼 이미 카드 안일 때는 배경을 빼고 줄만 차지한다 */
+.push-cta.inline {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 10px 0 0;
+}
+.push-cta .push-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.push-cta .push-btn:disabled { opacity: 0.6; cursor: default; }
+.push-cta .push-hint { font-size: 12.5px; color: var(--ink-faint); }
+.push-cta .push-done { margin: 0; font-size: 13.5px; color: #2b8a3e; font-weight: 600; }
+.push-cta .push-msg { flex-basis: 100%; margin: 0; font-size: 12.5px; color: var(--ink-faint); }
+@media (max-width: 640px) {
+  .push-cta { padding: 10px 12px; gap: 8px; }
+  .push-cta .push-hint { font-size: 11.5px; }
+}

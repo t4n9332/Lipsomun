@@ -6,10 +6,11 @@ import {
   getRecentReviewed,
   getPublishedCollections,
   getPriceCompareProducts,
+  withLinks,
 } from "@/lib/db";
 import ProductCard from "@/components/ProductCard";
 import CompareCard, { comparePrices } from "@/components/CompareCard";
-import { TELEGRAM_CHANNEL_URL, imgUrl } from "@/lib/util";
+import { TELEGRAM_CHANNEL_URL, imgUrl, jsonLdString } from "@/lib/util";
 import farm from "@/data/farm.json";
 import FarmCard, { type FarmItem } from "@/components/FarmCard";
 
@@ -21,11 +22,58 @@ export const revalidate = 300; // 홈 — 딜·가격 자주 변동
  */
 export const metadata = { alternates: { canonical: "/" } };
 
+const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
+
+/**
+ * 홈에만 두는 사이트 단위 구조화 데이터.
+ * - WebSite + SearchAction: 구글 검색결과의 사이트링크 검색창 자격 요건.
+ *   `{search_term_string}`은 리터럴이어야 하므로 URL 인코딩하지 않는다.
+ * - Organization: 지식 패널·브랜드 인식용. 로고는 절대 URL이어야 한다.
+ * 상품·기획전 페이지의 JSON-LD와 @type이 겹치지 않아 충돌하지 않는다.
+ */
+const siteJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE}/#website`,
+    url: `${SITE}/`,
+    name: "입소문",
+    alternateName: "입소문 — 쇼핑 가격비교·특가",
+    description:
+      "쿠팡·토스 가격비교, 오늘의 특가, 카테고리별 인기 랭킹과 솔직 리뷰를 한곳에서.",
+    inLanguage: "ko-KR",
+    publisher: { "@id": `${SITE}/#org` },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE}/search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE}/#org`,
+    name: "입소문",
+    url: `${SITE}/`,
+    logo: { "@type": "ImageObject", url: `${SITE}/icon-512.png`, width: 512, height: 512 },
+    sameAs: [TELEGRAM_CHANNEL_URL],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "t4n2140@gmail.com",
+      availableLanguage: ["ko"],
+    },
+  },
+];
+
 export default async function Home() {
   const [deals, popular, recent, picks, compareRaw] = await Promise.all([
-    getDeals(8),
+    getDeals(8).then(withLinks),
     getPopular(5),
-    getRecentReviewed(4),
+    getRecentReviewed(4).then(withLinks),
     getPublishedCollections(4).catch(() => []),
     getPriceCompareProducts(40).catch(() => []),
   ]);
@@ -36,6 +84,10 @@ export default async function Home() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdString(siteJsonLd) }}
+      />
       <section className="hero">
         <h1>
           진짜 써본 사람들의 <em>입소문</em>

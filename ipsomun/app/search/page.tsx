@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { searchProductsDb, type SearchSort } from "@/lib/db";
+import { searchProductsDb, withLinks, type SearchSort } from "@/lib/db";
 import { CATEGORIES } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
 
@@ -41,7 +41,9 @@ export default async function SearchPage({
     : "relevance";
   const cat = CATEGORIES.includes(catRaw || "") ? catRaw! : "";
 
-  const items = query ? await searchProductsDb(query, 60, sort, cat || undefined) : [];
+  const items = query
+    ? await withLinks(await searchProductsDb(query, 60, sort, cat || undefined))
+    : [];
 
   // 결과에 존재하는 카테고리만 필터로 노출 (필터 미적용 상태 기준)
   const allItems =

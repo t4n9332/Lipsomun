@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getBySlugs } from "@/lib/db";
+import { getBySlugs, withLinks } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,8 @@ export async function GET(req: Request) {
     .slice(0, 100);
   if (slugs.length === 0) return NextResponse.json({ products: [] });
 
-  const rows = await getBySlugs(slugs);
+  // 찜 목록도 카드에서 바로 가격비교·구매가 되도록 링크를 함께 내려준다
+  const rows = await withLinks(await getBySlugs(slugs));
   const products = rows.map((p) => ({
     slug: p.slug,
     title: p.title,
@@ -23,6 +24,7 @@ export async function GET(req: Request) {
     category: p.category,
     rating: p.rating,
     ratingCount: p.ratingCount,
+    links: p.links.map((l) => ({ id: l.id, platform: l.platform, price: l.price })),
   }));
   return NextResponse.json({ products });
 }
