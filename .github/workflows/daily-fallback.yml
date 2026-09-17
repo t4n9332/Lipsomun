@@ -55,3 +55,15 @@ jobs:
           if [ -z "$CRON_SECRET" ]; then exit 1; fi
           curl -sS --fail-with-body -m 60             -H "Authorization: Bearer $CRON_SECRET"             "https://lipsomun.co.kr/api/cron/notify?slot=morning"
           echo
+
+      # 결과물이 오늘 실제로 생겼는지 DB로 확인한다 (로컬 회차 성공 도장·가격 스냅샷·블로그 갱신).
+      # 문제가 있으면 서버가 텔레그램으로 하루 한 번 알린다. 블로그 안전망 뒤에 돌아야
+      # 방금 발행된 글을 '갱신 안 됨'으로 오판하지 않는다.
+      - name: 자동화 점검 (이상 시 텔레그램 알림)
+        if: always()
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then exit 1; fi
+          curl -sS --fail-with-body -m 60 -H "Authorization: Bearer $CRON_SECRET" "https://lipsomun.co.kr/api/cron/health"
+          echo

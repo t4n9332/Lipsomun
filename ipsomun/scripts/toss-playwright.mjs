@@ -1311,6 +1311,9 @@ async function main() {
         updated += await runCoupangRecheck(config, r.products);
       }
       printRunSummary("match-only", r, created, updated);
+      if (r) await siteApi(config, "POST", "/api/admin/heartbeat", { job: "toss-local" }).catch((e) =>
+        console.log(`[도장] 실패: ${e.message}`)
+      );
       console.log("[매칭 전용 실행] 완료\n");
       return;
     }
@@ -1351,6 +1354,9 @@ async function main() {
       }
       if (tossError) throw tossError; // exit 1 유지 — 스케줄러·[요약]에 실패로 남긴다
       printRunSummary("auto", r, created, updated);
+      if (r) await siteApi(config, "POST", "/api/admin/heartbeat", { job: "toss-local" }).catch((e) =>
+        console.log(`[도장] 실패: ${e.message}`)
+      );
       console.log("[자동 실행] 완료\n");
       return;
     }
