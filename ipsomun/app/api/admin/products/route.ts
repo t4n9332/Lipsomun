@@ -35,6 +35,8 @@ export async function GET(req: Request) {
     category: p.category,
     price: p.price,
     isPublished: p.isPublished,
+    isDeal: p.isDeal,
+    createdAt: p.createdAt,
     clicks: p.clicks,
     views: p.views,
     // 리뷰 유무만 — 본문까지 실으면 응답이 수 MB가 된다.
