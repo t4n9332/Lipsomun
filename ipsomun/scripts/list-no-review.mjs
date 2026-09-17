@@ -23,7 +23,7 @@ async function main() {
   const res = await fetch(`${config.siteUrl}/api/admin/products?limit=10000`, { headers });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `API 오류 ${res.status}`);
-  const noReview = data.products.filter((p) => !p.hasReview);
+  const noReview = data.products.filter((p) => p.isPublished && !p.hasReview);
   noReview.sort((a, b) => (b.clicks || 0) - (a.clicks || 0) || (b.views || 0) - (a.views || 0));
   console.log(`리뷰없음 총 ${noReview.length}개\n`);
   for (const p of noReview.slice(0, N)) {
