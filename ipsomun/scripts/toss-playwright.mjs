@@ -50,7 +50,22 @@ const CATALOG_PAGES = [
 ];
 
 /** 한 회차에 시도할 역매칭(쿠팡 검색) 횟수 — 쿠팡 검색 API 시간당 약 10회 제한을 고려 */
-const DISCOVER_PER_RUN = 8;
+const DISCOVER_PER_RUN = 6;
+
+/**
+ * 역매칭에서 토스가 쿠팡보다 비싸면 등록하지 않는다 (동가는 등록).
+ * 토스 쪽만 수익이 실제로 확인됐고, 쿠팡이 더 싼 비교 페이지는 토스 클릭을 만들지 못한다.
+ */
+const DISCOVER_TOSS_CHEAPER_ONLY = true;
+
+/**
+ * 한 회차에 쿠팡 가격을 재확인할 가격비교 상품 수. 쿠팡 가격은 등록 시점 값으로 굳어 있어
+ * '토스가 N원 저렴'이 낡은 숫자에 기대게 된다. 역매칭과 합쳐 시간당 10회 제한 안에 둔다.
+ */
+const COUPANG_RECHECK_PER_RUN = 3;
+
+/** 쿠팡 가격 재확인 이력 (상품 id → 마지막 확인 시각) */
+const RECHECK_PATH = path.join(__dirname, ".coupang-recheck.json");
 
 /** 역매칭 후보 가격 상한 — 이보다 비싼 상품은 쿠팡 제목 검색 매칭률이 낮다 */
 const DISCOVER_MAX_PRICE = 200_000;
@@ -880,6 +895,12 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
         continue;
       }
       const best = pick.f;
+      if (DISCOVER_TOSS_CHEAPER_ONLY && best.productPrice && c.price > best.productPrice) {
+        console.log(
+          `  ↷ [${c.title.slice(0, 34)}] 쿠팡이 더 저렴해 건너뜀 (쿠팡 ${best.productPrice.toLocaleString("ko-KR")}원 vs 토스 ${c.price.toLocaleString("ko-KR")}원)`
+        );
+        continue;
+      }
       if (pick !== top) {
         console.log(
           `  · [${c.title.slice(0, 34)}] 유사도 1등(${(top.s * 100).toFixed(0)}%)은 가격차 과다 → ${(pick.s * 100).toFixed(0)}% 후보 채택`
@@ -950,6 +971,88 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
   }
   console.log(`[역매칭] 신규 가격비교 상품 ${created}개 등록 (검색 ${tried}회 사용)`);
   return created;
+}
+
+/* ---------- 쿠팡 가격 재확인 ---------- */
+
+/**
+ * 가격비교 상품(쿠팡+토스)의 쿠팡 가격을 검색 API로 다시 읽어 갱신한다.
+ * 파트너스 API에는 상품 단건 조회가 없어 제목으로 검색한 뒤, 링크의 pageKey(=쿠팡 productId)와
+ * 같은 결과만 채택한다 — 제목이 비슷한 다른 상품의 가격이 섞이지 않는다.
+ * 순서: 한 번도 확인 안 한 것 → 오래된 것, 동률이면 절약액이 큰(상단에 노출되는) 상품부터.
+ */
+async function runCoupangRecheck(config, products, max = COUPANG_RECHECK_PER_RUN) {
+  let log = {};
+  try {
+    log = JSON.parse(readFileSync(RECHECK_PATH, "utf8"));
+  } catch {}
+  const targets = [];
+  for (const p of products) {
+    const coupang = p.links.find((l) => l.platform === "coupang");
+    const toss = p.links.find((l) => l.platform === "toss");
+    if (!coupang || !toss) continue;
+    const pageKey = coupang.url.match(/[?&]pageKey=(\d+)/)?.[1];
+    if (!pageKey) continue;
+    const oldPrice = coupang.price ?? p.price ?? null;
+    const saving = oldPrice && toss.price ? oldPrice - toss.price : 0;
+    targets.push({ p, coupang, pageKey, oldPrice, saving, last: log[p.id] ?? 0 });
+  }
+  targets.sort((a, b) => a.last - b.last || b.saving - a.saving);
+
+  let updated = 0;
+  let tried = 0;
+  for (const t of targets.slice(0, max)) {
+    tried++;
+    log[t.p.id] = Date.now();
+    const keyword = tokenize(t.p.title).slice(0, 6).join(" ");
+    try {
+      const { products: found } = await siteApi(
+        config,
+        "GET",
+        `/api/admin/coupang/search?keyword=${encodeURIComponent(keyword)}&limit=10`
+      );
+      // 같은 productId 아래 옵션(용량·수량)이 여럿일 수 있다 — itemId까지 같으면 확정,
+      // productId만 같으면 아래 가격 변동 가드를 거친다
+      const itemId = t.coupang.url.match(/[?&]itemId=(\d+)/)?.[1];
+      const sameItem = (f) => itemId && f.productUrl?.match(/[?&]itemId=(\d+)/)?.[1] === itemId;
+      const exact = (found || []).find(sameItem);
+      const hit = exact || (found || []).find((f) => String(f.productId) === t.pageKey);
+      if (!hit || !hit.productPrice) {
+        console.log(`  ↷ [${t.p.title.slice(0, 34)}] 검색 결과에 같은 쿠팡 상품 없음 — 가격 유지`);
+        continue;
+      }
+      if (hit.productPrice === t.oldPrice) {
+        console.log(`  = [${t.p.title.slice(0, 34)}] 쿠팡 ${hit.productPrice.toLocaleString("ko-KR")}원 그대로`);
+        continue;
+      }
+      if (!exact && priceRatioSuspicious(hit.productPrice, t.oldPrice)) {
+        console.log(
+          `  ⚠ [${t.p.title.slice(0, 34)}] 가격 변동 과다로 보류 (${t.oldPrice?.toLocaleString("ko-KR")}원 → ${hit.productPrice.toLocaleString("ko-KR")}원)`
+        );
+        continue;
+      }
+      await siteApi(config, "POST", "/api/admin/links", {
+        productId: t.p.id,
+        platform: "coupang",
+        url: t.coupang.url,
+        price: hit.productPrice,
+      });
+      updated++;
+      console.log(
+        `  ↻ 쿠팡 가격 갱신: ${t.p.title.slice(0, 34)} ${t.oldPrice?.toLocaleString("ko-KR") ?? "?"}원 → ${hit.productPrice.toLocaleString("ko-KR")}원`
+      );
+    } catch (e) {
+      console.log(`  ✘ [${t.p.title.slice(0, 30)}] ${e.message}`);
+      if (String(e.message).includes("429") || String(e.message).includes("제한")) break;
+    }
+  }
+  try {
+    writeFileSync(RECHECK_PATH, JSON.stringify(log, null, 2));
+  } catch (e) {
+    console.log(`  ⚠ 재확인 이력 저장 실패: ${e.message}`);
+  }
+  console.log(`[쿠팡 재확인] ${tried}건 확인, ${updated}건 갱신 (대상 ${targets.length}개)`);
+  return updated;
 }
 
 /* ---------- 자동 모드 3단계: 기존 토스 링크 가격 갱신 ---------- */
@@ -1205,6 +1308,7 @@ async function main() {
       if (r) {
         created = await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
         updated = await runPriceRefresh(config, r.catalog, r.products);
+        updated += await runCoupangRecheck(config, r.products);
       }
       printRunSummary("match-only", r, created, updated);
       console.log("[매칭 전용 실행] 완료\n");
@@ -1225,6 +1329,7 @@ async function main() {
         if (r) {
           created = await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
           updated = await runPriceRefresh(config, r.catalog, r.products);
+          updated += await runCoupangRecheck(config, r.products);
         }
       } catch (e) {
         tossError = e;

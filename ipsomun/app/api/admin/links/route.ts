@@ -32,6 +32,10 @@ export async function POST(req: Request) {
     url,
     typeof price === "number" && price > 0 ? Math.round(price) : null
   );
+  // products.price는 쿠팡 값이다 — 쿠팡 링크 가격이 바뀌면 목록 정렬·실효 최저가도 따라가야 한다
+  if (platform === "coupang" && typeof price === "number" && price > 0) {
+    await q(`UPDATE products SET price = $1 WHERE id = $2`, [Math.round(price), productId]);
+  }
   revalidatePath(`/p/${product.slug}`);
   return NextResponse.json({ ok: true, productId, platform });
 }
