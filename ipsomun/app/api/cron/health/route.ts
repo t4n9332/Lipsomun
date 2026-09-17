@@ -49,8 +49,10 @@ export async function GET(req: Request) {
           AND EXISTS (SELECT 1 FROM affiliate_links l WHERE l.product_id = p.id AND l.platform = 'toss')) AS compare`
   );
 
+  // ?dry=1 — 알림 없이 상태만 본다 (수동 확인용)
+  const dry = new URL(req.url).searchParams.get("dry") === "1";
   let alerted = false;
-  if (problems.length && (await claimDailyRun("health-alert"))) {
+  if (!dry && problems.length && (await claimDailyRun("health-alert"))) {
     const r = await sendTelegram(
       `🩺 <b>입소문 자동화 점검</b>\n` + problems.map((p) => `• ${escHtml(p)}`).join("\n")
     );
