@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-19T17:13+09:00",
+ "generated_at": "2026-09-22T17:15+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -1262,57 +1262,6 @@
    "created_at": "2026-08-24"
   },
   {
-   "id": "13681144699",
-   "group_id": "G10004210",
-   "title": "국내산 고춧가루 (김장용) 굵은가루 (26년산) 1kg",
-   "category": "김치·반찬",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004210_thumb.jpg",
-   "price_from": 39900,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 39900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13741782900",
-   "coupang_url": "https://www.coupang.com/vp/products/16368853419",
-   "season_kind": "시즌",
-   "peak_months": [
-    10,
-    11
-   ],
-   "created_at": "2026-09-02"
-  },
-  {
-   "id": "13681144771",
-   "group_id": "G10004210",
-   "title": "국내산 고춧가루 (김장용) 굵은가루 (26년산) 3kg·4kg",
-   "category": "김치·반찬",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004210_thumb.jpg",
-   "price_from": 112700,
-   "options": [
-    {
-     "name": "3kg",
-     "price": 112700,
-     "soldout": false
-    },
-    {
-     "name": "4kg",
-     "price": 149200,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13741782975",
-   "coupang_url": "https://www.coupang.com/vp/products/16368853419",
-   "season_kind": "시즌",
-   "peak_months": [
-    10,
-    11
-   ],
-   "created_at": "2026-09-02"
-  },
-  {
    "id": "13681155326",
    "group_id": "G10004443",
    "title": "신안 새우젓 0.5kg·2kg",
@@ -2186,31 +2135,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685107001",
-   "group_id": "G10001562",
-   "title": "머스크 메론 8kg 선물포장",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001562_thumb.jpg",
-   "price_from": 56900,
-   "options": [
-    {
-     "name": "(청)머스크 메론 8kg내외(3수) (3수)",
-     "price": 56900,
-     "soldout": false
-    },
-    {
-     "name": "(청)머스크 메론 8kg내외(4수) (4수)",
-     "price": 61400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745768639",
-   "coupang_url": "https://www.coupang.com/vp/products/16370933140",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685107730",
    "group_id": "G10000628",
    "title": "전라도 깍두기 1kg",
@@ -3028,36 +2952,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745796993",
    "coupang_url": "https://www.coupang.com/vp/products/16370914498",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685136059",
-   "group_id": "G10001569",
-   "title": "샤인머스캣 선물포장",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001569_thumb.jpg",
-   "price_from": 35100,
-   "options": [
-    {
-     "name": "2kg (4수)",
-     "price": 35100,
-     "soldout": false
-    },
-    {
-     "name": "2kg (2-3수)",
-     "price": 42300,
-     "soldout": false
-    },
-    {
-     "name": "4kg (4-5수)",
-     "price": 57000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745797732",
-   "coupang_url": "https://www.coupang.com/vp/products/16370914982",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
