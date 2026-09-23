@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const config = JSON.parse(readFileSync(path.join(__dirname, ".toss-config.json"), "utf8"));
-const token = createHash("sha256").update("ipsomun:" + config.adminPassword).digest("hex");
+const token = createHash("sha256").update("ipsomun:" + config.adminPassword + (config.tokenSecret ? ":" + config.tokenSecret : "")).digest("hex");
 const headers = { "Content-Type": "application/json", Cookie: `ipsomun_admin=${token}` };
 const MIN_AGE_DAYS = 14;
 

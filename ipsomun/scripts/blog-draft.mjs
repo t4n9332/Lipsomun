@@ -27,7 +27,7 @@ if (!existsSync(CONFIG_PATH)) {
   process.exit(1);
 }
 const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
-const token = createHash("sha256").update("ipsomun:" + config.adminPassword).digest("hex");
+const token = createHash("sha256").update("ipsomun:" + config.adminPassword + (config.tokenSecret ? ":" + config.tokenSecret : "")).digest("hex");
 
 const won = (n) => (n != null ? Number(n).toLocaleString("ko-KR") + "원" : "");
 const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);

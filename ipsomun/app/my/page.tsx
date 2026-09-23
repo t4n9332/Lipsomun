@@ -66,7 +66,7 @@ export default function MyPage() {
         <div className="my-card" style={{ textAlign: "center" }}>
           <div style={{ fontSize: 44 }}>⭐</div>
           <h1 style={{ fontSize: 22, margin: "10px 0 6px" }}>출석체크 & 레벨</h1>
-          <p style={{ color: "#55524d", fontSize: 14.5, marginTop: 0 }}>
+          <p style={{ color: "var(--ink-soft)", fontSize: 14.5, marginTop: 0 }}>
             매일 출석 도장을 모아 레벨을 올려보세요.
             <br />
             구글 계정으로 3초 만에 시작할 수 있어요.
@@ -80,7 +80,7 @@ export default function MyPage() {
             </svg>
             구글로 시작하기
           </a>
-          <p style={{ fontSize: 12, color: "#8a867f" }}>
+          <p style={{ fontSize: 12, color: "var(--ink-faint)" }}>
             이메일은 출석 기록 용도로만 사용됩니다.
           </p>
         </div>
@@ -92,7 +92,7 @@ export default function MyPage() {
               <span>
                 {l.emoji} Lv.{l.level} {l.name}
               </span>
-              <span style={{ color: "#8a867f" }}>도장 {l.min}개</span>
+              <span style={{ color: "var(--ink-faint)" }}>도장 {l.min}개</span>
             </div>
           ))}
         </div>
@@ -143,7 +143,7 @@ export default function MyPage() {
             <div className="progress">
               <div className="bar" style={{ width: progress + "%" }} />
             </div>
-            <p style={{ fontSize: 12.5, color: "#8a867f", margin: "6px 0 0" }}>
+            <p style={{ fontSize: 12.5, color: "var(--ink-faint)", margin: "6px 0 0" }}>
               다음 레벨 {me.next.emoji} {me.next.name}까지 도장{" "}
               {me.next.min - total}개 남음
             </p>
@@ -153,7 +153,7 @@ export default function MyPage() {
 
       <div className="my-card">
         <h2 style={{ fontSize: 16, marginTop: 0 }}>🔔 특가 알림</h2>
-        <p style={{ fontSize: 13.5, color: "#55524d", marginTop: 0 }}>
+        <p style={{ fontSize: 13.5, color: "var(--ink-soft)", marginTop: 0 }}>
           매일 아침 7시 새 특가와, 찜한 상품의 가격 인하를 알려드려요.
         </p>
         <PushSubscribeButton label="알림 켜기" className="push-cta inline" />
@@ -174,7 +174,7 @@ export default function MyPage() {
                 {l.emoji} Lv.{l.level} {l.name}
                 {current && " ← 현재"}
               </span>
-              <span style={{ color: reached ? "#2b8a3e" : "#8a867f" }}>
+              <span style={{ color: reached ? "#2b8a3e" : "var(--ink-faint)" }}>
                 {reached ? "달성 ✓" : `도장 ${l.min}개`}
               </span>
             </div>
@@ -183,7 +183,7 @@ export default function MyPage() {
       </div>
 
       <p style={{ textAlign: "center" }}>
-        <a href="/api/auth/signout" style={{ fontSize: 13, color: "#8a867f" }}>
+        <a href="/api/auth/signout" style={{ fontSize: 13, color: "var(--ink-faint)" }}>
           로그아웃
         </a>
       </p>

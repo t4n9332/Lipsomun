@@ -29,7 +29,7 @@ export default function GoldboxButton() {
         {busy ? "가져오는 중..." : "🎁 골드박스 지금 갱신"}
       </button>
       {result && (
-        <span style={{ fontSize: 12.5, color: "#55524d", maxWidth: 260 }}>
+        <span style={{ fontSize: 12.5, color: "var(--ink-soft)", maxWidth: 260 }}>
           {result}
         </span>
       )}

@@ -72,7 +72,7 @@ export default function PriceHistoryChart({
           vectorEffect="non-scaling-stroke"
         />
         {/* 최저/최고/현재 포인트와 라벨 (선별 직접 라벨) */}
-        <circle cx={x(minIdx)} cy={y(min)} r="3.5" fill="#e8590c" stroke="#fff" strokeWidth="1.5">
+        <circle cx={x(minIdx)} cy={y(min)} r="3.5" fill="#e8590c" stroke="var(--surface)" strokeWidth="1.5">
           <title>{`${fmtDay(history[minIdx].day)} 최저 ${won(min)}`}</title>
         </circle>
         <text x={x(minIdx)} y={H - 6} textAnchor={anchorFor(minIdx)} className="ph-label">
@@ -80,7 +80,7 @@ export default function PriceHistoryChart({
         </text>
         {maxIdx !== minIdx && (
           <>
-            <circle cx={x(maxIdx)} cy={y(max)} r="3" fill="#b3aea5" stroke="#fff" strokeWidth="1.5">
+            <circle cx={x(maxIdx)} cy={y(max)} r="3" fill="#b3aea5" stroke="var(--surface)" strokeWidth="1.5">
               <title>{`${fmtDay(history[maxIdx].day)} 최고 ${won(max)}`}</title>
             </circle>
             <text x={x(maxIdx)} y={16} textAnchor={anchorFor(maxIdx)} className="ph-label muted">
@@ -93,7 +93,7 @@ export default function PriceHistoryChart({
           cy={y(last.price)}
           r="4"
           fill="#1a1a1a"
-          stroke="#fff"
+          stroke="var(--surface)"
           strokeWidth="1.5"
         >
           <title>{`오늘 ${won(last.price)}`}</title>

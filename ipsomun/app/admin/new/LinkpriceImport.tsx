@@ -144,7 +144,7 @@ export default function LinkpriceImport({
   return (
     <div className="admin-card">
       <h2>{heading ?? "🔗 링크프라이스로 자동 등록"}</h2>
-      <p style={{ fontSize: 13.5, color: "#55524d", marginTop: 0 }}>
+      <p style={{ fontSize: 13.5, color: "var(--ink-soft)", marginTop: 0 }}>
         {guide ?? (
           <>
             제휴된 쇼핑몰(11번가, 오늘의집, G마켓, 옥션, SSG, 롯데온 등)의{" "}
@@ -223,9 +223,9 @@ export default function LinkpriceImport({
                 alignItems: "flex-start",
                 background: d.affiliateUrl
                   ? d.selected
-                    ? "#fff1e8"
-                    : "#fff"
-                  : "#fdf0f0",
+                    ? "var(--brand-soft)"
+                    : "var(--surface)"
+                  : "var(--err-bg)",
               }}
             >
               <input
@@ -244,14 +244,14 @@ export default function LinkpriceImport({
                     width: 52,
                     height: 52,
                     borderRadius: 8,
-                    background: "#f3f1ee",
+                    background: "var(--chip)",
                     flexShrink: 0,
                     marginTop: 6,
                   }}
                 />
               )}
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 12, color: "#8a867f", marginBottom: 4 }}>
+                <div style={{ fontSize: 12, color: "var(--ink-faint)", marginBottom: 4 }}>
                   {platformName(d.platform)} ·{" "}
                   {d.affiliateUrl ? (
                     <span style={{ color: "#2b8a3e" }}>제휴링크 생성됨 ✓</span>

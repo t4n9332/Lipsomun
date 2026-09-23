@@ -59,7 +59,7 @@ export default async function AdminCollectionsPage() {
                 <tr key={c.id}>
                   <td>
                     <b style={{ fontSize: 13.5 }}>{c.title}</b>
-                    <div style={{ fontSize: 12, color: "#8a867f" }}>/pick/{c.slug}</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-faint)" }}>/pick/{c.slug}</div>
                   </td>
                   <td>{c.itemCount}</td>
                   <td>

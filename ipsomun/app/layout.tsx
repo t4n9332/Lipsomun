@@ -7,6 +7,13 @@ import SearchBar from "@/components/SearchBar";
 import CatNav from "@/components/CatNav";
 import InstallPrompt from "@/components/InstallPrompt";
 import SourceTracker from "@/components/SourceTracker";
+import ThemeToggle from "@/components/ThemeToggle";
+
+// 저장된 테마 선택을 첫 페인트 전에 <html data-theme>로 적용한다(깜빡임 방지).
+// 저장값이 없으면 CSS의 prefers-color-scheme가 그대로 적용된다.
+const THEME_PRELOAD =
+  'try{var t=localStorage.getItem("ipsomun_theme");' +
+  'if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}';
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 
@@ -45,7 +52,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {/* PWA — 홈 화면 추가 지원 */}
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#e8590c" />
+        <meta name="theme-color" content="#e8590c" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1c1a18" media="(prefers-color-scheme: dark)" />
+        <script dangerouslySetInnerHTML={{ __html: THEME_PRELOAD }} />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -154,6 +163,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </a>
             </p>
             <p>© {new Date().getFullYear()} 입소문</p>
+            <ThemeToggle />
           </div>
         </footer>
       </body>

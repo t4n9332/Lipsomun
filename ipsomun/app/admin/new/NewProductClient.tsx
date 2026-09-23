@@ -184,11 +184,11 @@ export default function NewProductClient() {
       ) : tab === "auto" ? (
         <div className="admin-card">
           <h2>⚡ 키워드로 쿠팡 상품 자동 등록</h2>
-          <p style={{ fontSize: 13.5, color: "#55524d", marginTop: 0 }}>
+          <p style={{ fontSize: 13.5, color: "var(--ink-soft)", marginTop: 0 }}>
             키워드를 검색하면 쿠팡파트너스 API가 제품명·이미지·가격·제휴링크를
             자동으로 가져옵니다. 등록할 제품을 선택만 하면 끝!
             <br />
-            <span style={{ color: "#8a867f" }}>
+            <span style={{ color: "var(--ink-faint)" }}>
               ※ 쿠팡 검색 API는 시간당 호출 횟수 제한이 있으니 필요한 만큼만
               검색하세요.
             </span>
@@ -263,7 +263,7 @@ export default function NewProductClient() {
                   className="search-result-item"
                   style={{
                     cursor: "pointer",
-                    background: selected.has(r.productId) ? "#fff1e8" : "#fff",
+                    background: selected.has(r.productId) ? "var(--brand-soft)" : "var(--surface)",
                     borderColor: selected.has(r.productId)
                       ? "#e8590c"
                       : undefined,

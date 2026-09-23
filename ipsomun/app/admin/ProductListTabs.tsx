@@ -112,7 +112,7 @@ export default function ProductListTabs({ products }: { products: ProductRow[] }
                     <Link href={`/p/${p.slug}`} target="_blank">
                       <b style={{ fontSize: 13.5 }}>{p.title}</b>
                     </Link>
-                    <div style={{ fontSize: 12, color: "#8a867f" }}>
+                    <div style={{ fontSize: 12, color: "var(--ink-faint)" }}>
                       {p.category}
                     </div>
                   </td>

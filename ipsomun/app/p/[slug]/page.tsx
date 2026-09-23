@@ -248,7 +248,7 @@ export default async function ProductPage({
             </div>
           )}
           {product.description && (
-            <p style={{ color: "#55524d", fontSize: 15 }}>
+            <p style={{ color: "var(--ink-soft)", fontSize: 15 }}>
               {product.description}
             </p>
           )}

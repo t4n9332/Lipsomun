@@ -116,7 +116,7 @@ export default async function AdminPage() {
               })()}
             </tbody>
           </table>
-          <p style={{ fontSize: 12, color: "#8a867f", margin: "10px 0 0" }}>
+          <p style={{ fontSize: 12, color: "var(--ink-faint)", margin: "10px 0 0" }}>
             같은 구매라면 토스(약 10%)가 쿠팡(약 3%)보다 수수료가 높습니다. 토스
             클릭 비중이 오를수록 수익 효율이 좋아져요.
           </p>
@@ -157,7 +157,7 @@ export default async function AdminPage() {
             </tbody>
           </table>
         )}
-        <p style={{ fontSize: 12, color: "#8a867f", margin: "10px 0 0" }}>
+        <p style={{ fontSize: 12, color: "var(--ink-faint)", margin: "10px 0 0" }}>
           매일 손으로 하는 스레드·네이버 발행 중 어느 쪽이 실제 수익 클릭을 만드는지 여기서
           판단하세요. 직접 방문은 주소 직접 입력·북마크·PWA·출처 없는 앱 링크입니다.
         </p>
@@ -192,7 +192,7 @@ export default async function AdminPage() {
               </tbody>
             </table>
           )}
-          <p style={{ fontSize: 12, color: "#8a867f", margin: "10px 0 0" }}>
+          <p style={{ fontSize: 12, color: "var(--ink-faint)", margin: "10px 0 0" }}>
             클릭이 잘 나오는 카테고리에 제품을 더 등록하는 게 유리해요.
           </p>
         </div>
@@ -219,7 +219,7 @@ export default async function AdminPage() {
                       <Link href={`/p/${p.slug}`} target="_blank">
                         <b style={{ fontSize: 13 }}>{p.title}</b>
                       </Link>
-                      <div style={{ fontSize: 12, color: "#8a867f" }}>{p.category}</div>
+                      <div style={{ fontSize: 12, color: "var(--ink-faint)" }}>{p.category}</div>
                     </td>
                     <td><b>{p.clicks}</b></td>
                     <td>{p.views}</td>

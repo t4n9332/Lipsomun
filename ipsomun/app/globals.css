@@ -1476,3 +1476,79 @@ html { scroll-behavior: smooth; }
   .push-cta { padding: 10px 12px; gap: 8px; }
   .push-cta .push-hint { font-size: 11.5px; }
 }
+
+/* ---------- 다크모드 ----------
+   시스템 설정(prefers-color-scheme)을 따르고, <html data-theme="light|dark">로
+   사용자가 고정할 수 있다(푸터 토글 + localStorage, layout.tsx의 프리로드 스크립트).
+   하드코딩된 밝은 배경들은 아래에서 변수로 되돌린다. 새 밝은 배경을 넣을 때는
+   var(--thumb)·var(--chip)·var(--surface) 같은 변수를 쓸 것. */
+:root { --card: #ffffff; --thumb: #f3f1ee; --chip: #f1efec; --ok-bg: #ecfaf0; --ok-line: #c4ecd0; --ok-ink: #2b8a3e; --err-bg: #fdf0f0; --err-line: #f3d2d2; --err-ink: #c92a2a; color-scheme: light; }
+.card .thumb, .rank-item .thumb, .vs-thumb, .pick-thumbs .pt { background: var(--thumb); }
+.card-vs .vs-chip, .cat-filter a, .progress, .pill.off, .btn.secondary, .post-table th { background: var(--chip); }
+.review-box .content { color: var(--ink); }
+.pros-cons .pros, .pill.on, .notice.ok { background: var(--ok-bg); border-color: var(--ok-line); }
+.pill.on, .notice.ok, .push-cta .push-done { color: var(--ok-ink); }
+.pros-cons .cons, .notice.err { background: var(--err-bg); border-color: var(--err-line); }
+.notice.err { color: var(--err-ink); }
+.google-btn, .admin-wrap input, .admin-wrap textarea, .admin-wrap select, .search-form input { background: var(--surface); color: var(--ink); }
+.calc-card { background: var(--card); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121110;
+    --surface: #1c1a18;
+    --ink: #ece9e4;
+    --ink-soft: #b4afa7;
+    --ink-faint: #837e77;
+    --line: #2e2b27;
+    --brand: #ff7a2e;
+    --brand-soft: #3a2416;
+    --accent: #5aa9f0;
+    --card: #1c1a18;
+    --thumb: #262320;
+    --chip: #2a2723;
+    --ok-bg: #12291b; --ok-line: #1f4a2e; --ok-ink: #6fd08f;
+    --err-bg: #2e1616; --err-line: #4a2323; --err-ink: #ff7b72;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(0, 0, 0, 0.45);
+    color-scheme: dark;
+  }
+  :root:not([data-theme="light"]) .hero { background: linear-gradient(120deg, #2a1a10, #33200f 55%, #3a2412); }
+  :root:not([data-theme="light"]) .vs-section { background: linear-gradient(120deg, #141b26, #16202e 55%, #131e2a); border-color: #263449; }
+  :root:not([data-theme="light"]) .tg-banner { background: linear-gradient(120deg, #142131, #17263a); border-color: #274461; }
+  :root:not([data-theme="light"]) .post-lows, :root:not([data-theme="light"]) .push-cta { background: #2a1c12; border-color: #4a3121; }
+  :root:not([data-theme="light"]) .fav-btn { background: rgba(28, 26, 24, 0.92); color: var(--ink); }
+  :root:not([data-theme="light"]) .notice-bar { color: #d8a980; }
+  :root:not([data-theme="light"]) .buy-sticky .bs-price .lowest-chip { background: var(--brand-soft); color: var(--brand); }
+  :root:not([data-theme="light"]) .price-signal.good { color: var(--ok-ink); }
+  :root:not([data-theme="light"]) .stars-track { color: #3a3631; }
+  :root:not([data-theme="light"]) img { filter: brightness(0.92); }
+}
+:root[data-theme="dark"] {
+  --bg: #121110;
+  --surface: #1c1a18;
+  --ink: #ece9e4;
+  --ink-soft: #b4afa7;
+  --ink-faint: #837e77;
+  --line: #2e2b27;
+  --brand: #ff7a2e;
+  --brand-soft: #3a2416;
+  --accent: #5aa9f0;
+  --card: #1c1a18;
+  --thumb: #262320;
+  --chip: #2a2723;
+  --ok-bg: #12291b; --ok-line: #1f4a2e; --ok-ink: #6fd08f;
+  --err-bg: #2e1616; --err-line: #4a2323; --err-ink: #ff7b72;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+:root[data-theme="dark"] .hero { background: linear-gradient(120deg, #2a1a10, #33200f 55%, #3a2412); }
+:root[data-theme="dark"] .vs-section { background: linear-gradient(120deg, #141b26, #16202e 55%, #131e2a); border-color: #263449; }
+:root[data-theme="dark"] .tg-banner { background: linear-gradient(120deg, #142131, #17263a); border-color: #274461; }
+:root[data-theme="dark"] .post-lows, :root[data-theme="dark"] .push-cta { background: #2a1c12; border-color: #4a3121; }
+:root[data-theme="dark"] .fav-btn { background: rgba(28, 26, 24, 0.92); color: var(--ink); }
+:root[data-theme="dark"] .notice-bar { color: #d8a980; }
+:root[data-theme="dark"] .buy-sticky .bs-price .lowest-chip { background: var(--brand-soft); color: var(--brand); }
+:root[data-theme="dark"] .price-signal.good { color: var(--ok-ink); }
+:root[data-theme="dark"] .stars-track { color: #3a3631; }
+:root[data-theme="dark"] img { filter: brightness(0.92); }
+.theme-toggle { background: none; border: 1px solid #3a362f; color: inherit; border-radius: 999px; padding: 4px 12px; font-size: 12.5px; cursor: pointer; font-family: inherit; margin-top: 10px; }
+.theme-toggle:hover { border-color: #6a655c; }

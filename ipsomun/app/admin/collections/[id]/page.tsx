@@ -59,7 +59,7 @@ export default async function EditCollectionPage({
               저장
             </button>
           </div>
-          <p style={{ fontSize: 12.5, color: "#8a867f", margin: "10px 0 0" }}>
+          <p style={{ fontSize: 12.5, color: "var(--ink-faint)", margin: "10px 0 0" }}>
             아래에서 담을 제품을 체크하세요. 순서 칸에 1, 2, 3… 을 넣으면 그 순서대로
             보여요 (비워두면 뒤쪽에 배치).
           </p>
@@ -103,7 +103,7 @@ export default async function EditCollectionPage({
                     </td>
                     <td style={{ maxWidth: 340 }}>
                       <b style={{ fontSize: 13 }}>{p.title}</b>
-                      <div style={{ fontSize: 12, color: "#8a867f" }}>
+                      <div style={{ fontSize: 12, color: "var(--ink-faint)" }}>
                         {p.category}
                         {!p.isPublished && " · 비공개(기획전에 안 보임)"}
                       </div>

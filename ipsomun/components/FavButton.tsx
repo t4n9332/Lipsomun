@@ -52,7 +52,7 @@ export default function FavButton({
       className={`fav-btn${big ? " big" : ""}`}
       onClick={toggle}
       aria-label="찜하기"
-      style={{ color: fav ? "#e8590c" : "#b3aea5", visibility: ready ? "visible" : "hidden" }}
+      style={{ color: fav ? "#e8590c" : "var(--ink-faint)", visibility: ready ? "visible" : "hidden" }}
     >
       {fav ? "♥" : "♡"}
       {big && (fav ? " 찜 완료" : " 찜하기")}

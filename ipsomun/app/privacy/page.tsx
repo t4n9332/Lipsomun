@@ -7,7 +7,7 @@ export default function PrivacyPage() {
   return (
     <section className="section" style={{ maxWidth: 720, margin: "40px auto" }}>
       <h1 style={{ fontSize: 24, fontWeight: 800 }}>개인정보처리방침</h1>
-      <div style={{ fontSize: 14.5, lineHeight: 1.8, color: "#3d3a36" }}>
+      <div style={{ fontSize: 14.5, lineHeight: 1.8, color: "var(--ink-soft)" }}>
         <p>
           입소문(https://lipsomun.co.kr, 이하 &ldquo;사이트&rdquo;)은
           개인정보보호법 등 관련 법령을 준수하며, 이용자의 개인정보를 아래와
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
           개인정보 관련 문의: <a href="mailto:t4n2140@gmail.com" style={{ color: "#1c7ed6" }}>t4n2140@gmail.com</a>
         </p>
 
-        <p style={{ marginTop: 28, fontSize: 13, color: "#8a867f" }}>
+        <p style={{ marginTop: 28, fontSize: 13, color: "var(--ink-faint)" }}>
           사이트는 쿠팡 파트너스 등 제휴 마케팅 활동의 일환으로 일정액의
           수수료를 제공받으며, 이는 개인정보 수집과 무관합니다.
         </p>

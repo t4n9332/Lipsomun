@@ -9,7 +9,7 @@ export default function Error({ reset }: { error: Error & { digest?: string }; r
       <h1 style={{ fontSize: 24, fontWeight: 800, margin: "12px 0 6px" }}>
         일시적인 오류가 발생했어요
       </h1>
-      <p style={{ color: "#55524d", fontSize: 14.5, marginTop: 0 }}>
+      <p style={{ color: "var(--ink-soft)", fontSize: 14.5, marginTop: 0 }}>
         페이지를 다시 불러오거나 홈으로 돌아가 보세요.
       </p>
       <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 20 }}>

@@ -161,8 +161,8 @@ async function loadConfig() {
 }
 
 function adminCookie(config) {
-  // 사이트와 동일한 방식: sha256("ipsomun:" + 비밀번호)
-  const token = createHash("sha256").update("ipsomun:" + config.adminPassword).digest("hex");
+  // 사이트(lib/auth.ts)와 동일: sha256("ipsomun:" + 비밀번호 [+ ":" + tokenSecret]) — Vercel ADMIN_TOKEN_SECRET과 짝
+  const token = createHash("sha256").update("ipsomun:" + config.adminPassword + (config.tokenSecret ? ":" + config.tokenSecret : "")).digest("hex");
   return `ipsomun_admin=${token}`;
 }
 
