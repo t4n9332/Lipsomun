@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-22T17:15+09:00",
+ "generated_at": "2026-09-23T17:13+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -1840,31 +1840,6 @@
    "created_at": "2026-09-02"
   },
   {
-   "id": "13683213744",
-   "group_id": "G10004651",
-   "title": "국내산 마른오징어 750g이내",
-   "category": "건어물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004651_thumb.jpg",
-   "price_from": 71600,
-   "options": [
-    {
-     "name": "15미",
-     "price": 71600,
-     "soldout": false
-    },
-    {
-     "name": "10미",
-     "price": 73800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13743863272",
-   "coupang_url": "",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-03"
-  },
-  {
    "id": "13683889875",
    "group_id": "G10001149",
    "title": "전라도 묵은지 김치 1kg",
@@ -3498,32 +3473,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745826442",
-   "coupang_url": "https://www.coupang.com/vp/products/16370933782",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685164746",
-   "group_id": "G10004645",
-   "title": "국내산 마른오징어 이내 0.85kg·1.7kg",
-   "category": "건어물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004645_thumb.jpg",
-   "price_from": 82500,
-   "options": [
-    {
-     "name": "0.85kg (10미)",
-     "price": 82500,
-     "soldout": false
-    },
-    {
-     "name": "1.7kg (20미)",
-     "price": 156500,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745826456",
-   "coupang_url": "https://www.coupang.com/vp/products/16370933782",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -3823,31 +3773,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685196400",
-   "group_id": "G10004776",
-   "title": "명품3호 일 선물세트(애플망고 애플망고 샤인머스켓) 혼합과 [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004776_thumb.jpg",
-   "price_from": 116000,
-   "options": [
-    {
-     "name": "(다)명품3호 혼합과일 선물세트(애플",
-     "price": 116000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745858316",
-   "coupang_url": "https://www.coupang.com/vp/products/16370963097",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685197272",
    "group_id": "G10000409",
    "title": "프리미엄 연평도 알배기 간장게장",
@@ -3949,56 +3874,6 @@
     10,
     11,
     12
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685208292",
-   "group_id": "G10004778",
-   "title": "명품1호 일 선물세트(사과 배 샤인머스켓) 혼합과 [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004778_thumb.jpg",
-   "price_from": 113800,
-   "options": [
-    {
-     "name": "(다)명품1호 혼합과일 선물세트(사과",
-     "price": 113800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745870327",
-   "coupang_url": "https://www.coupang.com/vp/products/16370976346",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685214172",
-   "group_id": "G10004783",
-   "title": "프리미엄1호 일 선물세트(사과 배 샤인 애플망고 애플망고) 혼합과 [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004783_thumb.jpg",
-   "price_from": 175100,
-   "options": [
-    {
-     "name": "(다)프리미엄1호 혼합과일 선물세트(",
-     "price": 175100,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745876280",
-   "coupang_url": "https://www.coupang.com/vp/products/16373402764",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
    ],
    "created_at": "2026-09-04"
   },
@@ -4373,31 +4248,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685266369",
-   "group_id": "G10004784",
-   "title": "프리미엄1호 일 선물세트(사과 배 샤인 애플망고 애플망고) 혼합과",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004784_thumb.jpg",
-   "price_from": 172100,
-   "options": [
-    {
-     "name": "(다)프리미엄1호 혼합과일 선물세트(",
-     "price": 172100,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745929014",
-   "coupang_url": "https://www.coupang.com/vp/products/16371028984",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685268148",
    "group_id": "G10004766",
    "title": "정담3호 혼합 과일세트(애플망고 애플망고 샤인머스켓) [보자기 동봉]",
@@ -4551,129 +4401,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685303473",
-   "group_id": "G10004763",
-   "title": "정담5호 일 세트(사과 배) 혼합과",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004763_thumb.jpg",
-   "price_from": 66400,
-   "options": [
-    {
-     "name": "(다)정담5호 혼합과일 세트(사과·배",
-     "price": 66400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745966350",
-   "coupang_url": "https://www.coupang.com/vp/products/16371052843",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685303512",
-   "group_id": "G10004769",
-   "title": "정담1호 일 세트(사과 배 샤인머스켓) 혼합과",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004769_thumb.jpg",
-   "price_from": 61300,
-   "options": [
-    {
-     "name": "(다)정담1호 혼합과일 세트(사과·배",
-     "price": 61300,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745966389",
-   "coupang_url": "https://www.coupang.com/vp/products/16371053979",
-   "season_kind": "시즌",
-   "peak_months": [
-    8,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685303538",
-   "group_id": "G10004768",
-   "title": "정담1호 일 세트(사과 배 샤인머스켓) 혼합과 [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004768_thumb.jpg",
-   "price_from": 63500,
-   "options": [
-    {
-     "name": "(다)정담1호 혼합과일 세트(사과·배",
-     "price": 63500,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745966416",
-   "coupang_url": "https://www.coupang.com/vp/products/16373396138",
-   "season_kind": "시즌",
-   "peak_months": [
-    8,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685303567",
-   "group_id": "G10004762",
-   "title": "정담5호 일 세트(사과 배) 혼합과 [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004762_thumb.jpg",
-   "price_from": 68600,
-   "options": [
-    {
-     "name": "(다)정담5호 혼합과일 세트(사과·배",
-     "price": 68600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745966446",
-   "coupang_url": "https://www.coupang.com/vp/products/16373398417",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685304734",
-   "group_id": "G10004772",
-   "title": "명품5호 일 선물세트(사과 배) 혼합과 [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004772_thumb.jpg",
-   "price_from": 126800,
-   "options": [
-    {
-     "name": "(다)명품5호 혼합과일 선물세트(사과",
-     "price": 126800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745967629",
-   "coupang_url": "https://www.coupang.com/vp/products/16373393828",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685307119",
    "group_id": "G10000644",
    "title": "원양산 반건조 오징어 600~",
@@ -4734,26 +4461,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685308203",
-   "group_id": "G10001604",
-   "title": "오징어 입",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001604_thumb.jpg",
-   "price_from": 21000,
-   "options": [
-    {
-     "name": "0.5kg",
-     "price": 21000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745971109",
-   "coupang_url": "https://www.coupang.com/vp/products/16371073614",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685309834",
    "group_id": "G10003496",
    "title": "미더덕 쌈젓",
@@ -4771,31 +4478,6 @@
    "coupang_url": "https://www.coupang.com/vp/products/16371075078",
    "season_kind": "상시",
    "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685311181",
-   "group_id": "G10004773",
-   "title": "명품5호 일 선물세트(사과 배) 혼합과",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004773_thumb.jpg",
-   "price_from": 124700,
-   "options": [
-    {
-     "name": "(다)명품5호 혼합과일 선물세트(사과",
-     "price": 124700,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745974098",
-   "coupang_url": "https://www.coupang.com/vp/products/16371076341",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
    "created_at": "2026-09-04"
   },
   {
@@ -4906,156 +4588,6 @@
    "coupang_url": "https://www.coupang.com/vp/products/16371089492",
    "season_kind": "상시",
    "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685347491",
-   "group_id": "G10004781",
-   "title": "프리미엄3호 일 선물세트(사과 배 샤인 자몽 용과) 혼합과 [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004781_thumb.jpg",
-   "price_from": 142900,
-   "options": [
-    {
-     "name": "(다)프리미엄3호 혼합과일 선물세트(",
-     "price": 142900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746010646",
-   "coupang_url": "https://www.coupang.com/vp/products/16373391721",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685347723",
-   "group_id": "G10004758",
-   "title": "알찬3호 과일선물(사과 배) [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004758_thumb.jpg",
-   "price_from": 91200,
-   "options": [
-    {
-     "name": "(다)알찬3호 과일선물(사과/배) [",
-     "price": 91200,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746010878",
-   "coupang_url": "https://www.coupang.com/vp/products/16373389409",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685350055",
-   "group_id": "G10004782",
-   "title": "프리미엄3호 일 선물세트(사과 배 샤인 자몽 용과) 혼합과",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004782_thumb.jpg",
-   "price_from": 140000,
-   "options": [
-    {
-     "name": "(다)프리미엄3호 혼합과일 선물세트(",
-     "price": 140000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746013232",
-   "coupang_url": "https://www.coupang.com/vp/products/16371119201",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685350283",
-   "group_id": "G10004759",
-   "title": "알찬3호 과일선물(사과 배)",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004759_thumb.jpg",
-   "price_from": 89000,
-   "options": [
-    {
-     "name": "(다)알찬3호 과일선물(사과/배)",
-     "price": 89000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746013464",
-   "coupang_url": "https://www.coupang.com/vp/products/16371119416",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685352424",
-   "group_id": "G10004760",
-   "title": "알찬1호 과일선물(사과 배 샤인) [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004760_thumb.jpg",
-   "price_from": 79500,
-   "options": [
-    {
-     "name": "(다)알찬1호 과일선물(사과/배/샤인",
-     "price": 79500,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746015624",
-   "coupang_url": "https://www.coupang.com/vp/products/16373386392",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685352966",
-   "group_id": "G10004761",
-   "title": "알찬1호 과일선물(사과 배 샤인)",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004761_thumb.jpg",
-   "price_from": 77300,
-   "options": [
-    {
-     "name": "(다)알찬1호 과일선물(사과/배/샤인",
-     "price": 77300,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746016172",
-   "coupang_url": "https://www.coupang.com/vp/products/16371121995",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
    "created_at": "2026-09-04"
   },
   {
