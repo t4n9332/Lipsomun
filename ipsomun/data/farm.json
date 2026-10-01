@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-30T17:29+09:00",
+ "generated_at": "2026-10-01T17:40+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2680,7 +2680,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745788913",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370909932",
    "season_kind": "시즌",
    "peak_months": [
     8,
@@ -2709,7 +2709,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745793401",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370912894",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2734,7 +2734,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745795042",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370913518",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2754,7 +2754,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745795046",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370913518",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2779,7 +2779,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745796091",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370914016",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2804,7 +2804,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745796984",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370914498",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2824,7 +2824,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745796993",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370914498",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2854,7 +2854,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745799149",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370915813",
    "season_kind": "시즌",
    "peak_months": [
     10,
@@ -2887,7 +2887,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745801084",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16370917517",
    "season_kind": "시즌",
    "peak_months": [
     7,
@@ -3840,30 +3840,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685268148",
-   "group_id": "G10004766",
-   "title": "정담3호 혼합 과일세트(애플망고 애플망고 샤인머스켓) [보자기 동봉]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004766_thumb.jpg",
-   "price_from": 76600,
-   "options": [
-    {
-     "name": "(다)정담3호 혼합 과일세트(애플망고",
-     "price": 76600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745930803",
-   "coupang_url": "https://www.coupang.com/vp/products/16373400588",
-   "season_kind": "시즌",
-   "peak_months": [
-    8,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685270393",
    "group_id": "G10000125",
    "title": "쭈삼새 밀키트 [L]",
@@ -3923,30 +3899,6 @@
    "peak_months": [
     1,
     2,
-    9,
-    10
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685279980",
-   "group_id": "G10004767",
-   "title": "정담3호 혼합 과일세트(애플망고 애플망고 샤인머스켓)",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004767_thumb.jpg",
-   "price_from": 74400,
-   "options": [
-    {
-     "name": "(다)정담3호 혼합 과일세트(애플망고",
-     "price": 74400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745942725",
-   "coupang_url": "https://www.coupang.com/vp/products/16371044045",
-   "season_kind": "시즌",
-   "peak_months": [
-    8,
     9,
     10
    ],
@@ -4183,66 +4135,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685360595",
-   "group_id": "G10001697",
-   "title": "원양산(급냉)손질오징어 600- (2미 대왕특대)",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001697_thumb.jpg",
-   "price_from": 18600,
-   "options": [
-    {
-     "name": "(늘)원양산(급냉)손질오징어 600-",
-     "price": 18600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746023884",
-   "coupang_url": "https://www.coupang.com/vp/products/16371128760",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685360759",
-   "group_id": "G10002448",
-   "title": "원양산(급냉)손질오징어 500- (2미 왕특대)",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002448_thumb.jpg",
-   "price_from": 17800,
-   "options": [
-    {
-     "name": "(늘)원양산(급냉)손질오징어 500-",
-     "price": 17800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746024050",
-   "coupang_url": "https://www.coupang.com/vp/products/16371128975",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685360949",
-   "group_id": "G10002449",
-   "title": "원양산(급냉)손질오징어 400- (2미 특대)",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002449_thumb.jpg",
-   "price_from": 17000,
-   "options": [
-    {
-     "name": "(늘)원양산(급냉)손질오징어 400-",
-     "price": 17000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13746024244",
-   "coupang_url": "https://www.coupang.com/vp/products/16371129186",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13687309751",
    "group_id": "G10000351",
    "title": "맵싹 맛김치 1kg",
@@ -4301,57 +4193,6 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-05"
-  },
-  {
-   "id": "13690842092",
-   "group_id": "G10004920",
-   "title": "흰다리 새우 [생물] 1kg",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004920_thumb.jpg",
-   "price_from": 39400,
-   "options": [
-    {
-     "name": "1kg (30미내외)",
-     "price": 39400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13751567159",
-   "coupang_url": "https://www.coupang.com/vp/products/16376873665",
-   "season_kind": "시즌",
-   "peak_months": [
-    10,
-    11
-   ],
-   "created_at": "2026-09-08"
-  },
-  {
-   "id": "13690842106",
-   "group_id": "G10004920",
-   "title": "흰다리 새우 [생물] 3kg·5kg",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004920_thumb.jpg",
-   "price_from": 106500,
-   "options": [
-    {
-     "name": "3kg (30미내외)",
-     "price": 106500,
-     "soldout": false
-    },
-    {
-     "name": "5kg (30미내외)",
-     "price": 173600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13751567173",
-   "coupang_url": "https://www.coupang.com/vp/products/16376873665",
-   "season_kind": "시즌",
-   "peak_months": [
-    10,
-    11
-   ],
-   "created_at": "2026-09-08"
   },
   {
    "id": "13690843760",
@@ -4451,31 +4292,6 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-09"
-  },
-  {
-   "id": "13717323549",
-   "group_id": "G10004803",
-   "title": "프리미엄 메론세트",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004803_thumb.jpg",
-   "price_from": 46100,
-   "options": [
-    {
-     "name": "5kg (2수)",
-     "price": 46100,
-     "soldout": false
-    },
-    {
-     "name": "9kg (3-4수)",
-     "price": 73800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778321076",
-   "coupang_url": "https://www.coupang.com/vp/products/16396919821",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-28"
   },
   {
    "id": "13717325255",
@@ -4838,36 +4654,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778385309",
    "coupang_url": "https://www.coupang.com/vp/products/16396957778",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-28"
-  },
-  {
-   "id": "13717390263",
-   "group_id": "G10002779",
-   "title": "손질(급냉)반건조 참가자미",
-   "category": "건어물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002779_thumb.jpg",
-   "price_from": 24700,
-   "options": [
-    {
-     "name": "1kg (4미)",
-     "price": 24700,
-     "soldout": false
-    },
-    {
-     "name": "1kg (3미)",
-     "price": 26200,
-     "soldout": false
-    },
-    {
-     "name": "1kg (2미)",
-     "price": 27600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778388222",
-   "coupang_url": "https://www.coupang.com/vp/products/16396959826",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -6437,26 +6223,6 @@
    "created_at": "2026-09-28"
   },
   {
-   "id": "13717523499",
-   "group_id": "G10004188",
-   "title": "원양산 마른 오징어 (5미 대)",
-   "category": "건어물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004188_thumb.jpg",
-   "price_from": 28200,
-   "options": [
-    {
-     "name": "0.25kg",
-     "price": 28200,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778522526",
-   "coupang_url": "https://www.coupang.com/vp/products/16397042639",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-28"
-  },
-  {
    "id": "13717525069",
    "group_id": "G10003221",
    "title": "블랙사파이어 포도 0.5kg·1kg",
@@ -7877,6 +7643,89 @@
     11
    ],
    "created_at": "2026-09-29"
+  },
+  {
+   "id": "13722522965",
+   "group_id": "G10001821",
+   "title": "전라도 차량 단감(넙적 단감)",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001821_thumb.jpg",
+   "price_from": 37100,
+   "options": [
+    {
+     "name": "10kg (61-70과)",
+     "price": 37100,
+     "soldout": false
+    },
+    {
+     "name": "10kg (51-60과)",
+     "price": 51500,
+     "soldout": false
+    },
+    {
+     "name": "10kg (41-50과)",
+     "price": 65900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13783567434",
+   "coupang_url": "https://www.coupang.com/vp/products/16400599785",
+   "season_kind": "시즌",
+   "peak_months": [
+    10,
+    11
+   ],
+   "created_at": "2026-10-01"
+  },
+  {
+   "id": "13722536470",
+   "group_id": "G10002288",
+   "title": "원양산 반건조 오징어 750- (5미 왕특대)",
+   "category": "건어물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002288_thumb.jpg",
+   "price_from": 53900,
+   "options": [
+    {
+     "name": "2개×2박스",
+     "price": 53900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13783581009",
+   "coupang_url": "https://www.coupang.com/vp/products/16400604751",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-01"
+  },
+  {
+   "id": "13722543009",
+   "group_id": "G10002277",
+   "title": "통영 생굴 무침",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002277_thumb.jpg",
+   "price_from": 13700,
+   "options": [
+    {
+     "name": "0.3kg",
+     "price": 13700,
+     "soldout": false
+    },
+    {
+     "name": "0.5kg",
+     "price": 18200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13783587629",
+   "coupang_url": "https://www.coupang.com/vp/products/16400609044",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "created_at": "2026-10-01"
   }
  ]
 }
