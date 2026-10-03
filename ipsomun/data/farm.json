@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-02T17:28+09:00",
+ "generated_at": "2026-10-03T17:22+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -1166,7 +1166,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732216575",
-   "coupang_url": "https://www.coupang.com/vp/products/16366157372",
+   "coupang_url": "https://www.coupang.com/vp/products/16401842343",
    "season_kind": "시즌",
    "peak_months": [
     1,
@@ -1191,7 +1191,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732216657",
-   "coupang_url": "https://www.coupang.com/vp/products/16366157910",
+   "coupang_url": "https://www.coupang.com/vp/products/16401842484",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-08-24"
@@ -1216,7 +1216,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732216663",
-   "coupang_url": "https://www.coupang.com/vp/products/16366157910",
+   "coupang_url": "https://www.coupang.com/vp/products/16401842484",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-08-24"
@@ -1236,7 +1236,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732216732",
-   "coupang_url": "https://www.coupang.com/vp/products/16366158116",
+   "coupang_url": "https://www.coupang.com/vp/products/16401842604",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-08-24"
@@ -1256,7 +1256,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732216738",
-   "coupang_url": "https://www.coupang.com/vp/products/16366158116",
+   "coupang_url": "https://www.coupang.com/vp/products/16401842604",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-08-24"
@@ -3478,7 +3478,7 @@
    "price_from": 40700,
    "options": [
     {
-     "name": "4505kg (10미)",
+     "name": "900g~1kg (10미)",
      "price": 40700,
      "soldout": false
     }
@@ -4507,7 +4507,7 @@
    "price_from": 40700,
    "options": [
     {
-     "name": "4505kg (10미)",
+     "name": "900g~1kg (10미)",
      "price": 40700,
      "soldout": false
     }
@@ -4547,7 +4547,7 @@
    "price_from": 37300,
    "options": [
     {
-     "name": "2377.5kg (5미)",
+     "name": "950g~1kg (5미)",
      "price": 37300,
      "soldout": false
     }
@@ -5366,31 +5366,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778433518",
    "coupang_url": "https://www.coupang.com/vp/products/16396947168",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-28"
-  },
-  {
-   "id": "13717435311",
-   "group_id": "G10004609",
-   "title": "대추방울토마토 소과",
-   "category": "채소",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004609_thumb.jpg",
-   "price_from": 26300,
-   "options": [
-    {
-     "name": "2kg",
-     "price": 26300,
-     "soldout": false
-    },
-    {
-     "name": "4kg",
-     "price": 48000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778433607",
-   "coupang_url": "https://www.coupang.com/vp/products/16396928340",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -7789,6 +7764,64 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-02"
+  },
+  {
+   "id": "13727123638",
+   "group_id": "G10001867",
+   "title": "만풍배 중과 가정용",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001867_thumb.jpg",
+   "price_from": 19000,
+   "options": [
+    {
+     "name": "2.5kg (5-6과)",
+     "price": 19000,
+     "soldout": false
+    },
+    {
+     "name": "5kg (9-12과)",
+     "price": 32100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13788191242",
+   "coupang_url": "https://www.coupang.com/vp/products/16402420381",
+   "season_kind": "시즌",
+   "peak_months": [
+    9,
+    10
+   ],
+   "created_at": "2026-10-03"
+  },
+  {
+   "id": "13727619149",
+   "group_id": "G10002974",
+   "title": "국내산 흙 생강 [특품]",
+   "category": "채소",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002974_thumb.jpg",
+   "price_from": 11600,
+   "options": [
+    {
+     "name": "1kg",
+     "price": 11600,
+     "soldout": false
+    },
+    {
+     "name": "2kg",
+     "price": 19100,
+     "soldout": false
+    },
+    {
+     "name": "3kg",
+     "price": 26800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13788690460",
+   "coupang_url": "https://www.coupang.com/vp/products/16402522676",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-03"
   }
  ]
 }
