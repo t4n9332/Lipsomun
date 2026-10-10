@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-09T17:24+09:00",
+ "generated_at": "2026-10-10T17:17+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2415,16 +2415,6 @@
      "name": "0.5kg",
      "price": 17600,
      "soldout": false
-    },
-    {
-     "name": "1kg (500g×2박스)",
-     "price": 30000,
-     "soldout": false
-    },
-    {
-     "name": "1.5kg (500g×3박스)",
-     "price": 42400,
-     "soldout": false
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745783306",
@@ -3181,13 +3171,8 @@
    "title": "머스크 메론 2kg·4kg",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10003906_thumb.jpg",
-   "price_from": 18500,
+   "price_from": 26200,
    "options": [
-    {
-     "name": "2kg (2수)",
-     "price": 18500,
-     "soldout": false
-    },
     {
      "name": "4kg (2수)",
      "price": 26200,
@@ -4403,7 +4388,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778336357",
-   "coupang_url": "https://www.coupang.com/vp/products/16396927867",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4583,7 +4568,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778385309",
-   "coupang_url": "https://www.coupang.com/vp/products/16396957778",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4603,7 +4588,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778389590",
-   "coupang_url": "https://www.coupang.com/vp/products/16396960822",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4623,7 +4608,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778405528",
-   "coupang_url": "https://www.coupang.com/vp/products/16396972085",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4643,7 +4628,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778406822",
-   "coupang_url": "https://www.coupang.com/vp/products/16396972826",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4693,7 +4678,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778417486",
-   "coupang_url": "https://www.coupang.com/vp/products/16396951912",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     6,
@@ -4767,7 +4752,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778419718",
-   "coupang_url": "https://www.coupang.com/vp/products/16396963940",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4812,7 +4797,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778422748",
-   "coupang_url": "https://www.coupang.com/vp/products/16396919183",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4832,7 +4817,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778422781",
-   "coupang_url": "https://www.coupang.com/vp/products/16396919183",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4857,7 +4842,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778422866",
-   "coupang_url": "https://www.coupang.com/vp/products/16396958573",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4877,7 +4862,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778422891",
-   "coupang_url": "https://www.coupang.com/vp/products/16396958573",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4920,7 +4905,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778424984",
-   "coupang_url": "https://www.coupang.com/vp/products/16396966721",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -5015,7 +5000,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778428280",
-   "coupang_url": "https://www.coupang.com/vp/products/16396978417",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -5104,7 +5089,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778430645",
-   "coupang_url": "https://www.coupang.com/vp/products/16396965578",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -5129,7 +5114,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778431039",
-   "coupang_url": "https://www.coupang.com/vp/products/16396919547",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -5149,7 +5134,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778431056",
-   "coupang_url": "https://www.coupang.com/vp/products/16396919547",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -5299,7 +5284,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778437678",
-   "coupang_url": "https://www.coupang.com/vp/products/16396988585",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     11,
@@ -5324,7 +5309,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778438771",
-   "coupang_url": "https://www.coupang.com/vp/products/16396989370",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     1,
@@ -5354,7 +5339,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778440893",
-   "coupang_url": "https://www.coupang.com/vp/products/16396990978",
+   "coupang_url": "https://www.coupang.com/vp/products/16408832026",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -5374,7 +5359,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778440923",
-   "coupang_url": "https://www.coupang.com/vp/products/16396990978",
+   "coupang_url": "https://www.coupang.com/vp/products/16408832026",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -7747,6 +7732,230 @@
     1
    ],
    "created_at": "2026-10-09"
+  },
+  {
+   "id": "13741481074",
+   "group_id": "G10005110",
+   "title": "타이벡 감귤 (로얄 S-M) [정품/극조생] 2.5kg·4.5kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005110_thumb.jpg",
+   "price_from": 17800,
+   "options": [
+    {
+     "name": "2.5kg",
+     "price": 17800,
+     "soldout": false
+    },
+    {
+     "name": "4.5kg",
+     "price": 25100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802636960",
+   "coupang_url": "https://www.coupang.com/vp/products/16409360774",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-10-10"
+  },
+  {
+   "id": "13741481124",
+   "group_id": "G10005110",
+   "title": "타이벡 감귤 (로얄 S-M) [정품/극조생] 9kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005110_thumb.jpg",
+   "price_from": 41200,
+   "options": [
+    {
+     "name": "9kg",
+     "price": 41200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802637009",
+   "coupang_url": "https://www.coupang.com/vp/products/16409360774",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-10-10"
+  },
+  {
+   "id": "13741490623",
+   "group_id": "G10002062",
+   "title": "여수 석화(각굴) (4~5인분)",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002062_thumb.jpg",
+   "price_from": 28100,
+   "options": [
+    {
+     "name": "10kg",
+     "price": 28100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802646518",
+   "coupang_url": "https://www.coupang.com/vp/products/16409362792",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "created_at": "2026-10-10"
+  },
+  {
+   "id": "13741494239",
+   "group_id": "G10005105",
+   "title": "날치알 양념새우장",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005105_thumb.jpg",
+   "price_from": 12700,
+   "options": [
+    {
+     "name": "0.3kg",
+     "price": 12700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802650136",
+   "coupang_url": "https://www.coupang.com/vp/products/16409363726",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-10"
+  },
+  {
+   "id": "13741501081",
+   "group_id": "G10005104",
+   "title": "깐새우장",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005104_thumb.jpg",
+   "price_from": 11900,
+   "options": [
+    {
+     "name": "0.3kg",
+     "price": 11900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802656986",
+   "coupang_url": "https://www.coupang.com/vp/products/16409365231",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-10"
+  },
+  {
+   "id": "13741511434",
+   "group_id": "G10005111",
+   "title": "타이벡 감귤 소과 [정품/극조생] 2.5kg·4.5kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005111_thumb.jpg",
+   "price_from": 17600,
+   "options": [
+    {
+     "name": "2.5kg",
+     "price": 17600,
+     "soldout": false
+    },
+    {
+     "name": "4.5kg",
+     "price": 24900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802667349",
+   "coupang_url": "https://www.coupang.com/vp/products/16409366741",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-10-10"
+  },
+  {
+   "id": "13741511485",
+   "group_id": "G10005111",
+   "title": "타이벡 감귤 소과 [정품/극조생] 9kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005111_thumb.jpg",
+   "price_from": 40900,
+   "options": [
+    {
+     "name": "9kg",
+     "price": 40900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802667401",
+   "coupang_url": "https://www.coupang.com/vp/products/16409366741",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-10-10"
+  },
+  {
+   "id": "13741526090",
+   "group_id": "G10005112",
+   "title": "타이벡 감귤 (꼬마 2S미만) [정품/극조생] 2.5kg·4.5kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005112_thumb.jpg",
+   "price_from": 16100,
+   "options": [
+    {
+     "name": "2.5kg",
+     "price": 16100,
+     "soldout": false
+    },
+    {
+     "name": "4.5kg",
+     "price": 23400,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802682031",
+   "coupang_url": "https://www.coupang.com/vp/products/16409369608",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-10-10"
+  },
+  {
+   "id": "13741526160",
+   "group_id": "G10005112",
+   "title": "타이벡 감귤 (꼬마 2S미만) [정품/극조생] 9kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005112_thumb.jpg",
+   "price_from": 38700,
+   "options": [
+    {
+     "name": "9kg",
+     "price": 38700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13802682102",
+   "coupang_url": "https://www.coupang.com/vp/products/16409369608",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-10-10"
   }
  ]
 }
