@@ -64,7 +64,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(decodeURIComponent(slug)).catch(() => null);
+  const post = await getPostBySlug(decodeURIComponent(slug)).catch(() => undefined);
+  // DB 오류(undefined)는 일시 장애라 404로 굳히지 않는다. 진짜 없음(null)만 여기서
+  // notFound — 본문에서 판정하면 loading 스트리밍 탓에 200(소프트 404)이 나간다.
+  if (post === null) notFound();
   if (!post) return { title: "리포트를 찾을 수 없어요" };
   const data = parse(post.content);
   const desc = data

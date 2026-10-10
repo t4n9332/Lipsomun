@@ -37,13 +37,22 @@ export function generateStaticParams() {
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 
+/** 비공개 상품의 이동 대상: 같은 카테고리('기타'는 빈 페이지라 홈) */
+function hiddenTarget(category: string): string {
+  return category && category !== "기타" ? `/category/${encodeURIComponent(category)}` : "/";
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getBySlug(decodeURIComponent(slug)).catch(() => null);
+  const product = await getBySlug(decodeURIComponent(slug)).catch(() => undefined);
+  // 없음·비공개 판정은 메타데이터 단계에서 해야 실제 404/308이 나간다(본문에서 하면
+  // loading 스트리밍 탓에 200 소프트 404). DB 오류(undefined)는 일시 장애라 건드리지 않는다.
+  if (product === null) notFound();
+  if (product && !product.isPublished) permanentRedirect(hiddenTarget(product.category));
   if (!product || !product.isPublished) return { title: "제품을 찾을 수 없어요" };
 
   // 쿠팡·토스 가격이 모두 있으면 검색결과 제목/설명에 가격비교를 노출 (CTR 향상)
@@ -101,11 +110,7 @@ export default async function ProductPage({
   // 비공개로 내린 상품(가지치기 등)은 404 대신 같은 카테고리로 영구 이동시킨다.
   // 외부(블로그·스레드)에서 들어온 방문자를 살리고, GSC 404 누적도 막는다.
   if (!product.isPublished) {
-    permanentRedirect(
-      product.category && product.category !== "기타"
-        ? `/category/${encodeURIComponent(product.category)}`
-        : "/"
-    );
+    permanentRedirect(hiddenTarget(product.category));
   }
 
   const [related, history, priceStats] = await Promise.all([

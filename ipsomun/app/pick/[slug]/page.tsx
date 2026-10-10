@@ -20,7 +20,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const col = await getCollectionBySlug(decodeURIComponent(slug)).catch(() => null);
+  const col = await getCollectionBySlug(decodeURIComponent(slug)).catch(() => undefined);
+  if (col === null) notFound(); // 소프트 404 방지 (blog/[slug] 주석 참고)
   if (!col) return { title: "기획전을 찾을 수 없어요" };
   const url = `${SITE}/pick/${encodeURIComponent(col.slug)}`;
   const desc =
