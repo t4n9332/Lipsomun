@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import {
@@ -97,7 +97,16 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
   const product = await getBySlug(decodeURIComponent(slug));
-  if (!product || !product.isPublished) notFound();
+  if (!product) notFound();
+  // 비공개로 내린 상품(가지치기 등)은 404 대신 같은 카테고리로 영구 이동시킨다.
+  // 외부(블로그·스레드)에서 들어온 방문자를 살리고, GSC 404 누적도 막는다.
+  if (!product.isPublished) {
+    permanentRedirect(
+      product.category && product.category !== "기타"
+        ? `/category/${encodeURIComponent(product.category)}`
+        : "/"
+    );
+  }
 
   const [related, history, priceStats] = await Promise.all([
     getRelated(product.category, product.id, 4),
