@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { siteCategoryFor } from "@/lib/category-rules.mjs";
 import { tossTodayDeals, tossBestSelling, createSharelink, tossConfigured } from "@/lib/toss";
 import {
   createProduct,
@@ -81,7 +82,7 @@ export async function GET(req: Request) {
         imageUrl: it.thumbnailUrl || "",
         price: it.displayPrice ?? null,
         originalPrice: it.originalPrice ?? null,
-        category: "기타",
+        category: siteCategoryFor(null, it.displayName),
         isDeal: true,
         isPublished: true,
         source: SOURCE,

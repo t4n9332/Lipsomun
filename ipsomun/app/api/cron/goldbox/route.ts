@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { siteCategoryFor } from "@/lib/category-rules.mjs";
 import { goldboxProducts } from "@/lib/coupang";
 import {
   createProduct,
@@ -72,7 +73,7 @@ export async function GET(req: Request) {
           title: it.productName,
           imageUrl: it.productImage || "",
           price: it.productPrice ?? null,
-          category: "기타",
+          category: siteCategoryFor(it.categoryName, it.productName),
           isDeal: true,
           isPublished: true,
           source: SOURCE,
