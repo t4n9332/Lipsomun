@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-13T17:15+09:00",
+ "generated_at": "2026-10-14T17:28+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -570,7 +570,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732215344",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16398568230",
    "season_kind": "시즌",
    "peak_months": [
     1,
@@ -600,7 +600,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732215410",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16398568445",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -626,7 +626,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732215411",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16398568445",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -3535,26 +3535,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685257559",
-   "group_id": "G10004144",
-   "title": "자연산 급냉 (깐)중하새우살",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004144_thumb.jpg",
-   "price_from": 13300,
-   "options": [
-    {
-     "name": "0.2kg (20마리내외)",
-     "price": 13300,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745920150",
-   "coupang_url": "",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685258742",
    "group_id": "G10000764",
    "title": "국내산(급냉)한입한치",
@@ -3569,26 +3549,6 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745921339",
-   "coupang_url": "",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685265313",
-   "group_id": "G10000916",
-   "title": "자연산 (급냉)중하새우",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000916_thumb.jpg",
-   "price_from": 9600,
-   "options": [
-    {
-     "name": "0.5kg (60마리내외)",
-     "price": 9600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745927946",
    "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
@@ -6750,34 +6710,6 @@
    "created_at": "2026-09-29"
   },
   {
-   "id": "13719405073",
-   "group_id": "G10001866",
-   "title": "만풍배 대과 가정용",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001866_thumb.jpg",
-   "price_from": 21200,
-   "options": [
-    {
-     "name": "2.5kg (2-4과)",
-     "price": 21200,
-     "soldout": false
-    },
-    {
-     "name": "5kg (5-8과)",
-     "price": 35000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13780422511",
-   "coupang_url": "https://www.coupang.com/vp/products/16398447769",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10
-   ],
-   "created_at": "2026-09-29"
-  },
-  {
    "id": "13719409581",
    "group_id": "G10001778",
    "title": "진영 단감 특대과 2kg",
@@ -6917,34 +6849,6 @@
    "created_at": "2026-10-02"
   },
   {
-   "id": "13724830149",
-   "group_id": "G10001870",
-   "title": "만풍배 수출용 [정품]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001870_thumb.jpg",
-   "price_from": 22700,
-   "options": [
-    {
-     "name": "2.5kg (3-5과)",
-     "price": 22700,
-     "soldout": false
-    },
-    {
-     "name": "5kg (6-10과)",
-     "price": 38800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13785888299",
-   "coupang_url": "https://www.coupang.com/vp/products/16401774158",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10
-   ],
-   "created_at": "2026-10-02"
-  },
-  {
    "id": "13724843585",
    "group_id": "G10002968",
    "title": "국내산 세척 생강 [특품]",
@@ -6973,34 +6877,6 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-02"
-  },
-  {
-   "id": "13727123638",
-   "group_id": "G10001867",
-   "title": "만풍배 중과 가정용",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001867_thumb.jpg",
-   "price_from": 19000,
-   "options": [
-    {
-     "name": "2.5kg (5-6과)",
-     "price": 19000,
-     "soldout": false
-    },
-    {
-     "name": "5kg (9-12과)",
-     "price": 32100,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13788191242",
-   "coupang_url": "https://www.coupang.com/vp/products/16402420381",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10
-   ],
-   "created_at": "2026-10-03"
   },
   {
    "id": "13727619149",
@@ -7606,6 +7482,64 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-13"
+  },
+  {
+   "id": "13749352051",
+   "group_id": "G10001841",
+   "title": "단감 대과",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001841_thumb.jpg",
+   "price_from": 32100,
+   "options": [
+    {
+     "name": "5kg (20-25과)",
+     "price": 32100,
+     "soldout": false
+    },
+    {
+     "name": "10kg (40-50과)",
+     "price": 57600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13810561109",
+   "coupang_url": "https://www.coupang.com/vp/products/16414303749",
+   "season_kind": "시즌",
+   "peak_months": [
+    10,
+    11
+   ],
+   "created_at": "2026-10-14"
+  },
+  {
+   "id": "13749355821",
+   "group_id": "G10005158",
+   "title": "사과 시나노골드 대과 [정품]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005158_thumb.jpg",
+   "price_from": 21500,
+   "options": [
+    {
+     "name": "3kg (6-9과)",
+     "price": 21500,
+     "soldout": false
+    },
+    {
+     "name": "5kg (9-15과)",
+     "price": 31400,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13810564910",
+   "coupang_url": "https://www.coupang.com/vp/products/16414305973",
+   "season_kind": "시즌",
+   "peak_months": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "created_at": "2026-10-14"
   }
  ]
 }
