@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-14T17:28+09:00",
+ "generated_at": "2026-10-15T17:28+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -283,7 +283,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732214975",
-   "coupang_url": "https://www.coupang.com/vp/products/16398567120",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     1,
@@ -2185,12 +2185,12 @@
    "title": "태추 단감 중대과",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10001649_thumb.jpg",
-   "price_from": 21900,
+   "price_from": 30000,
    "options": [
     {
      "name": "1.5kg (6-7과)",
      "price": 21900,
-     "soldout": false
+     "soldout": true
     },
     {
      "name": "2kg (8-9과)",
@@ -2710,39 +2710,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685137475",
-   "group_id": "G10001652",
-   "title": "태추 단감 중소과",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001652_thumb.jpg",
-   "price_from": 20500,
-   "options": [
-    {
-     "name": "1.5kg (8-10과)",
-     "price": 20500,
-     "soldout": false
-    },
-    {
-     "name": "2kg (9-12과)",
-     "price": 27800,
-     "soldout": false
-    },
-    {
-     "name": "3kg (13-17과)",
-     "price": 37900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745799149",
-   "coupang_url": "",
-   "season_kind": "시즌",
-   "peak_months": [
-    10,
-    11
-   ],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685139407",
    "group_id": "G10001245",
    "title": "민물장어 +(소스 초생강 2세트)",
@@ -3100,46 +3067,6 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745830528",
-   "coupang_url": "",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685172953",
-   "group_id": "G10003906",
-   "title": "머스크 메론 2kg·4kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10003906_thumb.jpg",
-   "price_from": 26200,
-   "options": [
-    {
-     "name": "4kg (2수)",
-     "price": 26200,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745834699",
-   "coupang_url": "",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685172961",
-   "group_id": "G10003906",
-   "title": "머스크 메론 8kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10003906_thumb.jpg",
-   "price_from": 47800,
-   "options": [
-    {
-     "name": "8kg (4수)",
-     "price": 47800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745834707",
    "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
@@ -5083,26 +5010,6 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778462263",
-   "coupang_url": "",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-28"
-  },
-  {
-   "id": "13717466123",
-   "group_id": "G10003905",
-   "title": "머스크 메론 (2수 왕메론)",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10003905_thumb.jpg",
-   "price_from": 32400,
-   "options": [
-    {
-     "name": "5kg",
-     "price": 32400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778464651",
    "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
@@ -7540,6 +7447,136 @@
     12
    ],
    "created_at": "2026-10-14"
+  },
+  {
+   "id": "13751339996",
+   "group_id": "G10005202",
+   "title": "사과 대과 [정품]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005202_thumb.jpg",
+   "price_from": 27400,
+   "options": [
+    {
+     "name": "3kg (6-9과)",
+     "price": 27400,
+     "soldout": false
+    },
+    {
+     "name": "5kg (9-15과)",
+     "price": 41300,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13812561806",
+   "coupang_url": "https://www.coupang.com/vp/products/16415548007",
+   "season_kind": "시즌",
+   "peak_months": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "created_at": "2026-10-15"
+  },
+  {
+   "id": "13751346337",
+   "group_id": "G10001726",
+   "title": "부사 사과 대·특대과 가정용 [가정용/실중량]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001726_thumb.jpg",
+   "price_from": 14900,
+   "options": [
+    {
+     "name": "2kg (8과내외 · 실중량)",
+     "price": 14900,
+     "soldout": false
+    },
+    {
+     "name": "3kg (11과내외 · 실중량)",
+     "price": 19000,
+     "soldout": false
+    },
+    {
+     "name": "5kg (20과내외 · 실중량)",
+     "price": 27700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13812568204",
+   "coupang_url": "https://www.coupang.com/vp/products/16415551074",
+   "season_kind": "시즌",
+   "peak_months": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "created_at": "2026-10-15"
+  },
+  {
+   "id": "13751349598",
+   "group_id": "G10001727",
+   "title": "부사 사과 중·대과 가정용 [가정용/실중량]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001727_thumb.jpg",
+   "price_from": 14300,
+   "options": [
+    {
+     "name": "2kg (8-110과 · 실중량)",
+     "price": 14300,
+     "soldout": false
+    },
+    {
+     "name": "3kg (12-15과 · 실중량)",
+     "price": 18200,
+     "soldout": false
+    },
+    {
+     "name": "5kg (20-26과 · 실중량)",
+     "price": 27000,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13812571488",
+   "coupang_url": "https://www.coupang.com/vp/products/16415552102",
+   "season_kind": "시즌",
+   "peak_months": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "created_at": "2026-10-15"
+  },
+  {
+   "id": "13751352339",
+   "group_id": "G10005198",
+   "title": "사과 대과 가정용 [가정용]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005198_thumb.jpg",
+   "price_from": 18700,
+   "options": [
+    {
+     "name": "3kg (6-9과)",
+     "price": 18700,
+     "soldout": false
+    },
+    {
+     "name": "5kg (9-15과)",
+     "price": 26800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13812574262",
+   "coupang_url": "https://www.coupang.com/vp/products/16415553608",
+   "season_kind": "시즌",
+   "peak_months": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "created_at": "2026-10-15"
   }
  ]
 }
