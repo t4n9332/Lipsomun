@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-20T17:32+09:00",
+ "generated_at": "2026-10-21T17:17+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -25,7 +25,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13731294269",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16411908351",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -50,7 +50,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13731294296",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16411908351",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -85,7 +85,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732214703",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16411908821",
    "season_kind": "시즌",
    "peak_months": [
     8,
@@ -3967,7 +3967,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778417474",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16396976560",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -4021,7 +4021,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778418247",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16396975142",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -5549,7 +5549,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778581222",
-   "coupang_url": "https://www.coupang.com/vp/products/16419373173",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -6936,7 +6936,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13802656986",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16417837003",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-10"
@@ -7278,6 +7278,96 @@
    "created_at": "2026-10-13"
   },
   {
+   "id": "13747883104",
+   "group_id": "G10005122",
+   "title": "제주 그린 레몬 상품 [상품] 1.5kg·2.5kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005122_thumb.jpg",
+   "price_from": 19700,
+   "options": [
+    {
+     "name": "1.5kg",
+     "price": 19700,
+     "soldout": false
+    },
+    {
+     "name": "2.5kg",
+     "price": 27700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13809085473",
+   "coupang_url": "https://www.coupang.com/vp/products/16413465701",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-14"
+  },
+  {
+   "id": "13747883170",
+   "group_id": "G10005122",
+   "title": "제주 그린 레몬 상품 [상품] 9kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005122_thumb.jpg",
+   "price_from": 80900,
+   "options": [
+    {
+     "name": "9kg",
+     "price": 80900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13809085537",
+   "coupang_url": "https://www.coupang.com/vp/products/16413465701",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-14"
+  },
+  {
+   "id": "13747883332",
+   "group_id": "G10005126",
+   "title": "제주 그린 레몬 못난이 [못난이] 1.5kg·2.5kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005126_thumb.jpg",
+   "price_from": 17600,
+   "options": [
+    {
+     "name": "1.5kg",
+     "price": 17600,
+     "soldout": false
+    },
+    {
+     "name": "2.5kg",
+     "price": 24100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13809085701",
+   "coupang_url": "https://www.coupang.com/vp/products/16413469574",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-14"
+  },
+  {
+   "id": "13747883394",
+   "group_id": "G10005126",
+   "title": "제주 그린 레몬 못난이 [못난이] 9kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005126_thumb.jpg",
+   "price_from": 67900,
+   "options": [
+    {
+     "name": "9kg",
+     "price": 67900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13809085763",
+   "coupang_url": "https://www.coupang.com/vp/products/16413469574",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-14"
+  },
+  {
    "id": "13749352051",
    "group_id": "G10001841",
    "title": "단감 대과",
@@ -7395,7 +7485,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13812571488",
-   "coupang_url": "https://www.coupang.com/vp/products/16415552102",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -7425,7 +7515,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13814637100",
-   "coupang_url": "https://www.coupang.com/vp/products/16416749865",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     7,
@@ -7458,7 +7548,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13814648704",
-   "coupang_url": "https://www.coupang.com/vp/products/16416754289",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -7488,7 +7578,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13814652359",
-   "coupang_url": "https://www.coupang.com/vp/products/16416755632",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -7543,7 +7633,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13821366725",
-   "coupang_url": "https://www.coupang.com/vp/products/16419846336",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
@@ -7563,7 +7653,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13821366777",
-   "coupang_url": "https://www.coupang.com/vp/products/16419846336",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
@@ -7588,7 +7678,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13821376551",
-   "coupang_url": "https://www.coupang.com/vp/products/16419852073",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
@@ -7608,7 +7698,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13821376594",
-   "coupang_url": "https://www.coupang.com/vp/products/16419852073",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
@@ -7633,7 +7723,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13823385980",
-   "coupang_url": "https://www.coupang.com/vp/products/16421103778",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -7658,7 +7748,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13823386039",
-   "coupang_url": "https://www.coupang.com/vp/products/16421103778",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -7811,6 +7901,758 @@
     11
    ],
    "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762682194",
+   "group_id": "G10005214",
+   "title": "국내산 골드키위 중소과",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005214_thumb.jpg",
+   "price_from": 17600,
+   "options": [
+    {
+     "name": "2kg (27과내외)",
+     "price": 17600,
+     "soldout": false
+    },
+    {
+     "name": "3kg (40과내외)",
+     "price": 21900,
+     "soldout": false
+    },
+    {
+     "name": "5kg (65과내외)",
+     "price": 32100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823975933",
+   "coupang_url": "https://www.coupang.com/vp/products/16419844936",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762682305",
+   "group_id": "G10005207",
+   "title": "전라도 대봉감 5kg·5kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005207_thumb.jpg",
+   "price_from": 22600,
+   "options": [
+    {
+     "name": "5kg (17-22과)",
+     "price": 22600,
+     "soldout": false
+    },
+    {
+     "name": "5kg (12-16과)",
+     "price": 27000,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823976044",
+   "coupang_url": "https://www.coupang.com/vp/products/16419842001",
+   "season_kind": "시즌",
+   "peak_months": [
+    10,
+    11
+   ],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762682316",
+   "group_id": "G10005207",
+   "title": "전라도 대봉감 10kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005207_thumb.jpg",
+   "price_from": 51100,
+   "options": [
+    {
+     "name": "10kg (22-33과)",
+     "price": 51100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823976055",
+   "coupang_url": "https://www.coupang.com/vp/products/16419842001",
+   "season_kind": "시즌",
+   "peak_months": [
+    10,
+    11
+   ],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762683275",
+   "group_id": "G10005215",
+   "title": "국내산 골드키위 소과",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005215_thumb.jpg",
+   "price_from": 13200,
+   "options": [
+    {
+     "name": "2kg (31과내외)",
+     "price": 13200,
+     "soldout": false
+    },
+    {
+     "name": "3kg (45과내외)",
+     "price": 16100,
+     "soldout": false
+    },
+    {
+     "name": "5kg (75과내외)",
+     "price": 21200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823977010",
+   "coupang_url": "https://www.coupang.com/vp/products/16419850064",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762683369",
+   "group_id": "G10005131",
+   "title": "제주 레드키위 특대과 실중량 [실중량] 0.8kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005131_thumb.jpg",
+   "price_from": 18200,
+   "options": [
+    {
+     "name": "0.8kg (실중량)",
+     "price": 18200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823977121",
+   "coupang_url": "https://www.coupang.com/vp/products/16411807703",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762683382",
+   "group_id": "G10005131",
+   "title": "제주 레드키위 특대과 실중량 [실중량] 2.4kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005131_thumb.jpg",
+   "price_from": 39400,
+   "options": [
+    {
+     "name": "2.4kg (실중량)",
+     "price": 39400,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823977134",
+   "coupang_url": "https://www.coupang.com/vp/products/16411807703",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762683921",
+   "group_id": "G10005131",
+   "title": "제주 레드키위 특대과 실중량 [실중량] 6kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005131_thumb.jpg",
+   "price_from": 88200,
+   "options": [
+    {
+     "name": "6kg (실중량)",
+     "price": 88200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823977678",
+   "coupang_url": "https://www.coupang.com/vp/products/16411807703",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762683998",
+   "group_id": "G10005136",
+   "title": "제주 레드키위 중대과 실중량 [실중량] 0.8kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005136_thumb.jpg",
+   "price_from": 16800,
+   "options": [
+    {
+     "name": "0.8kg (실중량)",
+     "price": 16800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823977753",
+   "coupang_url": "https://www.coupang.com/vp/products/16411814588",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762684029",
+   "group_id": "G10005136",
+   "title": "제주 레드키위 중대과 실중량 [실중량] 2.4kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005136_thumb.jpg",
+   "price_from": 35000,
+   "options": [
+    {
+     "name": "2.4kg (실중량)",
+     "price": 35000,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823977788",
+   "coupang_url": "https://www.coupang.com/vp/products/16411814588",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762684032",
+   "group_id": "G10005136",
+   "title": "제주 레드키위 중대과 실중량 [실중량] 6kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005136_thumb.jpg",
+   "price_from": 76600,
+   "options": [
+    {
+     "name": "6kg (실중량)",
+     "price": 76600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823977791",
+   "coupang_url": "https://www.coupang.com/vp/products/16411814588",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762684147",
+   "group_id": "G10001924",
+   "title": "대봉감 대과 가정용",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001924_thumb.jpg",
+   "price_from": 13800,
+   "options": [
+    {
+     "name": "2kg (6-8과)",
+     "price": 13800,
+     "soldout": false
+    },
+    {
+     "name": "4.5kg (13-18과)",
+     "price": 24800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823977906",
+   "coupang_url": "https://www.coupang.com/vp/products/16411809131",
+   "season_kind": "시즌",
+   "peak_months": [
+    10,
+    11
+   ],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762684263",
+   "group_id": "G10005079",
+   "title": "청도반시 대과",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005079_thumb.jpg",
+   "price_from": 32100,
+   "options": [
+    {
+     "name": "5kg (26-30과)",
+     "price": 32100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823978022",
+   "coupang_url": "https://www.coupang.com/vp/products/16400606803",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762684387",
+   "group_id": "G10005244",
+   "title": "오만둥이 [생물] 1kg·3kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005244_thumb.jpg",
+   "price_from": 8200,
+   "options": [
+    {
+     "name": "1kg",
+     "price": 8200,
+     "soldout": false
+    },
+    {
+     "name": "3kg",
+     "price": 12700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823978146",
+   "coupang_url": "https://www.coupang.com/vp/products/16419848759",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762684428",
+   "group_id": "G10005244",
+   "title": "오만둥이 [생물] 5kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005244_thumb.jpg",
+   "price_from": 20100,
+   "options": [
+    {
+     "name": "5kg",
+     "price": 20100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13823978182",
+   "coupang_url": "https://www.coupang.com/vp/products/16419848759",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-20"
+  },
+  {
+   "id": "13762744652",
+   "group_id": "G10003407",
+   "title": "봄내음가득 비빔미더덕 밀키트",
+   "category": "밀키트",
+   "image": "https://t4n9332.github.io/witak-images/images/G10003407_thumb.jpg",
+   "price_from": 15200,
+   "options": [
+    {
+     "name": "(고)봄내음가득 비빔미더덕 밀키트",
+     "price": 15200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824038858",
+   "coupang_url": "https://www.coupang.com/vp/products/16384754176",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762744755",
+   "group_id": "G10001809",
+   "title": "통영 홍가리비 1kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001809_thumb.jpg",
+   "price_from": 12200,
+   "options": [
+    {
+     "name": "1kg (25미내외)",
+     "price": 12200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824038961",
+   "coupang_url": "https://www.coupang.com/vp/products/16392652645",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762744774",
+   "group_id": "G10001809",
+   "title": "통영 홍가리비 4kg·8kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001809_thumb.jpg",
+   "price_from": 28700,
+   "options": [
+    {
+     "name": "4kg (25미내외)",
+     "price": 28700,
+     "soldout": false
+    },
+    {
+     "name": "8kg (25미내외)",
+     "price": 51300,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824038980",
+   "coupang_url": "https://www.coupang.com/vp/products/16392652645",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762744823",
+   "group_id": "G10005102",
+   "title": "참가리비 무침",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005102_thumb.jpg",
+   "price_from": 14600,
+   "options": [
+    {
+     "name": "0.3kg",
+     "price": 14600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039029",
+   "coupang_url": "https://www.coupang.com/vp/products/16408746746",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762744883",
+   "group_id": "G10005103",
+   "title": "참가리비장",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005103_thumb.jpg",
+   "price_from": 13500,
+   "options": [
+    {
+     "name": "0.3kg",
+     "price": 13500,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039089",
+   "coupang_url": "https://www.coupang.com/vp/products/16408748106",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762744980",
+   "group_id": "G10001954",
+   "title": "벌교 새꼬막 소",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001954_thumb.jpg",
+   "price_from": 11700,
+   "options": [
+    {
+     "name": "2kg",
+     "price": 11700,
+     "soldout": false
+    },
+    {
+     "name": "3kg",
+     "price": 13900,
+     "soldout": false
+    },
+    {
+     "name": "5kg",
+     "price": 19100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039186",
+   "coupang_url": "https://www.coupang.com/vp/products/16403194699",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745163",
+   "group_id": "G10002027",
+   "title": "시나노골드 난좌포장 중대과 [정품]",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002027_thumb.jpg",
+   "price_from": 43100,
+   "options": [
+    {
+     "name": "5kg (16-19과)",
+     "price": 43100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039369",
+   "coupang_url": "https://www.coupang.com/vp/products/16398445792",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745247",
+   "group_id": "G10002028",
+   "title": "시나노골드 에어셀포장 중대과 [정품]",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002028_thumb.jpg",
+   "price_from": 21200,
+   "options": [
+    {
+     "name": "2kg (6-7과)",
+     "price": 21200,
+     "soldout": false
+    },
+    {
+     "name": "3kg (9-11과)",
+     "price": 28500,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039454",
+   "coupang_url": "https://www.coupang.com/vp/products/16398448998",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745313",
+   "group_id": "G10004913",
+   "title": "루비벨 대추방울토마토 1kg·2kg",
+   "category": "채소",
+   "image": "https://t4n9332.github.io/witak-images/images/G10004913_thumb.jpg",
+   "price_from": 17100,
+   "options": [
+    {
+     "name": "1kg",
+     "price": 17100,
+     "soldout": false
+    },
+    {
+     "name": "2kg",
+     "price": 29400,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039520",
+   "coupang_url": "https://www.coupang.com/vp/products/16400602324",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745321",
+   "group_id": "G10004913",
+   "title": "루비벨 대추방울토마토 5kg",
+   "category": "채소",
+   "image": "https://t4n9332.github.io/witak-images/images/G10004913_thumb.jpg",
+   "price_from": 66400,
+   "options": [
+    {
+     "name": "5kg",
+     "price": 66400,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039528",
+   "coupang_url": "https://www.coupang.com/vp/products/16400602324",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745404",
+   "group_id": "G10004608",
+   "title": "대추방울토마토 로얄과",
+   "category": "채소",
+   "image": "https://t4n9332.github.io/witak-images/images/G10004608_thumb.jpg",
+   "price_from": 18500,
+   "options": [
+    {
+     "name": "2kg",
+     "price": 18500,
+     "soldout": false
+    },
+    {
+     "name": "4kg",
+     "price": 35400,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039612",
+   "coupang_url": "https://www.coupang.com/vp/products/16401772854",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745727",
+   "group_id": "G10005101",
+   "title": "(급냉)장흥 매생이",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005101_thumb.jpg",
+   "price_from": 7500,
+   "options": [
+    {
+     "name": "0.2kg",
+     "price": 7500,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824039938",
+   "coupang_url": "https://www.coupang.com/vp/products/16409366038",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745863",
+   "group_id": "G10002120",
+   "title": "(생물)국내산 꼴뚜기 횟감용",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002120_thumb.jpg",
+   "price_from": 17800,
+   "options": [
+    {
+     "name": "0.5kg (50마리내외)",
+     "price": 17800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824040077",
+   "coupang_url": "https://www.coupang.com/vp/products/16411811467",
+   "season_kind": "시즌",
+   "peak_months": [
+    10,
+    11
+   ],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745951",
+   "group_id": "G10005001",
+   "title": "국내산(생물)갑오징어 1kg",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005001_thumb.jpg",
+   "price_from": 15900,
+   "options": [
+    {
+     "name": "1kg (4-7미)",
+     "price": 15900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824040167",
+   "coupang_url": "https://www.coupang.com/vp/products/16397307272",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762745960",
+   "group_id": "G10005001",
+   "title": "국내산(생물)갑오징어 3kg·5kg",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005001_thumb.jpg",
+   "price_from": 35800,
+   "options": [
+    {
+     "name": "3kg (12-21미 / 1kg×3박스)",
+     "price": 35800,
+     "soldout": false
+    },
+    {
+     "name": "5kg (20-35미 / 1kg×5박스)",
+     "price": 55900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824040176",
+   "coupang_url": "https://www.coupang.com/vp/products/16397307272",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762746132",
+   "group_id": "G10005179",
+   "title": "김장양념 (아이스박스) 1kg",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005179_thumb.jpg",
+   "price_from": 20800,
+   "options": [
+    {
+     "name": "1kg",
+     "price": 20800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824040348",
+   "coupang_url": "https://www.coupang.com/vp/products/16414301332",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762746158",
+   "group_id": "G10005179",
+   "title": "김장양념 (아이스박스) 3kg·6kg",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005179_thumb.jpg",
+   "price_from": 44700,
+   "options": [
+    {
+     "name": "3kg",
+     "price": 44700,
+     "soldout": false
+    },
+    {
+     "name": "6kg",
+     "price": 80500,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824040374",
+   "coupang_url": "https://www.coupang.com/vp/products/16414301332",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762746204",
+   "group_id": "G10005167",
+   "title": "김장양념 (종이박스) 1kg",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005167_thumb.jpg",
+   "price_from": 19400,
+   "options": [
+    {
+     "name": "1kg",
+     "price": 19400,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824040420",
+   "coupang_url": "https://www.coupang.com/vp/products/16414311101",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
+  },
+  {
+   "id": "13762746218",
+   "group_id": "G10005167",
+   "title": "김장양념 (종이박스) 3kg·6kg",
+   "category": "김치·반찬",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005167_thumb.jpg",
+   "price_from": 43300,
+   "options": [
+    {
+     "name": "3kg",
+     "price": 43300,
+     "soldout": false
+    },
+    {
+     "name": "6kg",
+     "price": 79200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13824040434",
+   "coupang_url": "https://www.coupang.com/vp/products/16414311101",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-21"
   }
  ]
 }
