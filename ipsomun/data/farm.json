@@ -1,65 +1,10 @@
 {
- "generated_at": "2026-10-22T17:20+09:00",
+ "generated_at": "2026-10-23T17:31+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
  },
  "items": [
-  {
-   "id": "13670787372",
-   "group_id": "G10001197",
-   "title": "빨간 사과(홍로) 중·대과 가정용 1kg·2kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001197_thumb.jpg",
-   "price_from": 12000,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 12000,
-     "soldout": false
-    },
-    {
-     "name": "2kg",
-     "price": 17900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13731294269",
-   "coupang_url": "https://www.coupang.com/vp/products/16411908351",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-08-23"
-  },
-  {
-   "id": "13670787399",
-   "group_id": "G10001197",
-   "title": "빨간 사과(홍로) 중·대과 가정용 5kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001197_thumb.jpg",
-   "price_from": 33000,
-   "options": [
-    {
-     "name": "5kg",
-     "price": 33000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13731294296",
-   "coupang_url": "https://www.coupang.com/vp/products/16411908351",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-08-23"
-  },
   {
    "id": "13671697215",
    "group_id": "G10004308",
@@ -240,12 +185,12 @@
    "title": "샤인머스켓 [실속]",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10004311_thumb.jpg",
-   "price_from": 16600,
+   "price_from": 26500,
    "options": [
     {
      "name": "1kg (2-3송이)",
      "price": 16600,
-     "soldout": false
+     "soldout": true
     },
     {
      "name": "2kg (4-5송이)",
@@ -638,166 +583,6 @@
    "created_at": "2026-08-24"
   },
   {
-   "id": "13671697954",
-   "group_id": "G10001198",
-   "title": "빨간 사과(홍로) 중과 가정용 1kg·2kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001198_thumb.jpg",
-   "price_from": 11300,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 11300,
-     "soldout": false
-    },
-    {
-     "name": "2kg",
-     "price": 16900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732215443",
-   "coupang_url": "",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-08-24"
-  },
-  {
-   "id": "13671697992",
-   "group_id": "G10001198",
-   "title": "빨간 사과(홍로) 중과 가정용 5kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001198_thumb.jpg",
-   "price_from": 31400,
-   "options": [
-    {
-     "name": "5kg",
-     "price": 31400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732215465",
-   "coupang_url": "",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-08-24"
-  },
-  {
-   "id": "13671698066",
-   "group_id": "G10001199",
-   "title": "빨간 사과(홍로) 중소과 가정용 1kg·2kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001199_thumb.jpg",
-   "price_from": 10700,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 10700,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732215555",
-   "coupang_url": "https://www.coupang.com/vp/products/16398568889",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-08-24"
-  },
-  {
-   "id": "13671698069",
-   "group_id": "G10001199",
-   "title": "빨간 사과(홍로) 중소과 가정용 5kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001199_thumb.jpg",
-   "price_from": 30100,
-   "options": [
-    {
-     "name": "5kg",
-     "price": 30100,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732215558",
-   "coupang_url": "https://www.coupang.com/vp/products/16398568889",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-08-24"
-  },
-  {
-   "id": "13671698136",
-   "group_id": "G10001200",
-   "title": "빨간 사과(홍로) 소과 가정용 1kg·2kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001200_thumb.jpg",
-   "price_from": 10400,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 10400,
-     "soldout": false
-    },
-    {
-     "name": "2kg",
-     "price": 15700,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732215626",
-   "coupang_url": "https://www.coupang.com/vp/products/16398569083",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-08-24"
-  },
-  {
-   "id": "13671698211",
-   "group_id": "G10001201",
-   "title": "빨간 사과(홍로) 꼬마과 가정용 1kg·2kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001201_thumb.jpg",
-   "price_from": 9800,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 9800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13732215701",
-   "coupang_url": "https://www.coupang.com/vp/products/16398569242",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-08-24"
-  },
-  {
    "id": "13671698294",
    "group_id": "G10001227",
    "title": "샤인머스켓",
@@ -1106,7 +891,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732216575",
-   "coupang_url": "https://www.coupang.com/vp/products/16401842343",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     1,
@@ -4320,30 +4105,6 @@
    "created_at": "2026-09-28"
   },
   {
-   "id": "13717431025",
-   "group_id": "G10000991",
-   "title": "제주 황금향 (50과전후) 상품 [상품로얄]",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000991_thumb.jpg",
-   "price_from": 80300,
-   "options": [
-    {
-     "name": "10kg",
-     "price": 80300,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778429276",
-   "coupang_url": "",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11
-   ],
-   "created_at": "2026-09-28"
-  },
-  {
    "id": "13717431778",
    "group_id": "G10003260",
    "title": "한돈 냉동 뒷다리살(제육 불고기용) 0.5kg·1kg",
@@ -4676,31 +4437,6 @@
    "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
-   "created_at": "2026-09-28"
-  },
-  {
-   "id": "13717444245",
-   "group_id": "G10002156",
-   "title": "제주 황금향 (부직포가방) 선물용",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002156_thumb.jpg",
-   "price_from": 59900,
-   "options": [
-    {
-     "name": "5kg (17-24과)",
-     "price": 59900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778442619",
-   "coupang_url": "",
-   "season_kind": "시즌",
-   "peak_months": [
-    1,
-    2,
-    9,
-    10
-   ],
    "created_at": "2026-09-28"
   },
   {
@@ -7323,51 +7059,6 @@
    "created_at": "2026-10-14"
   },
   {
-   "id": "13747883332",
-   "group_id": "G10005126",
-   "title": "제주 그린 레몬 못난이 [못난이] 1.5kg·2.5kg",
-   "category": "기타",
-   "image": "https://t4n9332.github.io/witak-images/images/G10005126_thumb.jpg",
-   "price_from": 17600,
-   "options": [
-    {
-     "name": "1.5kg",
-     "price": 17600,
-     "soldout": false
-    },
-    {
-     "name": "2.5kg",
-     "price": 24100,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13809085701",
-   "coupang_url": "https://www.coupang.com/vp/products/16413469574",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-10-14"
-  },
-  {
-   "id": "13747883394",
-   "group_id": "G10005126",
-   "title": "제주 그린 레몬 못난이 [못난이] 9kg",
-   "category": "기타",
-   "image": "https://t4n9332.github.io/witak-images/images/G10005126_thumb.jpg",
-   "price_from": 67900,
-   "options": [
-    {
-     "name": "9kg",
-     "price": 67900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13809085763",
-   "coupang_url": "https://www.coupang.com/vp/products/16413469574",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-10-14"
-  },
-  {
    "id": "13749352051",
    "group_id": "G10001841",
    "title": "단감 대과",
@@ -8162,26 +7853,6 @@
    "created_at": "2026-10-20"
   },
   {
-   "id": "13762684263",
-   "group_id": "G10005079",
-   "title": "청도반시 대과",
-   "category": "기타",
-   "image": "https://t4n9332.github.io/witak-images/images/G10005079_thumb.jpg",
-   "price_from": 32100,
-   "options": [
-    {
-     "name": "5kg (26-30과)",
-     "price": 32100,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13823978022",
-   "coupang_url": "https://www.coupang.com/vp/products/16400606803",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-10-20"
-  },
-  {
    "id": "13762684387",
    "group_id": "G10005244",
    "title": "오만둥이 [생물] 1kg·3kg",
@@ -8653,6 +8324,141 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-21"
+  },
+  {
+   "id": "13767196994",
+   "group_id": "G10005264",
+   "title": "애플망고 대과 [항공직송] 1kg·2kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005264_thumb.jpg",
+   "price_from": 24100,
+   "options": [
+    {
+     "name": "1kg (2과)",
+     "price": 24100,
+     "soldout": false
+    },
+    {
+     "name": "2kg (4과)",
+     "price": 43100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13828528267",
+   "coupang_url": "https://www.coupang.com/vp/products/16424945297",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-23"
+  },
+  {
+   "id": "13767197008",
+   "group_id": "G10005264",
+   "title": "애플망고 대과 [항공직송] 4kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005264_thumb.jpg",
+   "price_from": 80300,
+   "options": [
+    {
+     "name": "4kg (8과)",
+     "price": 80300,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13828528283",
+   "coupang_url": "https://www.coupang.com/vp/products/16424945297",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-23"
+  },
+  {
+   "id": "13767205812",
+   "group_id": "G10005267",
+   "title": "애플망고 중과 [항공직송] 1kg·2kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005267_thumb.jpg",
+   "price_from": 22600,
+   "options": [
+    {
+     "name": "1kg (2-3과)",
+     "price": 22600,
+     "soldout": false
+    },
+    {
+     "name": "2kg (5과)",
+     "price": 40100,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13828537169",
+   "coupang_url": "https://www.coupang.com/vp/products/16424953529",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-23"
+  },
+  {
+   "id": "13767205837",
+   "group_id": "G10005267",
+   "title": "애플망고 중과 [항공직송] 4kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005267_thumb.jpg",
+   "price_from": 74400,
+   "options": [
+    {
+     "name": "4kg (10과)",
+     "price": 74400,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13828537194",
+   "coupang_url": "https://www.coupang.com/vp/products/16424953529",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-23"
+  },
+  {
+   "id": "13767211932",
+   "group_id": "G10005270",
+   "title": "애플망고 소과 [항공직송] 1kg·2kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005270_thumb.jpg",
+   "price_from": 21900,
+   "options": [
+    {
+     "name": "1kg (3과)",
+     "price": 21900,
+     "soldout": false
+    },
+    {
+     "name": "2kg (6과)",
+     "price": 38700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13828543368",
+   "coupang_url": "https://www.coupang.com/vp/products/16424959893",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-23"
+  },
+  {
+   "id": "13767211953",
+   "group_id": "G10005270",
+   "title": "애플망고 소과 [항공직송] 4kg",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005270_thumb.jpg",
+   "price_from": 71500,
+   "options": [
+    {
+     "name": "4kg (12과)",
+     "price": 71500,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13828543388",
+   "coupang_url": "https://www.coupang.com/vp/products/16424959893",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-10-23"
   }
  ]
 }
