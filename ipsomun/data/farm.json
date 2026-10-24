@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-23T17:31+09:00",
+ "generated_at": "2026-10-24T17:16+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -30,7 +30,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732214703",
-   "coupang_url": "https://www.coupang.com/vp/products/16411908821",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     8,
@@ -891,7 +891,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13732216575",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16401842343",
    "season_kind": "시즌",
    "peak_months": [
     1,
@@ -6373,7 +6373,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13785878024",
-   "coupang_url": "https://www.coupang.com/vp/products/16415694512",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-02"
@@ -6808,7 +6808,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13807248210",
-   "coupang_url": "https://www.coupang.com/vp/products/16412284432",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-13"
@@ -6838,7 +6838,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13807248289",
-   "coupang_url": "https://www.coupang.com/vp/products/16412284607",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-13"
@@ -6863,7 +6863,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13807248409",
-   "coupang_url": "https://www.coupang.com/vp/products/16412283282",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-13"
@@ -6883,7 +6883,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13807248425",
-   "coupang_url": "https://www.coupang.com/vp/products/16412283282",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-13"
@@ -6908,7 +6908,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13807248521",
-   "coupang_url": "https://www.coupang.com/vp/products/16412283466",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-13"
@@ -7106,7 +7106,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13810564910",
-   "coupang_url": "https://www.coupang.com/vp/products/16414305973",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -7141,7 +7141,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13812568204",
-   "coupang_url": "https://www.coupang.com/vp/products/16415551074",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -7176,7 +7176,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13812571488",
-   "coupang_url": "https://www.coupang.com/vp/products/16415552102",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -7206,7 +7206,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13814637100",
-   "coupang_url": "https://www.coupang.com/vp/products/16416749865",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     7,
@@ -7269,7 +7269,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13814652359",
-   "coupang_url": "https://www.coupang.com/vp/products/16416755632",
+   "coupang_url": "https://www.coupang.com/vp/products/16425065797",
    "season_kind": "시즌",
    "peak_months": [
     9,
@@ -8459,6 +8459,111 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-23"
+  },
+  {
+   "id": "13768447130",
+   "group_id": "G10001700",
+   "title": "통영 석화(각굴) 3kg·5kg",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001700_thumb.jpg",
+   "price_from": 14600,
+   "options": [
+    {
+     "name": "3kg",
+     "price": 14600,
+     "soldout": false
+    },
+    {
+     "name": "5kg",
+     "price": 20500,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13829787198",
+   "coupang_url": "https://www.coupang.com/vp/products/16425640524",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "created_at": "2026-10-24"
+  },
+  {
+   "id": "13768447157",
+   "group_id": "G10001700",
+   "title": "통영 석화(각굴) 15kg",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001700_thumb.jpg",
+   "price_from": 48900,
+   "options": [
+    {
+     "name": "15kg",
+     "price": 48900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13829787206",
+   "coupang_url": "https://www.coupang.com/vp/products/16425640524",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "created_at": "2026-10-24"
+  },
+  {
+   "id": "13768447368",
+   "group_id": "G10002008",
+   "title": "통영 생굴(깐굴)",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002008_thumb.jpg",
+   "price_from": 19300,
+   "options": [
+    {
+     "name": "1kg",
+     "price": 19300,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13829787438",
+   "coupang_url": "https://www.coupang.com/vp/products/16425640698",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "created_at": "2026-10-24"
+  },
+  {
+   "id": "13768447470",
+   "group_id": "G10002063",
+   "title": "여수 석화(각굴) (2~3인분)",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002063_thumb.jpg",
+   "price_from": 19000,
+   "options": [
+    {
+     "name": "5kg",
+     "price": 19000,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13829787541",
+   "coupang_url": "https://www.coupang.com/vp/products/16425640781",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1,
+    2
+   ],
+   "created_at": "2026-10-24"
   }
  ]
 }
