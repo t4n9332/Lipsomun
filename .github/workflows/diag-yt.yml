@@ -1,4 +1,4 @@
-# 임시: 참고 영상의 배경음악 출처(곡명·저작권 표기)를 공개 페이지에서 확인. 확인 후 삭제.
+# 임시: 참고 영상의 배경음악 출처(곡명·저작권 표기)를 공개 메타데이터에서 확인 (영상·음원은 받지 않음). 확인 후 삭제.
 name: 진단 - 참고 영상 음악 출처
 on:
   push:
@@ -8,23 +8,22 @@ jobs:
   look:
     runs-on: ubuntu-latest
     steps:
+      - run: pip install -q yt-dlp
       - run: |
-          V=ohaNolDv6zE
-          echo "== oEmbed =="; curl -sS "https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=$V&format=json"; echo
-          curl -sS -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130 Safari/537.36" -H "Accept-Language: ko-KR,ko;q=0.9" "https://www.youtube.com/watch?v=$V&hl=ko" -o w.html
-          python3 - <<'PY'
-          import re, json
-          h = open("w.html", encoding="utf-8", errors="ignore").read()
-          m = re.search(r'"shortDescription":"(.*?)","isCrawlable"', h)
+          for V in ohaNolDv6zE; do
+            yt-dlp --skip-download --no-warnings --dump-single-json "https://www.youtube.com/watch?v=$V" > m.json || true
+            python3 - <<'PY'
+          import json
+          try:
+              d = json.load(open("m.json"))
+          except Exception as e:
+              print("메타데이터 실패", e); raise SystemExit
+          for k in ["title", "uploader", "channel", "upload_date", "duration", "track", "artist", "album", "creator", "license", "tags"]:
+              print(k, "=", d.get(k))
           print("== 설명란 ==")
-          print(json.loads('"' + m.group(1) + '"') if m else "(못 찾음)")
-          print("== 음악/저작권 표기 후보 ==")
-          for k in ["musicCredits", "음악", "Music", "BGM", "bgm", "Song", "Artist", "라이선스", "License", "NCS", "Audio Library", "Epidemic", "Artlist", "Pixabay"]:
-              for mm in re.finditer(re.escape(k), h):
-                  s = h[max(0, mm.start()-150): mm.end()+250].replace("\\n", " ")
-                  if "ytInitial" in s or len(s) < 10: continue
-                  print(f"[{k}]", re.sub(r"\s+", " ", s)[:400]); break
-          for pat in [r'"videoAttributeViewModel".{0,1500}', r'"carouselLockups".{0,2000}', r'"infoRows".{0,1500}']:
-              mm = re.search(pat, h)
-              if mm: print("== 구조 ==", re.sub(r"\s+", " ", mm.group(0))[:1500])
+          print(d.get("description"))
           PY
+          done
+      - name: 같은 채널의 다른 영상 제목 (원곡 정보 단서)
+        run: |
+          yt-dlp --flat-playlist --no-warnings --print "%(title)s | %(id)s" "https://www.youtube.com/@machine8932/videos" 2>/dev/null | head -20 || true
