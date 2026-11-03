@@ -1693,3 +1693,10 @@ textarea:focus-visible,
 .shorts-deal.price small { font-size: 4.6cqw; font-weight: 700; opacity: .85; }
 .cvs-more { display: flex; justify-content: center; margin: 22px 0 6px; }
 .cvs-more .btn { min-width: 220px; }
+.cvs-cross .save.same { color: var(--ink-faint); font-weight: 500; }
+.cvs-cats { display: flex; flex-wrap: wrap; gap: 8px; }
+.cvs-cats a {
+  display: inline-flex; align-items: baseline; gap: 6px; padding: 9px 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: 14px;
+}
+.cvs-cats a span { font-size: 12px; color: var(--ink-faint); font-weight: 600; }

@@ -41,3 +41,19 @@ test("행사 종류가 바뀐 변화가 정가만 바뀐 변화보다 먼저", (
   assert.equal(d[0].typeChanged, true);
   assert.equal(d[1].typeChanged, false);
 });
+
+test("상품 분류", async () => {
+  const { categoryOf } = await import("../lib/cvs.ts");
+  const cases: [string, string][] = [
+    ["덴마크)초코초코우유300ml", "음료"],
+    ["오비)카스레몬스퀴즈7.0캔500ml*4입", "주류"],
+    ["하이트)제로(무알콜)캔350ml", "음료"],
+    ["CJ)맥스봉빅소시지150g", "간편식"],
+    ["오뚜기)참기름김치볶음밥", "간편식"],
+    ["프링글스)스윗어니언100g", "과자·간식"],
+    ["빙그레)메로나", "아이스크림"],
+    ["리스테린)그린티100ml", "생활용품"],
+    ["청정원)까나리액젓500G", "기타"],
+  ];
+  for (const [n, c] of cases) assert.equal(categoryOf(n), c, n);
+});

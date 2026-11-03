@@ -63,6 +63,23 @@ jobs:
           git commit -m "편의점 행사 갱신 — ${m} ${n}개 (cvs-monthly)"
           git push
 
+      # 새 데이터가 배포된 뒤 텔레그램 채널에 이번 달 브리핑을 보낸다.
+      # 배포 전이면 서버가 409 를 돌려주므로 1분 간격으로 최대 10번 다시 부른다. 달마다 한 번만 나간다.
+      - name: 텔레그램 월간 브리핑
+        if: ${{ !inputs.dry }}
+        continue-on-error: true
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          for i in $(seq 1 10); do
+            code=$(curl -sS -m 40 -o r.json -w "%{http_code}" -H "Authorization: Bearer $CRON_SECRET" https://lipsomun.co.kr/api/cron/cvs-notify || echo 000)
+            echo "[$i] $code $(cat r.json 2>/dev/null)"
+            [ "$code" = "200" ] && exit 0
+            [ "$code" != "409" ] && [ "$code" != "000" ] && exit 1
+            sleep 60
+          done
+          echo "::warning::배포가 늦어 브리핑을 보내지 못했습니다. 나중에 /api/cron/cvs-notify 를 수동 호출하세요."
+
       - name: 수집 실패 알림
         if: steps.collect.outcome == 'failure'
         run: |
