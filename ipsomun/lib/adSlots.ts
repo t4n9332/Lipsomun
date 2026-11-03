@@ -25,6 +25,7 @@ export const CALC_AD_SLOTS: Record<string, string> = {
   퇴직금: AD_SLOT_PLACEHOLDER,
   실업급여: AD_SLOT_PLACEHOLDER,
   연차수당: AD_SLOT_PLACEHOLDER,
+  시급월급: AD_SLOT_PLACEHOLDER,
   연금저축IRP세액공제: AD_SLOT_PLACEHOLDER,
   연말정산환급금: AD_SLOT_PLACEHOLDER,
   종합소득세: AD_SLOT_PLACEHOLDER,

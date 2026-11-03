@@ -18,6 +18,7 @@ import UnemploymentCalc from "@/components/calc/UnemploymentCalc";
 import AnnualLeaveCalc from "@/components/calc/AnnualLeaveCalc";
 import PensionCreditCalc from "@/components/calc/PensionCreditCalc";
 import YearEndTaxCalc from "@/components/calc/YearEndTaxCalc";
+import HourlyPayCalc from "@/components/calc/HourlyPayCalc";
 import GlobalIncomeTaxCalc from "@/components/calc/GlobalIncomeTaxCalc";
 import AdSlot from "@/components/AdSlot";
 import { calcAdSlot } from "@/lib/adSlots";
@@ -41,6 +42,7 @@ const REGISTRY: Record<
   연차수당: { Calc: AnnualLeaveCalc, Guide: AnnualLeaveGuide },
   연금저축IRP세액공제: { Calc: PensionCreditCalc, Guide: PensionCreditGuide },
   연말정산환급금: { Calc: YearEndTaxCalc, Guide: YearEndTaxGuide },
+  시급월급: { Calc: HourlyPayCalc, Guide: HourlyPayGuide },
   종합소득세: { Calc: GlobalIncomeTaxCalc, Guide: GlobalIncomeTaxGuide },
 };
 
@@ -471,6 +473,45 @@ function PensionCreditGuide() {
         근로소득 외 소득이 있으면 총급여가 아니라 종합소득금액(4,500만원)이 기준이 된다.
         ISA 만기자금을 연금계좌로 옮기면 전환금액의 10%(최대 300만원)를 추가로
         공제받을 수 있으며, 위 계산에는 포함하지 않았다.
+      </p>
+    </article>
+  );
+}
+
+function HourlyPayGuide() {
+  return (
+    <article className="calc-guide">
+      <h3>2026년 최저임금은 시급 10,320원, 월 2,156,880원</h3>
+      <p>
+        2026년 최저임금은 <b>시급 10,320원</b>이다. 주 40시간을 일하면 주휴수당을 포함한 월 소정근로시간이
+        <b> 209시간</b>이라, 월급으로는 <b>2,156,880원</b>이 최저선이다. 이보다 적게 받는다면 수습(1년 이상 계약의
+        첫 3개월, 단순노무직 제외) 같은 예외가 아닌 한 최저임금 위반이다.
+      </p>
+
+      <h3>주휴수당 — 주 15시간이면 생긴다</h3>
+      <p>
+        1주일에 정해진 근무시간이 <b>15시간 이상</b>이고 그 주를 빠짐없이 나왔다면, 하루치 임금을 더 받는다. 이게
+        주휴수당이다. 주 40시간이면 8시간분, 그보다 적으면 비례해서(주 20시간 → 4시간분) 붙는다.
+        <b> 5인 미만 사업장도 줘야 한다</b>는 점을 모르는 경우가 많다. 주휴수당을 빼고 계산하면 월급이 20% 가까이
+        적게 나온다.
+      </p>
+
+      <h3>209시간은 어디서 나오나</h3>
+      <p>
+        주 40시간 + 주휴 8시간 = 주 48시간. 1년은 365 ÷ 7 = 약 52.14주, 한 달은 그 12분의 1인 약 4.345주다.
+        48 × 4.345 ≈ 208.6을 반올림한 <b>209시간</b>이 월급 환산 기준이다. 위 계산기도 같은 방식으로 계산한다.
+      </p>
+
+      <h3>3.3%와 4대보험, 무엇이 다른가</h3>
+      <p>
+        <b>3.3%</b>는 사업소득으로 처리해 소득세 3% + 지방소득세 0.3%만 떼는 방식이다. 당장 손에 쥐는 돈은 많지만
+        고용보험이 없어 실업급여를 받기 어렵다. <b>4대보험</b>은 국민연금·건강보험·고용보험을 떼는 대신 실업급여·
+        연금 가입기간이 쌓인다. 주 15시간 이상 꾸준히 일하는 근로자라면 원칙적으로 4대보험 대상이다.
+      </p>
+
+      <p className="calc-src">
+        연장·야간·휴일 근로 가산수당(5인 이상 사업장에서 1.5배)과 소득세는 반영하지 않았다. 정확한 내용은
+        고용노동부 고객상담센터(국번 없이 1350)에서 확인할 수 있다.
       </p>
     </article>
   );
