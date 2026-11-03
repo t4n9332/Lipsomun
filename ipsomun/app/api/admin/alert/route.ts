@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
-import { sendTelegram, escHtml } from "@/lib/telegram";
+import { sendAdminAlert, escHtml } from "@/lib/telegram";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,8 @@ export async function POST(req: Request) {
   if (!text) {
     return NextResponse.json({ error: "text가 필요합니다" }, { status: 400 });
   }
-  const result = await sendTelegram(`⚠️ <b>입소문 알림</b>\n${escHtml(text)}`);
+  // 운영 경고 — 공개 채널이 아니라 운영자 개인 대화로
+  const result = await sendAdminAlert(`⚠️ <b>입소문 알림</b>\n${escHtml(text)}`);
   if (!result.ok) {
     return NextResponse.json({ error: result.error || "발송 실패" }, { status: 502 });
   }

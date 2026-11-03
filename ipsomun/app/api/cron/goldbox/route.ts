@@ -11,7 +11,7 @@ import {
 } from "@/lib/db";
 import { cronOrAdmin } from "@/lib/auth";
 import { sendPushToAll, sendFavoritePriceDropPush } from "@/lib/push";
-import { sendTelegram, escHtml } from "@/lib/telegram";
+import { sendAdminAlert, escHtml } from "@/lib/telegram";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -103,7 +103,7 @@ export async function GET(req: Request) {
     } catch {}
 
     if (snapshotError) {
-      await sendTelegram(
+      await sendAdminAlert(
         `⚠️ <b>입소문 알림</b>\n가격 스냅샷 저장 실패: ${escHtml(snapshotError.slice(0, 200))}`
       ).catch(() => {});
     }
@@ -121,7 +121,7 @@ export async function GET(req: Request) {
   } catch (e) {
     const message = e instanceof Error ? e.message : "골드박스 갱신 실패";
     // 로컬 로그에는 아예 흔적이 남지 않는 크론이라 텔레그램으로 알린다 (실패를 삼키므로 안전)
-    await sendTelegram(
+    await sendAdminAlert(
       `⚠️ <b>입소문 알림</b>\n골드박스 크론 실패: ${escHtml(message.slice(0, 300))}\n(가격 스냅샷 ${snapshots}개는 저장됨)`
     ).catch(() => {});
     return NextResponse.json(
