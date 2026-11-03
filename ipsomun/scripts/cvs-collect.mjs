@@ -43,7 +43,26 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ---------------- 공통 유틸 ---------------- */
 
+// 해외 IP 를 막는 사이트(세븐일레븐)는 사이트의 서울 리전 중계(/api/cvs/proxy)로 받는다.
+// Actions 에서는 워크플로가 CVS_PROXY_URL·CRON_SECRET 을 넣어 준다.
+const PROXY = process.env.CVS_PROXY_URL;
+const PROXY_KEY = process.env.CRON_SECRET;
+const viaProxyHosts = new Set();
+
+async function viaProxy(url, init) {
+  const res = await fetch(PROXY, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${PROXY_KEY}` },
+    body: JSON.stringify({ url, method: init.method || "GET", headers: init.headers || {}, body: init.body }),
+    signal: AbortSignal.timeout(40_000),
+  });
+  if (!res.ok) throw new Error(`중계 HTTP ${res.status} (${res.headers.get("x-proxy-region") || "?"}): ${(await res.text()).slice(0, 200)}`);
+  return res;
+}
+
 async function get(url, init = {}) {
+  const host = new URL(url).hostname;
+  if (viaProxyHosts.has(host)) return viaProxy(url, init);
   for (let i = 0; i < 3; i++) {
     try {
       const res = await fetch(url, {
@@ -54,6 +73,13 @@ async function get(url, init = {}) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res;
     } catch (e) {
+      // 연결 자체가 안 되면(HTTP 응답 없음) 해외 IP 차단으로 보고 서울 중계로 전환 — 이후 같은 호스트는 계속 중계
+      const network = !String(e.message).startsWith("HTTP");
+      if (network && PROXY && PROXY_KEY) {
+        console.log(`  ↪ ${host} 직접 연결 실패(${e.cause?.code || e.message}) — 서울 중계로 전환`);
+        viaProxyHosts.add(host);
+        return viaProxy(url, init);
+      }
       if (i === 2) throw e;
       await sleep(1500 * (i + 1));
     }
@@ -139,7 +165,9 @@ async function fetchGS25() {
   const pageRes = await get("https://gs25.gsretail.com/gscvs/ko/products/event-goods");
   const pageHtml = await pageRes.text();
   const token = pageHtml.match(/name="CSRFToken"\s+value="([^"]+)"/)?.[1] || pageHtml.match(/CSRFToken\s*=\s*'([^']+)'/)?.[1];
-  const cookie = (pageRes.headers.getSetCookie?.() || []).map((c) => c.split(";")[0]).join("; ");
+  const cookie =
+    (pageRes.headers.getSetCookie?.() || []).map((c) => c.split(";")[0]).join("; ") ||
+    pageRes.headers.get("x-upstream-set-cookie") || ""; // 중계를 거치면 여기에 담겨 온다
   diag(`gs25 페이지 상태 ${pageRes.status}, 쿠키 ${cookie ? "있음" : "없음"}, CSRF 언급`, (pageHtml.match(/.{0,200}csrf.{0,200}/gi) || ["(없음)"]).join(" | "));
   if (!token) {
     debugDump("gs25-page", pageHtml);
