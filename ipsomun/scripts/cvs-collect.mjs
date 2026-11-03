@@ -23,10 +23,18 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 const DATA_DIR = path.join(ROOT, "data", "cvs");
-const DEBUG_DIR = path.join(__dirname, ".cvs-debug");
+// 숨김 폴더(.으로 시작)는 Actions 아티팩트 업로드에서 빠지므로 일반 이름으로 둔다
+const DEBUG_DIR = path.join(__dirname, "cvs-debug");
 const args = process.argv.slice(2);
 const DRY = args.includes("--dry");
 const ONLY = args.find((a) => a.startsWith("--only="))?.split("=")[1];
+// --dry 에서는 응답 원문 일부를 로그에 찍는다 — 사이트 구조가 바뀌었을 때 로그만 보고 파서를 고칠 수 있게
+const DIAG = DRY || args.includes("--diag");
+const diag = (label, text) => {
+  if (!DIAG) return;
+  const t = String(text).replace(/\s+/g, " ");
+  console.log(`  [진단] ${label} (${t.length}자): ${t.slice(0, 1500)}`);
+};
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36";
@@ -73,6 +81,7 @@ function dealType(s) {
   return m ? `${m[1]}+1` : "덤";
 }
 function debugDump(name, body) {
+  diag(`${name} 원문`, body);
   try {
     fs.mkdirSync(DEBUG_DIR, { recursive: true });
     fs.writeFileSync(path.join(DEBUG_DIR, `${name}.txt`), String(body).slice(0, 200_000));
@@ -110,7 +119,10 @@ async function fetchCU() {
         t: dealType(pick(b, /class="badge"[^>]*>([\s\S]*?)<\/div>/) || (cond === "23" ? "1+1" : "2+1")),
         img: absUrl(b.match(/<img[^>]+src="([^"]+)"/)?.[1], "https://cu.bgfretail.com/"),
       }));
-      if (page === 1 && items.length === 0) debugDump(`cu-${cond}`, html);
+      if (page === 1) {
+        if (items.length === 0) debugDump(`cu-${cond}`, html);
+        else diag(`cu-${cond} 1쪽 ${items.length}개, 첫 블록`, blocks(html, /<li class="prod_list/g)[0]);
+      }
       if (items.length === 0) break;
       out.push(...items);
       await sleep(300);
@@ -127,6 +139,7 @@ async function fetchGS25() {
   const pageHtml = await pageRes.text();
   const token = pageHtml.match(/name="CSRFToken"\s+value="([^"]+)"/)?.[1] || pageHtml.match(/CSRFToken\s*=\s*'([^']+)'/)?.[1];
   const cookie = (pageRes.headers.getSetCookie?.() || []).map((c) => c.split(";")[0]).join("; ");
+  diag(`gs25 페이지 상태 ${pageRes.status}, 쿠키 ${cookie ? "있음" : "없음"}, CSRF 언급`, (pageHtml.match(/.{0,200}csrf.{0,200}/gi) || ["(없음)"]).join(" | "));
   if (!token) {
     debugDump("gs25-page", pageHtml);
     throw new Error("CSRFToken 을 찾지 못함");
@@ -270,7 +283,9 @@ async function main() {
       if (DRY && items[0]) console.log("   예:", items.slice(0, 3));
       if (items.length === 0) failed.push(brand);
     } catch (e) {
-      console.error(`✗ ${brand}: ${e.message}`);
+      // fetch failed 같은 네트워크 오류는 진짜 원인이 e.cause 에 있다 (TLS·DNS·연결 거부 등)
+      const cause = e.cause ? ` — 원인: ${e.cause.code || ""} ${e.cause.message || e.cause}` : "";
+      console.error(`✗ ${brand}: ${e.message}${cause}`);
       failed.push(brand);
     }
   }
