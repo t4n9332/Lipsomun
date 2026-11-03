@@ -88,13 +88,13 @@ export async function generateMetadata({
       url,
       type: "website",
       siteName: "입소문",
-      images: product.imageUrl ? [{ url: product.imageUrl }] : undefined,
+      images: product.imageUrl ? [{ url: product.imageUrl }] : ["/og-default.png"],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: desc,
-      images: product.imageUrl ? [product.imageUrl] : undefined,
+      images: product.imageUrl ? [product.imageUrl] : ["/og-default.png"],
     },
   };
 }

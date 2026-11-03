@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { UNEMPLOYMENT, unemploymentDays, won } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 실업급여(구직급여) 계산기.
@@ -196,19 +197,5 @@ export default function UnemploymentCalc() {
         실제 지급액은 고용센터 결정에 따릅니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }

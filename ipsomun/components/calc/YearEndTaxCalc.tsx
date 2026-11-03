@@ -13,6 +13,7 @@ import {
   STANDARD_TAX_CREDIT_EARNED,
   won,
 } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 연말정산 환급금 계산기.
@@ -247,19 +248,5 @@ export default function YearEndTaxCalc() {
         급여명세서 또는 국세청 홈택스에서 확인해 직접 입력해야 합니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllSlugs, getAllCollectionSlugs, getAllPostSlugs } from "@/lib/db";
-import { CATEGORIES } from "@/lib/util";
+import { CATEGORIES, isFreshPost } from "@/lib/util";
 import { CALCULATORS } from "@/lib/calculators";
 import { TOOLS } from "@/lib/tools";
 
@@ -71,7 +71,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily" as const,
       priority: 0.8,
     })),
-    ...posts.map((p) => ({
+    // 오래된 자동 리포트는 noindex 라 사이트맵에서도 뺀다 (lastModified 기준 근사)
+    ...posts
+      .filter((p) => !p.slug.startsWith("compare-") || isFreshPost(p.updatedAt))
+      .map((p) => ({
       url: `${base}/blog/${enc(p.slug)}`,
       lastModified: p.updatedAt,
       changeFrequency: "monthly" as const,

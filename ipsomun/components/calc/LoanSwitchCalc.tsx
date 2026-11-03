@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Field from "./Field";
 
 /**
  * 주택담보대출 갈아타기 이득 계산기.
@@ -151,19 +152,5 @@ export default function LoanSwitchCalc() {
         실제 심사 결과에 따라 한도와 금리가 달라질 수 있습니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        <em>{unit}</em>
-      </span>
-    </label>
   );
 }

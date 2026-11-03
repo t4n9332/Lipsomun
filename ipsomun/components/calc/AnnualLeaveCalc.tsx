@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { MONTHLY_WORK_HOURS, annualLeaveDays, won } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 연차 개수 · 연차수당 계산기.
@@ -175,19 +176,5 @@ export default function AnnualLeaveCalc() {
         했다면 미사용 연차수당이 소멸할 수 있습니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }

@@ -43,3 +43,10 @@ test("누진세 구간 경계가 연속이다", () => {
 test("근로소득공제 한도 2천만원", () => {
   assert.equal(earnedIncomeDeduction(1_000_000_000), 20_000_000);
 });
+
+test("노란우산공제 한도 (2025 귀속 상향)", async () => {
+  const { noranUmbrellaCap } = await import("../lib/taxRates.ts");
+  assert.equal(noranUmbrellaCap(30_000_000), 6_000_000);
+  assert.equal(noranUmbrellaCap(80_000_000), 4_000_000);
+  assert.equal(noranUmbrellaCap(200_000_000), 2_000_000);
+});

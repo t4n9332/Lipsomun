@@ -11,6 +11,7 @@ import {
   LOCAL_TAX_RATE,
   won,
 } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 연봉 실수령액 계산기.
@@ -180,19 +181,5 @@ export default function SalaryNetCalc() {
         실제 실수령액은 이 값보다 높아지는 경우가 많습니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        <em>{unit}</em>
-      </span>
-    </label>
   );
 }

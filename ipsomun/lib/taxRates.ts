@@ -206,8 +206,10 @@ export const SIMPLE_EXPENSE_LIMIT_SERVICE = 24_000_000;
  * 큰 폭의 소득공제라 계산기에 넣을 값어치가 있다.
  */
 export function noranUmbrellaCap(businessIncome: number) {
-  if (businessIncome <= 40_000_000) return 5_000_000;
-  if (businessIncome <= 100_000_000) return 3_000_000;
+  // 2025 귀속부터 상향(500→600만, 300→400만). 4천~6천만원 구간을 500만원으로 따로 두는
+  // 자료도 있어, 확정 전까지는 보수적으로(공제를 과대 계산하지 않게) 400만원으로 둔다.
+  if (businessIncome <= 40_000_000) return 6_000_000;
+  if (businessIncome <= 100_000_000) return 4_000_000;
   return 2_000_000;
 }
 

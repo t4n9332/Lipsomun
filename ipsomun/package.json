@@ -26,5 +26,8 @@
     "@types/web-push": "^3.6.4",
     "playwright": "^1.62.1",
     "typescript": "^5.7.0"
+  },
+  "overrides": {
+    "postcss": "^8.5.23"
   }
 }

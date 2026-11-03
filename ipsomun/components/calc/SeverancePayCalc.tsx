@@ -8,6 +8,7 @@ import {
   LOCAL_TAX_RATE,
   won,
 } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 퇴직금 계산기.
@@ -191,19 +192,5 @@ export default function SeverancePayCalc() {
         퇴직연금(DC형)에 가입돼 있으면 적립금 운용 실적에 따라 금액이 달라집니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }

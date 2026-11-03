@@ -713,18 +713,6 @@ function cleanLinks(links?: { platform: string; url: string; price?: number | nu
     .filter((l, i, arr) => arr.findIndex((o) => o.platform === l.platform) === i);
 }
 
-async function insertLinks(
-  productId: string,
-  links: { platform: string; url: string; price?: number | null }[]
-) {
-  for (const l of links) {
-    await q(
-      `INSERT INTO affiliate_links (id, platform, url, price, product_id) VALUES ($1,$2,$3,$4,$5)`,
-      [crypto.randomUUID(), l.platform, l.url, l.price ?? null, productId]
-    );
-  }
-}
-
 /**
  * 특정 플랫폼 링크를 상품에 추가/갱신 (같은 플랫폼 링크가 있으면 교체).
  * 토스 가격비교 매칭 도구에서 사용.
@@ -749,8 +737,34 @@ export async function upsertLink(
 
 export async function createProduct(input: ProductInput): Promise<Product> {
   const id = crypto.randomUUID();
-  const slug = await uniqueSlug(input.title);
-  const rows = await q(
+  // 상품과 링크를 한 트랜잭션으로 — 링크 INSERT 가 실패하면 구매 버튼 없는 상품이 남는다.
+  // 같은 제목이 동시에 등록되면 slug UNIQUE 위반(23505)이 나므로 접미사를 붙여 다시 시도한다.
+  for (let attempt = 0; ; attempt++) {
+    const slug =
+      attempt === 0
+        ? await uniqueSlug(input.title)
+        : `${slugify(input.title)}-${crypto.randomUUID().slice(0, 6)}`;
+    try {
+      return await tx(async (run) => {
+        const rows = await insertProductRow(run, id, slug, input);
+        for (const l of cleanLinks(input.links)) {
+          await run(
+            `INSERT INTO affiliate_links (id, platform, url, price, product_id) VALUES ($1,$2,$3,$4,$5)`,
+            [crypto.randomUUID(), l.platform, l.url, l.price ?? null, id]
+          );
+        }
+        return rowToProduct(rows[0]);
+      });
+    } catch (e) {
+      const err = e as { code?: string; constraint?: string };
+      if (attempt < 2 && err.code === "23505" && /slug/.test(err.constraint || "")) continue;
+      throw e;
+    }
+  }
+}
+
+function insertProductRow(run: Run, id: string, slug: string, input: ProductInput) {
+  return run(
     `INSERT INTO products
        (id, title, slug, description, image_url, category, price, original_price,
         is_deal, is_published, priority, review, pros, cons, source, rating, rating_count)
@@ -776,8 +790,6 @@ export async function createProduct(input: ProductInput): Promise<Product> {
       input.ratingCount ?? null,
     ]
   );
-  await insertLinks(id, cleanLinks(input.links));
-  return rowToProduct(rows[0]);
 }
 
 /* ---------- 골드박스 자동 등록 지원 ---------- */
