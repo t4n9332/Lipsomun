@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T17:25+09:00",
+ "generated_at": "2026-11-03T17:24+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2159,7 +2159,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745796984",
-   "coupang_url": "https://www.coupang.com/vp/products/16403246471",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2179,7 +2179,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745796993",
-   "coupang_url": "https://www.coupang.com/vp/products/16403246471",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2867,26 +2867,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745911361",
    "coupang_url": "https://www.coupang.com/vp/products/16404086517",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685256053",
-   "group_id": "G10004349",
-   "title": "전복죽",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004349_thumb.jpg",
-   "price_from": 15900,
-   "options": [
-    {
-     "name": "0.22kg",
-     "price": 15900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745918634",
-   "coupang_url": "https://www.coupang.com/vp/products/16404086666",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -9342,6 +9322,29 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-11-02"
+  },
+  {
+   "id": "13787317732",
+   "group_id": "G10005413",
+   "title": "(늘) 대하 새우 [생물]",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005413_thumb.jpg",
+   "price_from": 32800,
+   "options": [
+    {
+     "name": "1kg (25미내외)",
+     "price": 32800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13848822100",
+   "coupang_url": "https://www.coupang.com/vp/products/16437875734",
+   "season_kind": "시즌",
+   "peak_months": [
+    9,
+    10
+   ],
+   "created_at": "2026-11-03"
   }
  ]
 }
