@@ -67,7 +67,7 @@ export async function generateMetadata({
     ? `쿠팡 ${won(cPrice)} vs 토스쇼핑 ${won(tPrice)} — 오늘 더 싼 곳에서 구매하세요. ` +
       (product.review || product.description || "").slice(0, 90)
     : (product.review || product.description || "").slice(0, 150) ||
-      `${product.title} 최저가 비교와 솔직 리뷰를 입소문에서 확인하세요.`;
+      `${product.title} 쿠팡·토스쇼핑 가격과 가격 변동을 입소문에서 비교하세요.`;
   // 슬러그가 한글이라 인코딩하지 않으면 canonical이 구글이 크롤하는 주소
   // (퍼센트 인코딩된 형태)와 달라진다.
   const url = `${SITE}/p/${encodeURIComponent(product.slug)}`;
@@ -88,13 +88,13 @@ export async function generateMetadata({
       url,
       type: "website",
       siteName: "입소문",
-      images: product.imageUrl ? [{ url: product.imageUrl }] : undefined,
+      images: product.imageUrl ? [{ url: product.imageUrl }] : ["/og-default.png"],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: desc,
-      images: product.imageUrl ? [product.imageUrl] : undefined,
+      images: product.imageUrl ? [product.imageUrl] : ["/og-default.png"],
     },
   };
 }
@@ -170,16 +170,8 @@ export default async function ProductPage({
       description:
         product.review || product.description || product.title,
       category: product.category,
-      ...(product.rating != null && product.rating > 0 && product.ratingCount
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: product.rating,
-              reviewCount: product.ratingCount,
-              bestRating: 5,
-            },
-          }
-        : {}),
+      // aggregateRating 은 넣지 않는다. 쿠팡 등 다른 사이트에서 가져온 평점을 구조화
+      // 데이터로 표시하면 구글 리뷰 스니펫 정책 위반(구조화 데이터 수동조치 대상)이다.
       ...(ldPrices.length >= 2
         ? {
             offers: {

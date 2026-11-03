@@ -11,7 +11,7 @@ export default async function DealsPage() {
   return (
     <section className="section">
       <div className="section-head">
-        <h2>🔥 오늘의 딜</h2>
+        <h1>🔥 오늘의 딜</h1>
         <span className="sub">매일 갱신되는 특가 모음</span>
       </div>
       <PushSubscribeButton hint="로그인 없이, 브라우저 알림으로 매일 아침 7시" />

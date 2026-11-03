@@ -8,6 +8,7 @@ import {
   LOCAL_TAX_RATE,
   won,
 } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 퇴직금 계산기.
@@ -112,12 +113,12 @@ export default function SeverancePayCalc() {
       </div>
 
       {r.invalid ? (
-        <div className="calc-result no">
+        <div aria-live="polite" className="calc-result no">
           <div className="calc-verdict">날짜를 확인해주세요</div>
           <div className="calc-netsub">퇴사일이 입사일보다 뒤여야 합니다</div>
         </div>
       ) : r.tooShort ? (
-        <div className="calc-result no">
+        <div aria-live="polite" className="calc-result no">
           <div className="calc-verdict">퇴직금 지급 대상이 아닙니다</div>
           <div className="calc-net">{r.workDays}일</div>
           <div className="calc-netsub">
@@ -125,7 +126,7 @@ export default function SeverancePayCalc() {
           </div>
         </div>
       ) : (
-        <div className="calc-result ok">
+        <div aria-live="polite" className="calc-result ok">
           <div className="calc-verdict">세금 떼고 실제로 받는 금액</div>
           <div className="calc-net">{won(r.net)}</div>
           <div className="calc-netsub">
@@ -191,19 +192,5 @@ export default function SeverancePayCalc() {
         퇴직연금(DC형)에 가입돼 있으면 적립금 운용 실적에 따라 금액이 달라집니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }

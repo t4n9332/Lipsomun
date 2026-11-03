@@ -150,6 +150,16 @@ export function withUtm(url: string, source: string, medium = "social", campaign
  * 외부에서 받아온 상품명·리뷰에 '</script>'가 들어오면 스크립트가 닫혀버린다(저장형 XSS).
  * 유니코드 이스케이프는 JSON 의미가 같으므로 구글 리치결과에 영향이 없다.
  */
+/**
+ * 자동 생성 가격비교 리포트를 검색 색인에 두는 기간(일).
+ * 가격은 하루만 지나도 낡으므로, 오래된 리포트를 계속 색인시키면 '비슷한 자동 생성 글이
+ * 대량으로 쌓인 사이트'로 보여 사이트 전체 평가가 떨어질 수 있다. 최근 것만 색인한다.
+ * (페이지와 링크는 그대로 둔다 — noindex,follow + 사이트맵 제외)
+ */
+export const BLOG_INDEX_DAYS = 14;
+export const isFreshPost = (createdAt: Date | string) =>
+  Date.now() - new Date(createdAt).getTime() < BLOG_INDEX_DAYS * 86_400_000;
+
 export function jsonLdString(obj: unknown): string {
   return JSON.stringify(obj)
     .replace(/</g, "\\u003c")

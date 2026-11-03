@@ -5,6 +5,9 @@ import { TOOLS, getTool } from "@/lib/tools";
 import PdfMergeTool from "@/components/tools/PdfMergeTool";
 import AdSlot from "@/components/AdSlot";
 import { toolAdSlot } from "@/lib/adSlots";
+import { jsonLdString } from "@/lib/util";
+
+const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 
 export const revalidate = 86400;
 
@@ -33,7 +36,7 @@ export async function generateMetadata({
     description: t.desc,
     keywords: t.keywords,
     alternates: { canonical: "/tools/" + encodeURIComponent(t.slug) },
-    openGraph: { title: t.title, description: t.desc },
+    openGraph: { title: t.title, description: t.desc, images: ["/og-default.png"], locale: "ko_KR", siteName: "입소문" },
   };
 }
 
@@ -50,12 +53,40 @@ export default async function ToolPage({
   if (!entry) notFound();
   const { Tool, Guide } = entry;
 
+  const pageUrl = `${SITE}/tools/${encodeURIComponent(t.slug)}`;
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: t.title,
+      description: t.desc,
+      url: pageUrl,
+      applicationCategory: "UtilitiesApplication",
+      operatingSystem: "All",
+      inLanguage: "ko-KR",
+      offers: { "@type": "Offer", price: 0, priceCurrency: "KRW" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "입소문", item: SITE },
+        { "@type": "ListItem", position: 2, name: "파일 도구", item: `${SITE}/tools` },
+        { "@type": "ListItem", position: 3, name: t.title, item: pageUrl },
+      ],
+    },
+  ];
+
   return (
     <section className="section">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
+      />
       <div className="section-head">
-        <h2>
+        <h1>
           {t.emoji} {t.short}
-        </h2>
+        </h1>
         <span className="sub">{t.desc}</span>
       </div>
 

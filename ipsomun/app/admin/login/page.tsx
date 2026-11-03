@@ -14,7 +14,11 @@ export default async function LoginPage({
       <div className="admin-card">
         <h2>🔐 관리자 로그인</h2>
         {error && (
-          <div className="notice err">비밀번호가 올바르지 않습니다.</div>
+          <div className="notice err">
+            {error === "locked"
+              ? "로그인 실패가 너무 많습니다. 15분 뒤에 다시 시도하세요."
+              : "비밀번호가 올바르지 않습니다."}
+          </div>
         )}
         <form action={loginAction}>
           <label>비밀번호</label>

@@ -12,6 +12,7 @@ import {
   LOCAL_TAX_RATE,
   won,
 } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 종합소득세 계산기 — 프리랜서(3.3% 원천징수) 기준.
@@ -160,7 +161,7 @@ export default function GlobalIncomeTaxCalc() {
         )}
       </div>
 
-      <div className={`calc-result ${r.isRefund ? "ok" : "no"}`}>
+      <div aria-live="polite" className={`calc-result ${r.isRefund ? "ok" : "no"}`}>
         <div className="calc-verdict">
           {r.isRefund ? "돌려받는 금액 (환급)" : "더 내야 하는 금액 (추가납부)"}
         </div>
@@ -273,19 +274,5 @@ export default function GlobalIncomeTaxCalc() {
         최종 세액은 홈택스 신고 화면의 값이 기준입니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }

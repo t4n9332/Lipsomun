@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { UNEMPLOYMENT, unemploymentDays, won } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 실업급여(구직급여) 계산기.
@@ -104,12 +105,12 @@ export default function UnemploymentCalc() {
       </div>
 
       {r.invalid ? (
-        <div className="calc-result no">
+        <div aria-live="polite" className="calc-result no">
           <div className="calc-verdict">날짜를 확인해주세요</div>
           <div className="calc-netsub">퇴사일이 입사일보다 뒤여야 합니다</div>
         </div>
       ) : (
-        <div className={`calc-result ${r.tooShort ? "no" : "ok"}`}>
+        <div aria-live="polite" className={`calc-result ${r.tooShort ? "no" : "ok"}`}>
           <div className="calc-verdict">
             {r.tooShort ? "가입기간이 부족할 수 있습니다" : "총 예상 수령액"}
           </div>
@@ -196,19 +197,5 @@ export default function UnemploymentCalc() {
         실제 지급액은 고용센터 결정에 따릅니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }

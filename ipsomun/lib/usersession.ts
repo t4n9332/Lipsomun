@@ -4,8 +4,11 @@ import crypto from "crypto";
 const COOKIE = "ipsomun_user";
 
 function secret(): string {
-  // AUTH_SECRET이 없으면 ADMIN_PASSWORD 기반으로 파생 (설정 단순화)
-  return process.env.AUTH_SECRET || "derive:" + (process.env.ADMIN_PASSWORD || "");
+  // AUTH_SECRET이 없으면 ADMIN_PASSWORD 기반으로 파생 (설정 단순화).
+  // 둘 다 없으면 서명 키가 공개 문자열("derive:")이 되어 아무 세션이나 위조할 수 있으므로 막는다.
+  if (process.env.AUTH_SECRET) return process.env.AUTH_SECRET;
+  if (process.env.ADMIN_PASSWORD) return "derive:" + process.env.ADMIN_PASSWORD;
+  throw new Error("AUTH_SECRET 미설정 — 회원 세션을 서명할 수 없습니다");
 }
 
 function sign(value: string): string {
@@ -31,7 +34,15 @@ export async function getUserId(): Promise<string | null> {
   if (dot < 0) return null;
   const id = raw.slice(0, dot);
   const sig = raw.slice(dot + 1);
-  if (sign(id) !== sig) return null;
+  let expected: string;
+  try {
+    expected = sign(id);
+  } catch {
+    return null;
+  }
+  const a = Buffer.from(expected);
+  const b = Buffer.from(sig);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
   return id;
 }
 

@@ -12,15 +12,15 @@ export const RATE_YEAR = 2026;
 
 /** 근로자 본인 부담분만. 사업주 부담은 실수령액과 무관해서 넣지 않는다. */
 export const INSURANCE = {
-  /** 국민연금 4.5% (사업주와 절반씩 9%를 나눔) */
-  pension: 0.045,
-  /** 기준소득월액 상한 — 이 금액을 넘는 소득에는 더 붙지 않는다 */
-  pensionCapMonthly: 6_170_000,
-  pensionFloorMonthly: 400_000,
-  /** 건강보험 3.545% (근로자 부담분) */
-  health: 0.03545,
+  /** 국민연금 4.75% (2026년 9.5%를 사업주와 절반씩. 2033년까지 매년 0.5%p 인상) */
+  pension: 0.0475,
+  /** 기준소득월액 상한 — 이 금액을 넘는 소득에는 더 붙지 않는다 (2026.7~2027.6) */
+  pensionCapMonthly: 6_590_000,
+  pensionFloorMonthly: 410_000,
+  /** 건강보험 3.595% (2026년 7.19%의 근로자 부담분) */
+  health: 0.03595,
   /** 장기요양보험은 소득이 아니라 '건강보험료'에 곱한다 — 자주 틀리는 부분 */
-  longTermCareOnHealth: 0.1295,
+  longTermCareOnHealth: 0.1314, // 2026년: 소득 대비 0.9448% ÷ 7.19%
   /** 고용보험 실업급여분 0.9% */
   employment: 0.009,
 };
@@ -77,7 +77,8 @@ export function childTaxCredit(children: number) {
   if (children <= 0) return 0;
   if (children === 1) return 250_000;
   if (children === 2) return 550_000;
-  return 550_000 + (children - 2) * 300_000;
+  // 2025 귀속부터 셋째 이후 1인당 40만원
+  return 550_000 + (children - 2) * 400_000;
 }
 
 /** 퇴직소득세 — 근속연수공제 */
@@ -121,8 +122,8 @@ export const MONTHLY_WORK_HOURS = 209;
 export const UNEMPLOYMENT = {
   /** 평균임금의 60% */
   rate: 0.6,
-  /** 1일 상한액 — 2019년부터 66,000원으로 묶여 있다 */
-  dailyCap: 66_000,
+  /** 1일 상한액 — 2019~2025년 66,000원, 2026.1.1 이후 이직자부터 68,100원 */
+  dailyCap: 68_100,
   /** 1일 하한액 = 최저임금 × 80% × 1일 소정근로 8시간 */
   dailyFloor: Math.round(MIN_WAGE_HOURLY * 0.8 * 8),
 };
@@ -185,6 +186,9 @@ export const pensionCreditRate = (gross: number) =>
  */
 export const WITHHOLDING_FREELANCE = 0.033;
 
+/** 근로소득자 표준세액공제 — 특별소득·세액공제를 신청하지 않을 때만 */
+export const STANDARD_TAX_CREDIT_EARNED = 130_000;
+
 /** 근로소득이 없는 종합소득자의 표준세액공제 (근로소득자는 13만원으로 다르다) */
 export const STANDARD_TAX_CREDIT_NO_EARNED = 70_000;
 
@@ -202,8 +206,10 @@ export const SIMPLE_EXPENSE_LIMIT_SERVICE = 24_000_000;
  * 큰 폭의 소득공제라 계산기에 넣을 값어치가 있다.
  */
 export function noranUmbrellaCap(businessIncome: number) {
-  if (businessIncome <= 40_000_000) return 5_000_000;
-  if (businessIncome <= 100_000_000) return 3_000_000;
+  // 2025 귀속부터 상향(500→600만, 300→400만). 4천~6천만원 구간을 500만원으로 따로 두는
+  // 자료도 있어, 확정 전까지는 보수적으로(공제를 과대 계산하지 않게) 400만원으로 둔다.
+  if (businessIncome <= 40_000_000) return 6_000_000;
+  if (businessIncome <= 100_000_000) return 4_000_000;
   return 2_000_000;
 }
 

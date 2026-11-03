@@ -4,6 +4,7 @@ import {
   getPriceCompareProducts,
   getAllTimeLows,
   claimDailyRun,
+  releaseDailyRun,
   type ProductWithLinks,
 } from "@/lib/db";
 import { cronOrAdmin } from "@/lib/auth";
@@ -143,6 +144,8 @@ export async function GET(req: Request) {
         `<i>쿠팡 파트너스·토스쇼핑 쉐어링크 활동으로 수수료를 받을 수 있습니다. 가격은 발송 시점 기준입니다.</i>`
       );
       telegram = await sendTelegram(lines.join("\n"));
+      // 발송 실패면 도장을 되돌려, 오늘 안에 안전망(GitHub Actions)이 다시 보낼 수 있게
+      if (!telegram.ok && !force) await releaseDailyRun(job).catch(() => {});
     }
 
     // ---------- 역대최저가 웹푸시 (아침 회차에만, 있을 때만) ----------
@@ -166,6 +169,7 @@ export async function GET(req: Request) {
       evening,
     });
   } catch (e) {
+    if (!force) await releaseDailyRun(job).catch(() => {});
     return NextResponse.json(
       { ok: false, error: e instanceof Error ? e.message : "알림 실패" },
       { status: 502 }

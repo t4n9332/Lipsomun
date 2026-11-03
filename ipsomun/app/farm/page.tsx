@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import farm from "@/data/farm.json";
-import { type FarmItem } from "@/components/FarmCard";
+import FarmCard, { type FarmItem } from "@/components/FarmCard";
 import FarmTabs from "@/components/FarmTabs";
 
 // 산지직송 코너 — 입소문 운영자가 직접 파는 농수산물 (제휴 링크 아님).
@@ -25,6 +25,8 @@ export const metadata: Metadata = {
     url: `${SITE}/farm`,
     type: "website",
     siteName: "입소문",
+    locale: "ko_KR",
+    images: ["/og-default.png"],
   },
 };
 
@@ -59,7 +61,21 @@ export default function FarmPage() {
       {groups.length === 0 ? (
         <div className="empty">지금은 판매 중인 상품이 없습니다. 곧 다시 채워 넣을게요.</div>
       ) : (
-        <FarmTabs groups={groups} />
+        <FarmTabs tabs={groups.map(([cat, list]) => ({ cat, count: list.length }))}>
+          {groups.map(([cat, list], i) => (
+            <section className="section farm-panel" key={cat} id={cat} role="tabpanel" hidden={i !== 0}>
+              <div className="section-head">
+                <h2>{cat}</h2>
+                <span className="sub">{list.length}개</span>
+              </div>
+              <div className="grid">
+                {list.map((p) => (
+                  <FarmCard key={p.id} p={p} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </FarmTabs>
       )}
 
       <p className="vs-note">

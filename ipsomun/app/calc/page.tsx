@@ -20,7 +20,7 @@ export default function CalcHub() {
   return (
     <section className="section">
       <div className="section-head">
-        <h2>🧮 생활 계산기</h2>
+        <h1>🧮 생활 계산기</h1>
         <span className="sub">
           숫자만 넣으면 바로 답이 나옵니다 — 가입도, 설치도 필요 없습니다
         </span>

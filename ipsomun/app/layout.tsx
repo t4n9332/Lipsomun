@@ -20,11 +20,11 @@ const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: {
-    default: "입소문 — 진짜 써본 사람들의 쇼핑 추천",
+    default: "입소문 — 가격비교·편의점 행사·생활 계산기",
     template: "%s | 입소문",
   },
   description:
-    "오늘의 특가부터 카테고리별 인기 랭킹, 솔직 리뷰까지. 입소문에서 확인하고 최저가로 구매하세요.",
+    "쿠팡·토스쇼핑 가격비교, 이번 달 편의점 1+1·2+1 행사, 연봉·퇴직금·실업급여 계산기까지. 사기 전에 입소문에서 먼저 확인하세요.",
   openGraph: {
     siteName: "입소문",
     type: "website",
@@ -60,6 +60,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="입소문" />
+        {/* 폰트 CDN·썸네일 프록시에 미리 연결해 첫 화면(LCP)을 앞당긴다 */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://wsrv.nl" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
@@ -109,6 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/ranking">랭킹</Link>
               <Link href="/pick">기획전</Link>
               <Link href="/farm">산지직송</Link>
+              <Link href="/cvs">편의점 행사</Link>
               {/* 정보 축 — 성격이 다르므로 선으로 갈라준다.
                   섞어두면 계산기가 쇼핑 메뉴에 얹힌 남의 물건처럼 보인다. */}
               <span className="nav-div" aria-hidden />
@@ -147,6 +151,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               가격은 쿠폰 보유 등에 따라 변동될 수 있습니다.
             </p>
             <p className="footer-links">
+              <Link href="/about">소개</Link>
+              <span aria-hidden> · </span>
+              <Link href="/terms">이용약관</Link>
+              <span aria-hidden> · </span>
               <Link href="/privacy">개인정보처리방침</Link>
               <span aria-hidden> · </span>
               <a href="mailto:t4n2140@gmail.com">문의·제휴 t4n2140@gmail.com</a>

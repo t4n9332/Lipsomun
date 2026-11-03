@@ -1,0 +1,27 @@
+# 푸시·PR 마다 타입 검사와 세율 단위 테스트를 돌린다.
+# 세율 상수를 갱신하다 실수하면(예: 실업급여 하한 > 상한) 배포 전에 여기서 걸린다.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["ipsomun/**", ".github/workflows/ci.yml"]
+  pull_request:
+    paths: ["ipsomun/**"]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ipsomun
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ipsomun/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm run typecheck
+      - run: npm test

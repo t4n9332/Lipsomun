@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPostBySlug, getPosts } from "@/lib/db";
-import { won, jsonLdString } from "@/lib/util";
+import { won, jsonLdString, isFreshPost } from "@/lib/util";
 
 export const revalidate = 1800; // 블로그 본문 — 발행 후 거의 불변
 
@@ -78,7 +78,9 @@ export async function generateMetadata({
     title: post.title,
     description: desc,
     alternates: { canonical: url },
-    openGraph: { title: post.title, description: desc, url, type: "article", siteName: "입소문" },
+    // 자동 가격비교 리포트만 기간 제한 (직접 쓴 글은 계속 색인)
+    ...(data && !isFreshPost(post.createdAt) ? { robots: { index: false, follow: true } } : {}),
+    openGraph: { title: post.title, description: desc, url, type: "article", siteName: "입소문", images: ["/og-default.png"], locale: "ko_KR" },
   };
 }
 

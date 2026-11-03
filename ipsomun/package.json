@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:seed": "node scripts/seed.mjs"
+    "db:seed": "node scripts/seed.mjs",
+    "test": "node --experimental-strip-types --no-warnings --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "next": "^15.4.6",
@@ -24,5 +26,8 @@
     "@types/web-push": "^3.6.4",
     "playwright": "^1.62.1",
     "typescript": "^5.7.0"
+  },
+  "overrides": {
+    "postcss": "^8.5.23"
   }
 }

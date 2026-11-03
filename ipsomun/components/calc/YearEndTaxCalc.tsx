@@ -10,8 +10,10 @@ import {
   PENSION_CREDIT,
   INSURANCE,
   LOCAL_TAX_RATE,
+  STANDARD_TAX_CREDIT_EARNED,
   won,
 } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * 연말정산 환급금 계산기.
@@ -25,10 +27,9 @@ import {
 
 const CREDIT_CARD_BASE_RATE = 0.15; // 총급여 25% 초과분에 대한 신용카드 공제율(단순화)
 
+/** 기본 한도 — 2023 귀속부터 7천만원 초과는 250만원 한 구간으로 통합됐다 */
 function creditCardDeductionCap(grossWon: number) {
-  if (grossWon <= 70_000_000) return 3_000_000;
-  if (grossWon <= 120_000_000) return 2_500_000;
-  return 2_000_000;
+  return grossWon <= 70_000_000 ? 3_000_000 : 2_500_000;
 }
 
 export default function YearEndTaxCalc() {
@@ -54,7 +55,7 @@ export default function YearEndTaxCalc() {
     // 2. 소득공제
     const personalDeduction = dep * 1_500_000;
 
-    const pension = Math.min(grossWon, 617 * 10_000 * 12) * INSURANCE.pension;
+    const pension = Math.min(grossWon, INSURANCE.pensionCapMonthly * 12) * INSURANCE.pension;
     const health = grossWon * INSURANCE.health;
     const ltc = health * INSURANCE.longTermCareOnHealth;
     const employment = grossWon * INSURANCE.employment;
@@ -65,30 +66,46 @@ export default function YearEndTaxCalc() {
     const cardDeductionRaw = cardOverThreshold * CREDIT_CARD_BASE_RATE;
     const cardDeduction = Math.min(cardDeductionRaw, creditCardDeductionCap(grossWon));
 
-    const totalDeduction = personalDeduction + insuranceDeduction + cardDeduction;
-
-    // 3. 과세표준 · 산출세액
-    const taxBase = Math.max(0, earnedIncome - totalDeduction);
-    const calculatedTax = progressiveTax(taxBase);
-
-    // 4. 세액공제
-    const earnedCredit = earnedIncomeTaxCredit(calculatedTax, grossWon);
     const childCredit = childTaxCredit(kids);
     const pensionEligible = Math.min(pensionWon, PENSION_CREDIT.totalCap);
     const pensionCreditWon = pensionEligible * pensionCreditRate(grossWon);
-    const totalCredit = earnedCredit + childCredit + pensionCreditWon;
+
+    // 3~4. 과세표준 · 산출세액 · 세액공제
+    // 건강·고용보험료 공제는 '특별소득공제'라, 이를 포기하면 표준세액공제 13만원을
+    // 대신 받을 수 있다. 둘 중 세금이 적은 쪽이 실제 연말정산 결과다.
+    const settle = (deduction: number, standardCredit: number) => {
+      const taxBase = Math.max(0, earnedIncome - deduction);
+      const calculatedTax = progressiveTax(taxBase);
+      const earnedCredit = earnedIncomeTaxCredit(calculatedTax, grossWon);
+      const totalCredit = earnedCredit + childCredit + pensionCreditWon + standardCredit;
+      return {
+        taxBase, calculatedTax, earnedCredit, totalCredit,
+        decided: Math.max(0, calculatedTax - totalCredit),
+      };
+    };
+    const special = settle(personalDeduction + insuranceDeduction + cardDeduction, 0);
+    const standard = settle(
+      personalDeduction + pension + cardDeduction,
+      STANDARD_TAX_CREDIT_EARNED,
+    );
+    const useStandard = standard.decided < special.decided;
+    const best = useStandard ? standard : special;
+    const { taxBase, calculatedTax, earnedCredit, totalCredit } = best;
+    const totalDeduction =
+      personalDeduction + (useStandard ? pension : insuranceDeduction) + cardDeduction;
 
     // 5. 결정세액 (지방소득세 10% 포함)
-    const decidedIncomeTax = Math.max(0, calculatedTax - totalCredit);
+    const decidedIncomeTax = best.decided;
     const decidedTotalTax = decidedIncomeTax * (1 + LOCAL_TAX_RATE);
 
     const refund = paidTaxWon - decidedTotalTax;
 
     return {
       earnedDeduction, earnedIncome,
-      personalDeduction, insuranceDeduction, cardDeduction, cardThreshold,
+      personalDeduction, cardDeduction, cardThreshold,
       totalDeduction, taxBase, calculatedTax,
-      earnedCredit, childCredit, pensionCreditWon, totalCredit,
+      earnedCredit, childCredit, pensionCreditWon, totalCredit, useStandard,
+      insuranceDeduction: useStandard ? pension : insuranceDeduction,
       decidedIncomeTax, decidedTotalTax,
       refund, isRefund: refund >= 0,
       cardHitCap: cardDeductionRaw > creditCardDeductionCap(grossWon),
@@ -136,7 +153,7 @@ export default function YearEndTaxCalc() {
         </Field>
       </div>
 
-      <div className={`calc-result ${r.isRefund ? "ok" : "no"}`}>
+      <div aria-live="polite" className={`calc-result ${r.isRefund ? "ok" : "no"}`}>
         <div className="calc-verdict">
           {r.isRefund ? "돌려받는 금액 (환급)" : "더 내야 하는 금액 (추가납부)"}
         </div>
@@ -158,7 +175,12 @@ export default function YearEndTaxCalc() {
           </tr>
           <tr>
             <th>4대보험료 공제</th>
-            <td>{won(r.insuranceDeduction)}</td>
+            <td>
+              {won(r.insuranceDeduction)}
+              {r.useStandard && (
+                <span className="calc-note"> (국민연금만 — 표준세액공제가 더 유리)</span>
+              )}
+            </td>
           </tr>
           <tr>
             <th>신용카드 등 공제</th>
@@ -180,7 +202,8 @@ export default function YearEndTaxCalc() {
             <td>
               {won(r.totalCredit)}
               <span className="calc-note">
-                {" "}(근로소득 {won(r.earnedCredit)} · 자녀 {won(r.childCredit)} · 연금계좌 {won(r.pensionCreditWon)})
+                {" "}(근로소득 {won(r.earnedCredit)} · 자녀 {won(r.childCredit)} · 연금계좌 {won(r.pensionCreditWon)}
+                {r.useStandard && " · 표준 130,000원"})
               </span>
             </td>
           </tr>
@@ -220,24 +243,10 @@ export default function YearEndTaxCalc() {
         이 계산은 인적공제·4대보험료공제·신용카드등공제·연금계좌세액공제·자녀세액공제만
         반영한 단순화된 값입니다. 의료비·교육비·기부금·월세·주택자금 공제 등은
         포함하지 않았으며, 실제 원천징수영수증(연말정산 간소화 서비스)의 금액과
-        다를 수 있습니다. 4대보험료는 국민연금 상한(월 617만원 기준소득월액)만
-        반영한 추정치입니다. 기납부세액은 매달 원천징수된 금액의 합계로,
+        다를 수 있습니다. 4대보험료는 국민연금 기준소득월액 상한만 반영한
+        추정치이며, 특별소득공제와 표준세액공제(13만원) 중 유리한 쪽을 자동으로 고릅니다. 기납부세액은 매달 원천징수된 금액의 합계로,
         급여명세서 또는 국세청 홈택스에서 확인해 직접 입력해야 합니다.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }

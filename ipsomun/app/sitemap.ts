@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 import { getAllSlugs, getAllCollectionSlugs, getAllPostSlugs } from "@/lib/db";
-import { CATEGORIES } from "@/lib/util";
+import { CATEGORIES, isFreshPost } from "@/lib/util";
+import { BRANDS } from "@/lib/cvs";
+import { CUR } from "@/lib/cvsData";
+
+const CVS_UPDATED = CUR.generated_at ? CUR.generated_at.slice(0, 10) : undefined;
 import { CALCULATORS } from "@/lib/calculators";
 import { TOOLS } from "@/lib/tools";
 
@@ -30,7 +34,7 @@ function kstToday(): Date {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.SITE_URL || "https://example.com";
+  const base = process.env.SITE_URL || "https://lipsomun.co.kr";
   let products: { slug: string; updatedAt: Date }[] = [];
   let picks: { slug: string; updatedAt: Date }[] = [];
   let posts: { slug: string; updatedAt: Date }[] = [];
@@ -51,8 +55,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/ranking`, lastModified: today, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/pick`, lastModified: today, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/farm`, lastModified: today, changeFrequency: "daily", priority: 0.8 },
+    // 편의점 행사는 매월 1일 갱신
+    { url: `${base}/cvs`, lastModified: CVS_UPDATED, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${base}/cvs/patch`, lastModified: CVS_UPDATED, changeFrequency: "monthly", priority: 0.8 },
+    ...BRANDS.map((b) => ({
+      url: `${base}/cvs/${b.id}`,
+      lastModified: CVS_UPDATED,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
     { url: `${base}/blog`, lastModified: today, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/calc`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/about`, changeFrequency: "yearly" as const, priority: 0.5 },
     ...CALCULATORS.map((c) => ({
       url: `${base}/calc/${encodeURIComponent(c.slug)}`,
       changeFrequency: "monthly" as const,
@@ -71,7 +85,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily" as const,
       priority: 0.8,
     })),
-    ...posts.map((p) => ({
+    // 오래된 자동 리포트는 noindex 라 사이트맵에서도 뺀다 (lastModified 기준 근사)
+    ...posts
+      .filter((p) => !p.slug.startsWith("compare-") || isFreshPost(p.updatedAt))
+      .map((p) => ({
       url: `${base}/blog/${enc(p.slug)}`,
       lastModified: p.updatedAt,
       changeFrequency: "monthly" as const,

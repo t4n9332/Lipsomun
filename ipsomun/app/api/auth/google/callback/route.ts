@@ -13,8 +13,15 @@ export async function GET(req: Request) {
   const cookieHeader = req.headers.get("cookie") || "";
   const savedState = /(?:^|;\s*)oauth_state=([^;]+)/.exec(cookieHeader)?.[1];
 
+  // 한 번 쓴 state 쿠키는 성공·실패와 무관하게 지운다 (재사용 방지)
+  const done = (path: string) => {
+    const res = NextResponse.redirect(`${siteUrl}${path}`);
+    res.cookies.delete("oauth_state");
+    return res;
+  };
+
   if (!code || !state || state !== savedState) {
-    return NextResponse.redirect(`${siteUrl}/my?error=login`);
+    return done("/my?error=login");
   }
 
   try {
@@ -39,7 +46,8 @@ export async function GET(req: Request) {
       { headers: { Authorization: `Bearer ${token.access_token}` } }
     );
     const info = await infoRes.json();
-    if (!info.email) throw new Error("no email");
+    // 인증 안 된 이메일로 기존 계정에 병합되는 것을 막는다
+    if (!info.email || info.email_verified !== true) throw new Error("no verified email");
 
     // 3) 회원 저장 + 세션
     const user = await upsertUser(
@@ -49,8 +57,8 @@ export async function GET(req: Request) {
     );
     await setUserSession(user.id);
 
-    return NextResponse.redirect(`${siteUrl}/my?welcome=1`);
+    return done("/my?welcome=1");
   } catch {
-    return NextResponse.redirect(`${siteUrl}/my?error=login`);
+    return done("/my?error=login");
   }
 }

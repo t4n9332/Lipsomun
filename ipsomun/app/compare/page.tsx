@@ -18,7 +18,7 @@ export default async function ComparePage() {
   return (
     <section className="section">
       <div className="section-head">
-        <h2>🆚 쿠팡 vs 토스 가격비교</h2>
+        <h1>🆚 쿠팡 vs 토스 가격비교</h1>
         <span className="sub">
           같은 상품 {items.length}개 — 절약액이 큰 순서로 보여드려요
         </span>

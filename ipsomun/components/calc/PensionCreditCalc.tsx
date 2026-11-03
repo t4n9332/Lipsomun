@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { PENSION_CREDIT, pensionCreditRate, won } from "@/lib/taxRates";
+import Field from "./Field";
 
 /**
  * IRP·연금저축 세액공제 계산기.
@@ -76,7 +77,7 @@ export default function PensionCreditCalc() {
         </Field>
       </div>
 
-      <div className="calc-result ok">
+      <div aria-live="polite" className="calc-result ok">
         <div className="calc-verdict">연말정산에서 돌려받는 금액</div>
         <div className="calc-net">{won(r.credit)}</div>
         <div className="calc-netsub">
@@ -170,19 +171,5 @@ export default function PensionCreditCalc() {
         기타소득세(16.5%)로 토해내야 하므로, 당장 쓸 돈은 넣지 마세요.
       </p>
     </div>
-  );
-}
-
-function Field({
-  label, unit, children,
-}: { label: string; unit: string; children: React.ReactNode }) {
-  return (
-    <label className="calc-field">
-      <span className="calc-label">{label}</span>
-      <span className="calc-input">
-        {children}
-        {unit && <em>{unit}</em>}
-      </span>
-    </label>
   );
 }
