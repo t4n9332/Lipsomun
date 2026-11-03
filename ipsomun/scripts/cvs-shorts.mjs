@@ -56,6 +56,7 @@ function caption(s) {
       const what = s.from !== s.to ? `${s.from}에서 ${s.to}로` : `${s.to} 그대로, 정가 ${won(s.fromPrice)}에서 ${won(s.toPrice)}로`;
       return `${head} ${s.brand} ${s.name} ${what}. 1개당 ${won(s.toUnit)}`;
     }
+    case "best": return `${s.cat} 꿀템! ${s.brand} ${s.name} ${s.t}, 1개당 ${won(s.unit)}으로 ${won(s.saved)} 아껴요`;
     case "versus": return `${s.name}, 제일 싼 곳은 ${s.offers[0].brand} ${s.offers[0].t}`;
     default: return "";
   }
@@ -134,10 +135,12 @@ fs.writeFileSync(path.join(outDir, "captions.srt"), srt);
 
 const intro = slides[0];
 const buffs = slides.filter((s) => s.kind === "buff");
+const bests = slides.filter((s) => s.kind === "best");
+const versus = slides.filter((s) => s.kind === "versus");
 const nerfs = slides.filter((s) => s.kind === "nerf");
 const desc = [
   `제목 후보:`,
-  `- ${intro.title} | 1+1 된 것 vs 2+1 된 것 #shorts`,
+  buffs.length ? `- ${intro.title} | 1+1 된 것 vs 2+1 된 것 #shorts` : `- ${intro.title} | 같은 상품도 편의점마다 1개당 가격이 다르다 #shorts`,
   `- 이번 달 편의점 행사 버프·너프 총정리 (GS25·CU·세븐·이마트24) #shorts`,
   buffs[0] ? `- ${buffs[0].name} ${buffs[0].to} 됐다?! ${intro.title} #shorts` : null,
   ``,
@@ -146,6 +149,8 @@ const desc = [
   ``,
   ...buffs.map((s) => `▲ ${s.brand} ${s.name}: ${s.from} → ${s.to} (1개당 ${won(s.fromUnit)} → ${won(s.toUnit)})`),
   ...nerfs.map((s) => `▼ ${s.brand} ${s.name}: ${s.from} → ${s.to} (1개당 ${won(s.fromUnit)} → ${won(s.toUnit)})`),
+  ...bests.map((s) => `💰 ${s.cat} 꿀템 — ${s.brand} ${s.name} ${s.t} (1개당 ${won(s.unit)}, ${won(s.saved)} 아낌)`),
+  ...versus.map((s) => `🆚 ${s.name} — ${s.offers[0].brand} ${s.offers[0].t}가 1개당 가장 쌈 (${won(s.offers[0].unit)})`),
   ``,
   `전체 행사 목록·어디가 이득인지 비교 → ${BASE}/cvs?utm_source=youtube&utm_medium=video`,
   ``,

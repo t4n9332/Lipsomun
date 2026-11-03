@@ -1706,3 +1706,6 @@ textarea:focus-visible,
 }
 .cvs-cp { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; color: #c9302c; }
 .cvs-cp:hover { text-decoration: underline; }
+.shorts-slide.k-best { background: radial-gradient(120% 80% at 50% 0%, #6b4e00 0%, #141005 72%); }
+.shorts-verdict.best { color: #ffd43b; font-size: 10cqw; }
+.k-best .shorts-deal .new { color: #ffd43b; }

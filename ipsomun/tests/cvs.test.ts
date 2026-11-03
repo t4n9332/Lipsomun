@@ -63,3 +63,10 @@ test("쿠팡 검색어 정리", async () => {
   assert.equal(coupangQuery("덴마크)초코초코우유300ml"), "덴마크 초코초코우유 300ml");
   assert.equal(coupangQuery("풀무원)샘물펫500ml*20입(QR)"), "풀무원 샘물펫 500ml 20입");
 });
+
+test("분류 — 생활용품·국 오분류 방지", async () => {
+  const { categoryOf } = await import("../lib/cvs.ts");
+  assert.equal(categoryOf("홈스타)뿌리는곰팡이싹900ml"), "생활용품");
+  assert.equal(categoryOf("CJ)소고기듬뿍무국500g"), "간편식");
+  assert.equal(categoryOf("오뚜기)한우미역국500g"), "간편식");
+});

@@ -13,6 +13,9 @@ import CompareCard, { comparePrices } from "@/components/CompareCard";
 import { TELEGRAM_CHANNEL_URL, imgUrl, jsonLdString } from "@/lib/util";
 import farm from "@/data/farm.json";
 import FarmCard, { type FarmItem } from "@/components/FarmCard";
+import { CROSS, CUR as CVS, HAS_DATA as CVS_READY } from "@/lib/cvsData";
+import { brandName, monthLabel, unitPrice } from "@/lib/cvs";
+import { won } from "@/lib/util";
 
 export const revalidate = 300; // 홈 — 딜·가격 자주 변동
 
@@ -117,7 +120,7 @@ export default async function Home() {
           </Link>
           <Link href="/calc/연말정산환급금">
             <strong>🧧 연말정산 환급금</strong>
-            <span>얼마 돌려받나 미리 계산</span>
+            <span>의료비·월세까지 미리 계산</span>
           </Link>
           <Link href="/calc/실업급여">
             <strong>🧾 실업급여</strong>
@@ -133,6 +136,34 @@ export default async function Home() {
           </Link>
         </div>
       </section>
+
+      {CVS_READY && CROSS.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>🏪 {monthLabel(CVS.month)} 편의점, 여기서 사면 이득</h2>
+            <Link className="more" href="/cvs/compare">
+              전체 {CROSS.length}개 →
+            </Link>
+          </div>
+          <ul className="cvs-cross">
+            {CROSS.filter((x) => x.save > 0)
+              .slice(0, 4)
+              .map((x) => (
+                <li key={x.name}>
+                  <div className="nm">{x.name}</div>
+                  <div className="offers">
+                    {x.offers.map((o, i) => (
+                      <span key={o.b} className={`cvs-offer b-${o.b}${i === 0 ? " win" : ""}`}>
+                        {brandName(o.b)} <b>{o.t}</b> {won(unitPrice(o))}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="save">1개당 {won(x.save)} 이득</div>
+                </li>
+              ))}
+          </ul>
+        </section>
+      )}
 
       {compare.length > 0 && (
         <section className="vs-section">
