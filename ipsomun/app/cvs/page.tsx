@@ -38,7 +38,7 @@ export default function CvsHome() {
       {
         "@type": "Question",
         name: "편의점 행사는 언제 바뀌나요?",
-        acceptedAnswer: { "@type": "Answer", text: "GS25·CU·세븐일레븐·이마트24 모두 매월 1일에 행사상품이 바뀝니다. 입소문은 매월 1일 아침에 4사 행사를 모아 갱신합니다." },
+        acceptedAnswer: { "@type": "Answer", text: "GS25·CU·세븐일레븐·이마트24 모두 매월 1일에 행사상품이 바뀝니다. 입소문은 매월 1일 아침에 CU·세븐일레븐·이마트24의 공식 행사 목록을 모아 갱신합니다. GS25는 2026년부터 공식 홈페이지에서 행사 목록을 제공하지 않아 앱에서 확인해야 합니다." },
       },
       {
         "@type": "Question",
@@ -84,6 +84,7 @@ export default function CvsHome() {
                   </span>
                   <em>전체 {count(b.id)}개 →</em>
                   {CUR.stale?.includes(b.id) && <small>지난달 데이터 (갱신 지연)</small>}
+                  {b.webless && count(b.id) === 0 && <small>공식 웹 목록 미제공 · 앱에서 확인</small>}
                 </Link>
               ))}
             </div>

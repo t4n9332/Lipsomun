@@ -159,108 +159,14 @@ async function fetchCU() {
 }
 
 /* ---------------- GS25 ---------------- */
-// 행사 페이지에서 CSRFToken·세션 쿠키를 받은 뒤 /event-goods-search 를 부르면 JSON(문자열로 한 번 더
-// 감싼 JSON)이 온다. parameterList: ONE_TO_ONE(1+1) / TWO_TO_ONE(2+1) / GIFT(덤증정).
+// 2026-11 확인: GS25 홈페이지가 Vue 앱으로 개편되면서 웹 행사상품 목록과 예전 검색 API
+// (/gscvs/ko/products/event-goods-search)가 사라졌다 — 어떤 주소로 요청해도 새 홈페이지 껍데기만 온다.
+// 번들·지연 청크 125개 어디에도 행사상품 API 가 없어, 행사 목록은 앱(우리동네GS)으로 옮겨간 것으로 본다.
+// 앱 API 를 뜯어 쓰는 것은 약관상 위험해 하지 않는다. 그래서 기본 수집에서 뺀다(SKIP).
+// GS25 가 웹 목록을 다시 열면 이 함수를 새 구조에 맞게 쓰고 SKIP 에서 지우면 된다.
+// 그동안은 scripts/cvs-import.mjs 로 CSV 를 직접 넣을 수 있다.
 async function fetchGS25() {
-  const pageRes = await get("https://gs25.gsretail.com/gscvs/ko/products/event-goods");
-  const pageHtml = await pageRes.text();
-  const token = pageHtml.match(/name="CSRFToken"\s+value="([^"]+)"/)?.[1] || pageHtml.match(/CSRFToken\s*=\s*'([^']+)'/)?.[1];
-  const cookie =
-    (pageRes.headers.getSetCookie?.() || []).map((c) => c.split(";")[0]).join("; ") ||
-    pageRes.headers.get("x-upstream-set-cookie") || ""; // 중계를 거치면 여기에 담겨 온다
-  diag(`gs25 페이지 상태 ${pageRes.status}, 쿠키 ${cookie ? "있음" : "없음"}, CSRF 언급`, (pageHtml.match(/.{0,200}csrf.{0,200}/gi) || ["(없음)"]).join(" | "));
-  if (!token) {
-    // 2026 개편으로 행사 페이지가 사라졌다. 예전 검색 API 가 아직 살아 있는지만 확인한다.
-    for (const q of ["", "?CSRFToken="]) {
-      try {
-        const r = await fetch(`https://gs25.gsretail.com/gscvs/ko/products/event-goods-search${q}`, {
-          method: "POST",
-          headers: { "User-Agent": UA, ...FORM_HEADERS },
-          body: form({ pageNum: 1, pageSize: 5, searchType: "", searchWord: "", parameterList: "ONE_TO_ONE" }),
-          signal: AbortSignal.timeout(15_000),
-        });
-        diag(`gs25 예전 검색 API${q} 상태 ${r.status}`, (await r.text()).slice(0, 400));
-      } catch (e) {
-        diag(`gs25 예전 검색 API${q} 실패`, e.message);
-      }
-    }
-    debugDump("gs25-page", pageHtml);
-    // 2026 개편 후 홈페이지가 Vue 앱이 됐다 — 진단 모드에서는 번들 JS 에서 API 경로 후보를 뽑아 로그에 남긴다
-    if (DIAG) {
-      for (const src of pageHtml.match(/src="([^"]+\.js)"/g) || []) {
-        const url = src.slice(5, -1);
-        try {
-          const js = await (await get(url)).text();
-          const hits = [...new Set(js.match(/["'`][^"'`\s]{0,80}(?:event|Event|goods|Goods|promotion|prod)[^"'`\s]{0,80}["'`]/g) || [])];
-          diag(`gs25 번들 ${url.split("/").pop()} API 후보 ${hits.length}개`, hits.slice(0, 120).join(" "));
-          const bases = [...new Set(js.match(/https?:\/\/[a-z0-9.\-]+gsretail[a-z0-9.\-]*[^"'`\s]{0,60}/gi) || [])];
-          diag(`gs25 번들 ${url.split("/").pop()} 호스트`, bases.slice(0, 40).join(" "));
-          // 경로처럼 생긴 문자열 (axios 호출 주소 후보)
-          const paths = [...new Set(js.match(/["'`]\/[a-zA-Z0-9_\-\/.]{3,100}["'`]/g) || [])];
-          diag(`gs25 번들 ${url.split("/").pop()} 경로 ${paths.length}개`, paths.slice(0, 250).join(" "));
-          // baseURL·api 문맥
-          const ctx = (js.match(/.{0,120}(?:baseURL|apiUrl|API_URL|\/api\/).{0,160}/g) || []).slice(0, 12);
-          diag(`gs25 번들 ${url.split("/").pop()} api 문맥`, ctx.join(" ||| "));
-          // 지연 로딩 청크 이름표 (이벤트 화면 코드는 별도 청크에 있을 수 있다)
-          // 지연 로딩 청크를 전부 받아 gsapi 호출·이벤트 문맥을 찾는다 (행사 화면 코드는 여기에 있다)
-          const map = js.match(/return"js\/"\+\w+\+"\."\+(\{[^}]+\})/);
-          if (map) {
-            const ids = [...map[1].matchAll(/(\d+):"([0-9a-f]+)"/g)];
-            const base = url.replace(/[^/]+$/, "");
-            const found = new Set();
-            for (const [, id, hash] of ids) {
-              try {
-                const cjs = await (await get(`${base}${id}.${hash}.js`)).text();
-                for (const m of cjs.match(/["'`]\/gsapi\/[^"'`]{2,120}["'`]/g) || []) found.add(m);
-                if (/event|행사|1\+1|ONE_TO_ONE|evtGoods|eventGoods/i.test(cjs)) {
-                  const ctx = (cjs.match(/.{0,100}(?:gsapi|ONE_TO_ONE|eventGoods|evtGoods|1\+1).{0,160}/g) || []).slice(0, 6);
-                  if (ctx.length) diag(`gs25 청크 ${id} 행사 문맥`, ctx.join(" ||| "));
-                }
-              } catch {}
-            }
-            diag(`gs25 청크 ${ids.length}개의 gsapi 경로`, [...found].join(" "));
-          }
-        } catch (e) {
-          diag(`gs25 번들 ${url} 실패`, e.message);
-        }
-      }
-    }
-    throw new Error("CSRFToken 을 찾지 못함");
-  }
-  const out = [];
-  for (const param of ["ONE_TO_ONE", "TWO_TO_ONE", "GIFT"]) {
-    for (let page = 1; page <= MAX_PAGES; page++) {
-      const raw = await (
-        await get(`https://gs25.gsretail.com/gscvs/ko/products/event-goods-search?CSRFToken=${encodeURIComponent(token)}`, {
-          method: "POST",
-          headers: { ...FORM_HEADERS, Cookie: cookie, Referer: "https://gs25.gsretail.com/gscvs/ko/products/event-goods" },
-          body: form({ pageNum: page, pageSize: 50, searchType: "", searchWord: "", parameterList: param }),
-        })
-      ).text();
-      let data;
-      try {
-        data = JSON.parse(raw);
-        if (typeof data === "string") data = JSON.parse(data);
-      } catch {
-        debugDump(`gs25-${param}`, raw);
-        throw new Error(`${param} 응답이 JSON 이 아님`);
-      }
-      const rows = data?.results || [];
-      for (const r of rows) {
-        out.push({
-          b: "gs25",
-          n: decode(r.goodsNm || ""),
-          p: toPrice(r.price),
-          t: dealType(r.eventTypeNm || r.eventTypeSp?.code || (param === "ONE_TO_ONE" ? "1+1" : param === "TWO_TO_ONE" ? "2+1" : "덤")),
-          img: absUrl(r.attFileNm || r.attFileNmOld, "https://gs25.gsretail.com/"),
-        });
-      }
-      const last = data?.pagination?.numberOfPages ?? (rows.length ? page + 1 : page);
-      if (!rows.length || page >= last) break;
-      await sleep(300);
-    }
-  }
-  return out;
+  throw new Error("GS25 공식 웹 행사 목록 미제공 (2026 개편) — cvs-import.mjs 로 수동 등록");
 }
 
 /* ---------------- 세븐일레븐 ---------------- */
@@ -277,17 +183,21 @@ async function fetchSeven() {
           body: form({ intPageSize: 10, intCurrPage: page, cateCd1: "", cateCd2: "", cateCd3: "", pTab: tab }),
         })
       ).text();
-      const items = blocks(html, /<div class="pic_product/g)
+      // 상품 하나 = <li><ul class="tag_list_01">(행사 배지)</ul> … 이름·가격 … </li>.
+      // 속성을 작은따옴표(class='name')로 쓰므로 따옴표 종류를 가리지 않는다.
+      // 증정(덤) 탭은 블록 안에 '증정 상품'이 하나 더 있어, 첫 번째 이름·가격(본상품)만 쓴다.
+      const items = blocks(html, /<ul class=["']tag_list_01["']/g)
         .map((b) => ({
           b: "seven",
-          n: pick(b, /class="name"[^>]*>([\s\S]*?)<\/div>/),
-          p: toPrice(pick(b, /class="price"[^>]*>([\s\S]*?)<\/div>/)),
-          t: dealType(pick(b, /class="tag_list_01"[^>]*>([\s\S]*?)<\/ul>/) || fallback),
-          img: absUrl(b.match(/<img[^>]+src="([^"]+)"/)?.[1], "https://www.7-eleven.co.kr/"),
+          n: pick(b, /class=["']name["'][^>]*>([\s\S]*?)<\/div>/),
+          p: toPrice(pick(b, /class=["']price["'][^>]*>\s*<span>([\s\S]*?)<\/span>/)),
+          t: dealType(pick(b, /class=["']ico_tag_\d+["'][^>]*>([\s\S]*?)<\/li>/) || fallback),
+          img: absUrl(b.match(/<img[^>]+src=["']([^"']+)["']/)?.[1], "https://www.7-eleven.co.kr/"),
         }))
         .filter((x) => x.n);
       if (page === 1 && items.length === 0) debugDump(`seven-${tab}`, html);
-      if (items.length === 0) break;
+      // 마지막 쪽을 넘기면 빈 응답이거나 같은 쪽을 다시 줄 수 있다
+      if (items.length === 0 || items[0].n === out.at(-items.length)?.n) break;
       out.push(...items);
       await sleep(300);
     }
@@ -327,6 +237,8 @@ async function fetchEmart24() {
 /* ---------------- 실행 ---------------- */
 
 const FETCHERS = { gs25: fetchGS25, cu: fetchCU, seven: fetchSeven, emart24: fetchEmart24 };
+/** 기본 수집에서 빼는 곳 — 실패로 치지 않고, 이전(또는 수동 등록) 데이터를 그대로 둔다 */
+const SKIP = new Set(["gs25"]);
 
 function clean(items) {
   const seen = new Set();
@@ -358,6 +270,10 @@ async function main() {
   const failed = [];
   for (const [brand, fn] of Object.entries(FETCHERS)) {
     if (ONLY && ONLY !== brand) continue;
+    if (SKIP.has(brand) && ONLY !== brand) {
+      console.log(`- ${brand}: 건너뜀 (공식 웹 행사 목록 없음 — 수동 등록 데이터 유지)`);
+      continue;
+    }
     try {
       const items = clean(await fn());
       results[brand] = items;
@@ -375,7 +291,9 @@ async function main() {
   if (DRY) return failed.length ? process.exit(1) : undefined;
 
   // 실패한 편의점은 이전 데이터를 유지한다 (빈 목록으로 덮어쓰지 않게)
-  const keep = (brand) => (current.items || []).filter((x) => x.b === brand);
+  const keep = (brand) =>
+    // 건너뛴 곳(GS25)은 이번 달에 손으로 넣은 데이터만 유지 — 지난달 것을 이번 달로 둔갑시키지 않는다
+    SKIP.has(brand) && current.month !== month ? [] : (current.items || []).filter((x) => x.b === brand);
   const items = Object.keys(FETCHERS).flatMap((b) => (results[b]?.length ? results[b] : keep(b)));
   if (items.length === 0) {
     console.error("모든 편의점 수집 실패 — 아무것도 저장하지 않습니다.");

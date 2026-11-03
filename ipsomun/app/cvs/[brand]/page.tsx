@@ -67,7 +67,9 @@ export default async function CvsBrandPage({ params }: { params: Promise<{ brand
       </section>
 
       {groups.length === 0 ? (
-        <div className="empty">매월 1일 아침에 행사상품을 모아 올립니다.</div>
+        <div className="empty">
+          {BRANDS.find((b) => b.id === brand)?.webless || "매월 1일 아침에 행사상품을 모아 올립니다."}
+        </div>
       ) : (
         <div id="cvs-list">
           <CvsSearch target="cvs-list" />

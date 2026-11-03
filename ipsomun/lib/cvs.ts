@@ -34,8 +34,12 @@ export interface CvsMonth {
 }
 
 /** 매장 수 순 (GS25·CU 2강, 세븐일레븐, 이마트24) */
-export const BRANDS: { id: BrandId; name: string; short: string; color: string }[] = [
-  { id: "gs25", name: "GS25", short: "GS", color: "#0a8fd8" },
+export const BRANDS: { id: BrandId; name: string; short: string; color: string; webless?: string }[] = [
+  {
+    id: "gs25", name: "GS25", short: "GS", color: "#0a8fd8",
+    // 2026 홈페이지 개편으로 공식 웹 행사 목록이 사라졌다 (행사 정보는 '우리동네GS' 앱)
+    webless: "GS25는 2026년 홈페이지 개편 후 공식 웹에서 행사상품 목록을 제공하지 않아요. 행사 정보는 '우리동네GS' 앱에서 확인할 수 있어요.",
+  },
   { id: "cu", name: "CU", short: "CU", color: "#7b3fa0" },
   { id: "seven", name: "세븐일레븐", short: "7E", color: "#00843d" },
   { id: "emart24", name: "이마트24", short: "E24", color: "#f5a800" },
