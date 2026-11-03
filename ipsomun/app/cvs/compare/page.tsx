@@ -3,6 +3,7 @@ import Link from "next/link";
 import { brandName, coupangQuery, monthLabel, unitPrice } from "@/lib/cvs";
 import { CUR, HAS_DATA, CROSS } from "@/lib/cvsData";
 import CvsSearch from "@/components/CvsSearch";
+import CvsSubscribe from "@/components/CvsSubscribe";
 import { won } from "@/lib/util";
 
 /**
@@ -67,6 +68,7 @@ export default function CvsComparePage() {
           </ul>
         </div>
       )}
+      <CvsSubscribe place="compare" />
     </section>
   );
 }

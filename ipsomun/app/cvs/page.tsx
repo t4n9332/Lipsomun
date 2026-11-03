@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BRANDS, brandName, monthLabel, unitPrice } from "@/lib/cvs";
 import { CUR, PREV, HAS_DATA, HAS_PREV, CHANGES, CROSS, CATEGORY_COUNTS, bestSaving } from "@/lib/cvsData";
 import CvsCard from "@/components/CvsCard";
+import CvsSubscribe from "@/components/CvsSubscribe";
 import type { CvsCategory } from "@/lib/cvs";
 import CvsChangeRow from "@/components/CvsChangeRow";
 import { won, jsonLdString } from "@/lib/util";
@@ -168,6 +169,8 @@ export default function CvsHome() {
           )}
         </>
       )}
+
+      <CvsSubscribe place="hub" />
 
       <p className="vs-note">
         ※ 각 편의점 공식 홈페이지의 행사 안내를 모아 정리한 정보입니다. 매장·지역에 따라 행사 여부와 가격이 다를 수
