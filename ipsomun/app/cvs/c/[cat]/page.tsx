@@ -14,6 +14,7 @@ import {
 } from "@/lib/cvs";
 import { CUR, HAS_DATA, CATEGORY_COUNTS, itemsInCategory } from "@/lib/cvsData";
 import CvsBrowser from "@/components/CvsBrowser";
+import CvsSubscribe from "@/components/CvsSubscribe";
 import { won, jsonLdString } from "@/lib/util";
 
 /**
@@ -110,6 +111,7 @@ export default async function CvsCategoryPage({ params }: { params: Promise<{ ca
           showBrand
         />
       )}
+      <CvsSubscribe place="category" />
     </>
   );
 }

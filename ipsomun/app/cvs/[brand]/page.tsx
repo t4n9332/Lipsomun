@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { BRANDS, DEAL_TYPES, brandName, isBrand, monthLabel, type CvsItem, type DealType } from "@/lib/cvs";
 import { CUR, HAS_DATA } from "@/lib/cvsData";
 import CvsBrowser from "@/components/CvsBrowser";
+import CvsSubscribe from "@/components/CvsSubscribe";
 
 /** 탭마다 처음 HTML 로 그리는 개수 — 나머지는 '더 보기' 때 JSON 으로 받는다 */
 const FIRST = 48;
@@ -83,6 +84,7 @@ export default async function CvsBrandPage({ params }: { params: Promise<{ brand
           initial={initial}
         />
       )}
+      <CvsSubscribe place={brand} />
     </>
   );
 }

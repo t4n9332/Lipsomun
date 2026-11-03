@@ -1709,3 +1709,13 @@ textarea:focus-visible,
 .shorts-slide.k-best { background: radial-gradient(120% 80% at 50% 0%, #6b4e00 0%, #141005 72%); }
 .shorts-verdict.best { color: #ffd43b; font-size: 10cqw; }
 .k-best .shorts-deal .new { color: #ffd43b; }
+.cvs-sub {
+  display: flex; align-items: center; gap: 14px; justify-content: space-between; margin: 28px 0 8px;
+  padding: 16px 18px; border-radius: 14px; background: #e7f3ff; border: 1px solid #b6dcff; color: #0b3d66;
+}
+.cvs-sub strong { display: block; font-size: 15px; margin-bottom: 3px; }
+.cvs-sub span { font-size: 13px; opacity: .85; }
+.cvs-sub .btn { flex: 0 0 auto; background: #229ed9; color: #fff; }
+@media (max-width: 640px) { .cvs-sub { flex-direction: column; align-items: stretch; text-align: center; } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cvs-sub { background: #0f2a40; border-color: #1d4a6e; color: #cfe8ff; } }
+:root[data-theme="dark"] .cvs-sub { background: #0f2a40; border-color: #1d4a6e; color: #cfe8ff; }
