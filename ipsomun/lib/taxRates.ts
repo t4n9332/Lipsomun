@@ -258,3 +258,36 @@ export function rentCredit(paidRent: number, gross: number) {
   const rate = gross <= 55_000_000 ? 0.17 : 0.15;
   return Math.round(Math.min(Math.max(0, paidRent), 10_000_000) * rate);
 }
+
+/* ---------- 시급 → 주급·월급 (주휴수당) ---------- */
+
+/**
+ * 주휴수당 시간 — 1주 소정근로 15시간 이상이면 생긴다(개근 전제).
+ * 주 40시간 이상이면 8시간, 그보다 적으면 비례(소정근로시간 ÷ 40 × 8). 5인 미만 사업장도 적용된다.
+ */
+export function weeklyHolidayHours(weeklyHours: number) {
+  if (weeklyHours < 15) return 0;
+  return (Math.min(weeklyHours, 40) / 40) * 8;
+}
+
+/**
+ * 시급으로 주급·월급 계산.
+ * 월 환산은 법정 방식 그대로 (주 소정근로 + 주휴) × 365/7/12 를 반올림한 '월 소정근로시간'
+ * (주 40시간이면 209시간)에 시급을 곱한다 — 그래야 고용노동부 최저임금 월 환산액과 맞는다.
+ */
+export function payFromHourly(hourly: number, hoursPerDay: number, daysPerWeek: number) {
+  const weeklyHours = Math.max(0, hoursPerDay) * Math.max(0, daysPerWeek);
+  const holidayHours = weeklyHolidayHours(weeklyHours);
+  const weekly = Math.round(hourly * (weeklyHours + holidayHours));
+  const monthlyHours = Math.round(((weeklyHours + holidayHours) * 365) / 7 / 12);
+  const monthly = Math.round(hourly * monthlyHours);
+  return {
+    weeklyHours,
+    holidayHours,
+    holidayPay: Math.round(hourly * holidayHours),
+    weekly,
+    monthlyHours,
+    monthly,
+    belowMinimum: hourly < MIN_WAGE_HOURLY,
+  };
+}

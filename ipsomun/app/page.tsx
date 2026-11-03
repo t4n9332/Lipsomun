@@ -130,9 +130,9 @@ export default async function Home() {
             <strong>💼 퇴직금</strong>
             <span>퇴직소득세까지</span>
           </Link>
-          <Link href="/tools">
-            <strong>🧰 파일 도구</strong>
-            <span>업로드 없이 PDF 합치기</span>
+          <Link href="/calc/시급월급">
+            <strong>⏱️ 시급·주휴수당</strong>
+            <span>2026 최저임금 월급 계산</span>
           </Link>
         </div>
       </section>

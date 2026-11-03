@@ -1719,3 +1719,13 @@ textarea:focus-visible,
 @media (max-width: 640px) { .cvs-sub { flex-direction: column; align-items: stretch; text-align: center; } }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cvs-sub { background: #0f2a40; border-color: #1d4a6e; color: #cfe8ff; } }
 :root[data-theme="dark"] .cvs-sub { background: #0f2a40; border-color: #1d4a6e; color: #cfe8ff; }
+.calc-input select {
+  flex: 1; min-width: 0; border: 0; background: transparent; outline: none;
+  font: inherit; font-size: 16px; font-weight: 700; padding: 13px 0; color: inherit; text-align: right;
+}
+/* 모바일: 제목 옆 긴 설명이 제목을 세로로 찌그러뜨리지 않게 아래로 내린다 */
+@media (max-width: 640px) {
+  .section-head { flex-wrap: wrap; row-gap: 4px; }
+  .section-head .sub { flex-basis: 100%; }
+  .section-head .more { margin-left: 0; }
+}

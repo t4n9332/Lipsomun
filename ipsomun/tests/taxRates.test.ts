@@ -63,3 +63,14 @@ test("연말정산 특별세액공제·월세", async () => {
   assert.equal(t.rentCredit(12_000_000, 70_000_000), 1_500_000);
   assert.equal(t.rentCredit(6_000_000, 90_000_000), 0);
 });
+
+test("시급 → 월급·주휴수당 (2026 최저임금)", async () => {
+  const { payFromHourly, weeklyHolidayHours } = await import("../lib/taxRates.ts");
+  const r = payFromHourly(10_320, 8, 5);
+  assert.equal(r.monthlyHours, 209);
+  assert.equal(r.monthly, 2_156_880); // 고용노동부 고시 월 환산액
+  assert.equal(r.holidayHours, 8);
+  assert.equal(weeklyHolidayHours(14), 0); // 주 15시간 미만은 주휴 없음
+  assert.equal(weeklyHolidayHours(20), 4); // 비례
+  assert.equal(payFromHourly(10_000, 4, 5).belowMinimum, true);
+});
