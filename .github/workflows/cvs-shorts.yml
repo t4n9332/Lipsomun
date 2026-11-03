@@ -1,0 +1,52 @@
+# 편의점 쇼츠 영상 자동 제작 — 매월 수집(예약 실행)이 끝나면, 또는 'Run workflow' 버튼으로.
+# 운영 사이트의 /cvs/shorts 를 녹화해 1080×1920 영상·자막·설명문·썸네일을 만들고 Artifacts 로 올린다.
+# 결과 받기: Actions → 이 실행 → 아래 Artifacts 의 'shorts-YYYY-MM' 내려받기 → final.mp4(음악 있음) 또는 video.webm 업로드.
+#
+# 배경음악: 라이선스 프리 음원을 ipsomun/scripts/bgm.mp3 로 저장소에 넣어 두면 자동으로 깔린다.
+#           출처 문구는 ipsomun/scripts/bgm-credit.txt 한 줄 (설명문 끝에 붙는다).
+name: 편의점 쇼츠 영상 제작
+
+on:
+  workflow_run:
+    workflows: ["편의점 행사 월간 갱신"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  make:
+    # 매월 예약 수집 뒤에만 자동으로 (수동 dry 점검 때는 만들지 않는다)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.event == 'schedule' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ipsomun
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ipsomun/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+
+      - name: 새 데이터 배포 대기 (자동 실행일 때)
+        if: ${{ github.event_name == 'workflow_run' }}
+        run: sleep 240
+
+      - name: 쇼츠 녹화
+        run: |
+          ARGS=""
+          if [ -f scripts/bgm.mp3 ]; then
+            ARGS="--bgm scripts/bgm.mp3"
+            [ -f scripts/bgm-credit.txt ] && ARGS="$ARGS --bgm-credit \"$(head -1 scripts/bgm-credit.txt)\""
+          fi
+          eval node scripts/cvs-shorts.mjs https://lipsomun.co.kr $ARGS
+          ls -la scripts/out/*/
+
+      - name: 결과 올리기
+        uses: actions/upload-artifact@v4
+        with:
+          name: shorts-${{ github.run_id }}
+          path: ipsomun/scripts/out/
+          retention-days: 30
