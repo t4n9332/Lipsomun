@@ -25,6 +25,8 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
     title: `${M} ${name} 행사상품 1+1·2+1 전체 목록`,
     description: `${M} ${name} 1+1·2+1 행사상품 전체를 1개당 가격과 함께 정리했습니다. 상품 이름으로 바로 찾아보세요. 매월 1일 갱신.`,
     alternates: { canonical: `${SITE}/cvs/${brand}` },
+    // 행사 목록이 없는 편의점(GS25 — 공식 웹 미제공)은 빈 페이지라 검색 제외
+    ...(CUR.items.some((x) => x.b === brand) ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${M} ${name} 행사상품 | 입소문`,
       url: `${SITE}/cvs/${brand}`,
@@ -76,7 +78,7 @@ export default async function CvsBrandPage({ params }: { params: Promise<{ brand
         </div>
       ) : (
         <CvsBrowser
-          brand={brand}
+          dataUrl={`/cvs/data/${brand}`}
           tabs={groups.map(([t, v]) => ({ t, count: v.length }))}
           initial={initial}
         />

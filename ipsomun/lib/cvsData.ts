@@ -5,7 +5,17 @@
  */
 import current from "@/data/cvs/current.json";
 import previous from "@/data/cvs/previous.json";
-import { crossBrand, diffMonths, type CvsMonth } from "@/lib/cvs";
+import {
+  CATEGORIES,
+  categoryOf,
+  categorySlug,
+  crossBrand,
+  diffMonths,
+  unitPrice,
+  type CvsCategory,
+  type CvsItem,
+  type CvsMonth,
+} from "@/lib/cvs";
 
 export const CUR = current as CvsMonth;
 export const PREV = previous as CvsMonth;
@@ -15,3 +25,17 @@ export const HAS_PREV = PREV.items.length > 0 && PREV.month !== CUR.month;
 
 export const CHANGES = HAS_PREV ? diffMonths(PREV.items, CUR.items) : [];
 export const CROSS = crossBrand(CUR.items);
+
+/** 분류별 상품 — 1개당 가격이 싼 순 (4사 통합) */
+export function itemsInCategory(c: CvsCategory): CvsItem[] {
+  return CUR.items
+    .filter((it) => categoryOf(it.n) === c)
+    .sort((a, b) => unitPrice(a) - unitPrice(b));
+}
+
+/** 허브·내비게이션용: 분류별 개수 */
+export const CATEGORY_COUNTS = CATEGORIES.map((c) => ({
+  c,
+  slug: categorySlug(c),
+  count: CUR.items.filter((it) => categoryOf(it.n) === c).length,
+}));

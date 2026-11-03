@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllSlugs, getAllCollectionSlugs, getAllPostSlugs } from "@/lib/db";
 import { CATEGORIES, isFreshPost } from "@/lib/util";
 import { BRANDS } from "@/lib/cvs";
-import { CUR } from "@/lib/cvsData";
+import { CUR, CATEGORY_COUNTS } from "@/lib/cvsData";
 
 const CVS_UPDATED = CUR.generated_at ? CUR.generated_at.slice(0, 10) : undefined;
 import { CALCULATORS } from "@/lib/calculators";
@@ -58,7 +58,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 편의점 행사는 매월 1일 갱신
     { url: `${base}/cvs`, lastModified: CVS_UPDATED, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/cvs/patch`, lastModified: CVS_UPDATED, changeFrequency: "monthly", priority: 0.8 },
-    ...BRANDS.map((b) => ({
+    { url: `${base}/cvs/compare`, lastModified: CVS_UPDATED, changeFrequency: "monthly", priority: 0.8 },
+    ...CATEGORY_COUNTS.filter((x) => x.count > 0).map((x) => ({
+      url: `${base}/cvs/c/${encodeURIComponent(x.slug)}`,
+      lastModified: CVS_UPDATED,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    ...BRANDS.filter((b) => CUR.items.some((x) => x.b === b.id)).map((b) => ({
       url: `${base}/cvs/${b.id}`,
       lastModified: CVS_UPDATED,
       changeFrequency: "monthly" as const,

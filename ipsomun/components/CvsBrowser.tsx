@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { BrandId, CvsItem, DealType } from "@/lib/cvs";
+import type { CvsItem, DealType } from "@/lib/cvs";
 import CvsCard from "./CvsCard";
 
 const STEP = 96;
@@ -12,13 +12,17 @@ const STEP = 96;
  * /cvs/data/{brand} 전체 목록을 그때 받아온다. 처음 열 때 수천 개를 다 받지 않게.
  */
 export default function CvsBrowser({
-  brand,
+  dataUrl,
   tabs,
   initial,
+  showBrand = false,
 }: {
-  brand: BrandId;
+  /** 전체 목록 JSON 주소 (/cvs/data/seven, /cvs/data/c/음료 …) */
+  dataUrl: string;
   tabs: { t: DealType; count: number }[];
   initial: Partial<Record<DealType, CvsItem[]>>;
+  /** 여러 편의점을 섞어 보여줄 때 카드에 편의점 이름 표시 */
+  showBrand?: boolean;
 }) {
   const [active, setActive] = useState<DealType>(tabs[0]?.t);
   const [q, setQ] = useState("");
@@ -31,7 +35,7 @@ export default function CvsBrowser({
     if (all || loadingRef.current) return;
     loadingRef.current = true;
     setLoading(true);
-    fetch(`/cvs/data/${brand}`)
+    fetch(dataUrl)
       .then((r) => r.json())
       .then((items: CvsItem[]) => setAll(items))
       .catch(() => {})
@@ -111,7 +115,7 @@ export default function CvsBrowser({
       <section className="section" role="tabpanel">
         <div className="grid cvs-grid">
           {shown.map((it, k) => (
-            <CvsCard key={`${it.n}-${it.t}-${k}`} it={it} />
+            <CvsCard key={`${it.b}-${it.n}-${it.t}-${k}`} it={it} showBrand={showBrand} />
           ))}
         </div>
         {shown.length < total && (

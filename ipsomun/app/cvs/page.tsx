@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BRANDS, brandName, monthLabel, unitPrice } from "@/lib/cvs";
-import { CUR, PREV, HAS_DATA, HAS_PREV, CHANGES, CROSS } from "@/lib/cvsData";
+import { CUR, PREV, HAS_DATA, HAS_PREV, CHANGES, CROSS, CATEGORY_COUNTS } from "@/lib/cvsData";
 import CvsChangeRow from "@/components/CvsChangeRow";
 import { won, jsonLdString } from "@/lib/util";
 
@@ -90,6 +90,20 @@ export default function CvsHome() {
             </div>
           </section>
 
+          <section className="section">
+            <div className="section-head">
+              <h2>분류별 1개당 최저가</h2>
+              <span className="sub">편의점 구분 없이 같은 분류끼리</span>
+            </div>
+            <div className="cvs-cats">
+              {CATEGORY_COUNTS.filter((x) => x.count > 0).map((x) => (
+                <Link key={x.c} href={`/cvs/c/${encodeURIComponent(x.slug)}`}>
+                  {x.c} <span>{x.count}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
           {HAS_PREV && (
             <section className="section">
               <div className="section-head">
@@ -117,7 +131,9 @@ export default function CvsHome() {
             <section className="section">
               <div className="section-head">
                 <h2>🆚 같은 상품, 어디가 이득?</h2>
-                <span className="sub">두 곳 이상에서 행사 중인 상품 — 1개당 가격 차이 큰 순</span>
+                <Link className="more" href="/cvs/compare">
+                  전체 {CROSS.length}개 →
+                </Link>
               </div>
               <ul className="cvs-cross">
                 {cross.map((x) => (
