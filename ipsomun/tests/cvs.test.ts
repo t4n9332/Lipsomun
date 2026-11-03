@@ -1,0 +1,34 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { diffMonths, crossBrand, unitPrice, normName, type CvsItem } from "../lib/cvs.ts";
+
+const it = (b: CvsItem["b"], n: string, p: number, t: CvsItem["t"]): CvsItem => ({ b, n, p, t });
+
+test("1개당 가격: 1+1 절반, 2+1 2/3", () => {
+  assert.equal(unitPrice({ p: 2700, t: "1+1" }), 1350);
+  assert.equal(unitPrice({ p: 2700, t: "2+1" }), 1800);
+});
+
+test("표기가 달라도 같은 상품", () => {
+  assert.equal(normName("몬스터)울트라 355ML"), normName("몬스터 울트라355ml"));
+  assert.notEqual(normName("몬스터 355ml"), normName("몬스터 250ml"));
+});
+
+test("2+1 → 1+1 은 버프, 반대는 너프, 사라지면 종료, 생기면 신규", () => {
+  const prev = [it("gs25", "몬스터 울트라", 2700, "2+1"), it("cu", "몬스터 울트라", 2700, "1+1"), it("cu", "핫식스", 1500, "2+1")];
+  const cur = [it("gs25", "몬스터 울트라", 2700, "1+1"), it("cu", "몬스터 울트라", 2700, "2+1"), it("seven", "레드불", 2800, "1+1")];
+  const d = diffMonths(prev, cur);
+  const by = (k: string, b: string) => d.find((x) => x.kind === k && x.b === b);
+  assert.ok(by("buff", "gs25"));
+  assert.ok(by("nerf", "cu"));
+  assert.equal(by("ended", "cu")?.n, "핫식스");
+  assert.equal(by("new", "seven")?.n, "레드불");
+  assert.equal(Math.round(by("buff", "gs25")!.pct * 100), -25);
+});
+
+test("같은 상품 어디가 이득", () => {
+  const x = crossBrand([it("gs25", "몬스터 울트라", 2700, "1+1"), it("cu", "몬스터)울트라", 2700, "2+1")]);
+  assert.equal(x.length, 1);
+  assert.equal(x[0].offers[0].b, "gs25");
+  assert.equal(x[0].save, 450);
+});
