@@ -308,7 +308,8 @@ async function main() {
   }
   const next = {
     month,
-    generated_at: new Date(Date.now() + 9 * 3600_000).toISOString().replace("Z", "+09:00").slice(0, 22) + ":00",
+    // 한국 시각, 예: 2026-11-04T06:22+09:00 (farm.json 과 같은 형식)
+    generated_at: new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 16) + "+09:00",
     items,
     ...(failed.length ? { stale: failed } : {}),
   };

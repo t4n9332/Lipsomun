@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BRANDS, DEAL_TYPES, brandName, isBrand, monthLabel, type CvsItem } from "@/lib/cvs";
+import { BRANDS, DEAL_TYPES, brandName, isBrand, monthLabel, type CvsItem, type DealType } from "@/lib/cvs";
 import { CUR, HAS_DATA } from "@/lib/cvsData";
-import CvsCard from "@/components/CvsCard";
-import CvsSearch from "@/components/CvsSearch";
-import FarmTabs from "@/components/FarmTabs";
+import CvsBrowser from "@/components/CvsBrowser";
+
+/** 탭마다 처음 HTML 로 그리는 개수 — 나머지는 '더 보기' 때 JSON 으로 받는다 */
+const FIRST = 48;
 
 export const dynamic = "force-static";
 export const dynamicParams = false;
@@ -40,9 +41,12 @@ export default async function CvsBrandPage({ params }: { params: Promise<{ brand
   if (!isBrand(brand)) notFound();
   const name = brandName(brand);
   const items = CUR.items.filter((x) => x.b === brand);
-  const groups = DEAL_TYPES.map((t) => [t, items.filter((x) => x.t === t)] as [string, CvsItem[]]).filter(
+  const groups = DEAL_TYPES.map((t) => [t, items.filter((x) => x.t === t)] as [DealType, CvsItem[]]).filter(
     ([, v]) => v.length > 0
   );
+  const initial = Object.fromEntries(groups.map(([t, v]) => [t, v.slice(0, FIRST)])) as Partial<
+    Record<DealType, CvsItem[]>
+  >;
 
   return (
     <>
@@ -71,20 +75,11 @@ export default async function CvsBrandPage({ params }: { params: Promise<{ brand
           {BRANDS.find((b) => b.id === brand)?.webless || "매월 1일 아침에 행사상품을 모아 올립니다."}
         </div>
       ) : (
-        <div id="cvs-list">
-          <CvsSearch target="cvs-list" />
-          <FarmTabs tabs={groups.map(([cat, list]) => ({ cat, count: list.length }))}>
-            {groups.map(([cat, list], i) => (
-              <section className="section farm-panel" key={cat} id={cat} role="tabpanel" hidden={i !== 0}>
-                <div className="grid cvs-grid">
-                  {list.map((it, k) => (
-                    <CvsCard key={k} it={it} />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </FarmTabs>
-        </div>
+        <CvsBrowser
+          brand={brand}
+          tabs={groups.map(([t, v]) => ({ t, count: v.length }))}
+          initial={initial}
+        />
       )}
     </>
   );
