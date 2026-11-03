@@ -2,8 +2,10 @@
 # 운영 사이트의 /cvs/shorts 를 녹화해 1080×1920 영상·자막·설명문·썸네일을 만들고 Artifacts 로 올린다.
 # 결과 받기: Actions → 이 실행 → 아래 Artifacts 의 'shorts-YYYY-MM' 내려받기 → final.mp4(음악 있음) 또는 video.webm 업로드.
 #
-# 배경음악: 라이선스 프리 음원을 ipsomun/scripts/bgm.mp3 로 저장소에 넣어 두면 자동으로 깔린다.
-#           출처 문구는 ipsomun/scripts/bgm-credit.txt 한 줄 (설명문 끝에 붙는다).
+# 배경음악: 저장소가 공개라 음원을 그대로 올리면 '음원 재배포'가 된다(오디오 보관함 약관 위반).
+#           그래서 암호화한 ipsomun/scripts/bgm.mp3.enc 만 저장소에 두고, 열쇠는 Secret BGM_KEY 에 둔다.
+#           영상을 만들 때만 풀어서 쓴다. 출처 문구는 ipsomun/scripts/bgm-credit.txt (설명문 끝에 붙는다).
+#           음악 바꾸기: openssl enc -aes-256-cbc -pbkdf2 -salt -in 새곡.mp3 -out ipsomun/scripts/bgm.mp3.enc -pass pass:<BGM_KEY>
 name: 편의점 쇼츠 영상 제작
 
 on:
@@ -33,6 +35,16 @@ jobs:
       - name: 새 데이터 배포 대기 (자동 실행일 때)
         if: ${{ github.event_name == 'workflow_run' }}
         run: sleep 240
+
+      - name: 배경음악 풀기 (Secret BGM_KEY 가 있을 때)
+        env:
+          BGM_KEY: ${{ secrets.BGM_KEY }}
+        run: |
+          if [ -n "$BGM_KEY" ] && [ -f scripts/bgm.mp3.enc ]; then
+            openssl enc -d -aes-256-cbc -pbkdf2 -in scripts/bgm.mp3.enc -out scripts/bgm.mp3 -pass "pass:$BGM_KEY" && echo "배경음악 준비 완료"
+          else
+            echo "::warning::Secret BGM_KEY 가 없어 무음 영상으로 만듭니다."
+          fi
 
       - name: 쇼츠 녹화
         run: |

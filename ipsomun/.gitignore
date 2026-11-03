@@ -25,3 +25,7 @@ scripts/.no-review-live.json
 scripts/.pruned-*.json
 scripts/cvs-debug/
 scripts/out/
+
+# 배경음악 원본 — 공개 저장소라 올리면 음원 재배포. 암호화본(bgm.mp3.enc)만 올린다
+scripts/bgm.mp3
+scripts/*.wav
