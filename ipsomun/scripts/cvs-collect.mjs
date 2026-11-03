@@ -170,6 +170,20 @@ async function fetchGS25() {
     pageRes.headers.get("x-upstream-set-cookie") || ""; // 중계를 거치면 여기에 담겨 온다
   diag(`gs25 페이지 상태 ${pageRes.status}, 쿠키 ${cookie ? "있음" : "없음"}, CSRF 언급`, (pageHtml.match(/.{0,200}csrf.{0,200}/gi) || ["(없음)"]).join(" | "));
   if (!token) {
+    // 2026 개편으로 행사 페이지가 사라졌다. 예전 검색 API 가 아직 살아 있는지만 확인한다.
+    for (const q of ["", "?CSRFToken="]) {
+      try {
+        const r = await fetch(`https://gs25.gsretail.com/gscvs/ko/products/event-goods-search${q}`, {
+          method: "POST",
+          headers: { "User-Agent": UA, ...FORM_HEADERS },
+          body: form({ pageNum: 1, pageSize: 5, searchType: "", searchWord: "", parameterList: "ONE_TO_ONE" }),
+          signal: AbortSignal.timeout(15_000),
+        });
+        diag(`gs25 예전 검색 API${q} 상태 ${r.status}`, (await r.text()).slice(0, 400));
+      } catch (e) {
+        diag(`gs25 예전 검색 API${q} 실패`, e.message);
+      }
+    }
     debugDump("gs25-page", pageHtml);
     // 2026 개편 후 홈페이지가 Vue 앱이 됐다 — 진단 모드에서는 번들 JS 에서 API 경로 후보를 뽑아 로그에 남긴다
     if (DIAG) {

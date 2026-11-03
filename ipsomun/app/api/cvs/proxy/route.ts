@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cronOrAdmin } from "@/lib/auth";
 
 /**
  * 편의점 행사 수집용 중계 — 서울 리전에서 대신 받아 준다.
@@ -9,10 +8,21 @@ import { cronOrAdmin } from "@/lib/auth";
  * 거쳐 한국(icn1)에서 요청한다.
  *
  * 남용 방지: CRON_SECRET(Bearer) 필수, 허용한 편의점 호스트로만 요청, 응답 크기 제한.
+ *
+ * Edge 런타임인 이유: 일반(Node) 함수는 요금제에 따라 preferredRegion 이 무시돼 미국(iad1)에서
+ * 실행됐다(2026-11-03 실측). Edge 함수는 지정한 리전에서 돈다.
  */
+export const runtime = "edge";
 export const preferredRegion = "icn1";
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+
+/** 길이가 같을 때 끝까지 비교하는 상수 시간 비교 (Edge 에는 crypto.timingSafeEqual 이 없다) */
+function safeEqual(a: string, b: string) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
 
 const ALLOWED_HOSTS = new Set([
   "www.7-eleven.co.kr",
@@ -23,7 +33,8 @@ const ALLOWED_HOSTS = new Set([
 const MAX_BYTES = 3_000_000;
 
 export async function POST(req: Request) {
-  if (!(await cronOrAdmin(req))) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || !safeEqual(req.headers.get("authorization") || "", `Bearer ${secret}`)) {
     return NextResponse.json({ error: "권한 없음" }, { status: 401 });
   }
   const body = (await req.json().catch(() => null)) as {
