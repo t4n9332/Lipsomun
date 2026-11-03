@@ -116,7 +116,8 @@ async function fetchCU() {
         b: "cu",
         n: pick(b, /class="name"[^>]*>\s*<p>([\s\S]*?)<\/p>/),
         p: toPrice(pick(b, /class="price"[^>]*>[\s\S]*?<strong>([\s\S]*?)<\/strong>/)),
-        t: dealType(pick(b, /class="badge"[^>]*>([\s\S]*?)<\/div>/) || (cond === "23" ? "1+1" : "2+1")),
+        // 배지 div 안에 "[D] .plus2 : 2+1 / .plus1 : 1+1" 주석이 있어 div 전체를 읽으면 늘 2+1 로 잡힌다 — span 만 본다
+        t: dealType(pick(b, /<span class="plus\d"[^>]*>([\s\S]*?)<\/span>/) || (cond === "23" ? "1+1" : "2+1")),
         img: absUrl(b.match(/<img[^>]+src="([^"]+)"/)?.[1], "https://cu.bgfretail.com/"),
       }));
       if (page === 1) {
@@ -142,6 +143,21 @@ async function fetchGS25() {
   diag(`gs25 페이지 상태 ${pageRes.status}, 쿠키 ${cookie ? "있음" : "없음"}, CSRF 언급`, (pageHtml.match(/.{0,200}csrf.{0,200}/gi) || ["(없음)"]).join(" | "));
   if (!token) {
     debugDump("gs25-page", pageHtml);
+    // 2026 개편 후 홈페이지가 Vue 앱이 됐다 — 진단 모드에서는 번들 JS 에서 API 경로 후보를 뽑아 로그에 남긴다
+    if (DIAG) {
+      for (const src of pageHtml.match(/src="([^"]+\.js)"/g) || []) {
+        const url = src.slice(5, -1);
+        try {
+          const js = await (await get(url)).text();
+          const hits = [...new Set(js.match(/["'`][^"'`\s]{0,80}(?:event|Event|goods|Goods|promotion|prod)[^"'`\s]{0,80}["'`]/g) || [])];
+          diag(`gs25 번들 ${url.split("/").pop()} API 후보 ${hits.length}개`, hits.slice(0, 120).join(" "));
+          const bases = [...new Set(js.match(/https?:\/\/[a-z0-9.\-]+gsretail[a-z0-9.\-]*[^"'`\s]{0,60}/gi) || [])];
+          diag(`gs25 번들 ${url.split("/").pop()} 호스트`, bases.slice(0, 40).join(" "));
+        } catch (e) {
+          diag(`gs25 번들 ${url} 실패`, e.message);
+        }
+      }
+    }
     throw new Error("CSRFToken 을 찾지 못함");
   }
   const out = [];
