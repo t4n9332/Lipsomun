@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BRANDS, brandName, monthLabel, unitPrice } from "@/lib/cvs";
-import { CUR, PREV, HAS_DATA, HAS_PREV, CHANGES, CROSS, CATEGORY_COUNTS } from "@/lib/cvsData";
+import { CUR, PREV, HAS_DATA, HAS_PREV, CHANGES, CROSS, CATEGORY_COUNTS, bestSaving } from "@/lib/cvsData";
+import CvsCard from "@/components/CvsCard";
+import type { CvsCategory } from "@/lib/cvs";
 import CvsChangeRow from "@/components/CvsChangeRow";
 import { won, jsonLdString } from "@/lib/util";
 
@@ -101,6 +103,18 @@ export default function CvsHome() {
                   {x.c} <span>{x.count}</span>
                 </Link>
               ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="section-head">
+              <h2>💰 분류별 꿀템</h2>
+              <span className="sub">1개당 가장 많이 아끼는 1+1·2+1</span>
+            </div>
+            <div className="grid cvs-grid">
+              {(["음료", "과자·간식", "간편식", "아이스크림", "생활용품", "주류"] as CvsCategory[]).flatMap((c) =>
+                bestSaving(c).map((it) => <CvsCard key={c} it={it} showBrand />)
+              )}
             </div>
           </section>
 

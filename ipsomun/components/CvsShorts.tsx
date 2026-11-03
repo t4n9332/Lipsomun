@@ -11,6 +11,10 @@ export type Slide =
       fromPrice?: number; toPrice?: number;
     }
   | {
+      kind: "best"; cat: string; brand: string; brandId: string; name: string; img?: string;
+      t: string; price: number; unit: number; saved: number;
+    }
+  | {
       kind: "versus"; name: string; img?: string;
       offers: { brand: string; brandId: string; t: string; unit: number }[];
     };
@@ -94,6 +98,22 @@ export default function CvsShorts({ slides }: { slides: Slide[] }) {
                 {s.pct > 0 ? "+" : ""}
                 {Math.round(s.pct * 100)}%
               </em>
+            </div>
+          </>
+        )}
+
+        {s.kind === "best" && (
+          <>
+            <div className="shorts-verdict best">💰 {s.cat} 꿀템</div>
+            <div className={`shorts-brand b-${s.brandId}`}>{s.brand}</div>
+            <div className="shorts-img">{s.img ? <img src={s.img} alt="" /> : <span>🏪</span>}</div>
+            <h2 className="shorts-name">{s.name}</h2>
+            <div className="shorts-deal">
+              <span className="new">{s.t}</span>
+            </div>
+            <div className="shorts-unit">
+              1개당 <b>{won(s.unit)}</b>
+              <em>{won(s.saved)} 아낌</em>
             </div>
           </>
         )}
