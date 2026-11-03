@@ -115,7 +115,7 @@ button { font-family: inherit; }
 /* ---------- Sections ---------- */
 .section { margin: 44px 0; }
 .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
-.section-head h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
+.section-head h1, .section-head h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
 .section-head .sub { font-size: 13.5px; color: var(--ink-faint); }
 .section-head .more { margin-left: auto; font-size: 13.5px; color: var(--accent); }
 
@@ -617,7 +617,7 @@ button { font-family: inherit; }
   padding: 24px 26px 26px;
 }
 .vs-section .section-head { margin-bottom: 14px; }
-.vs-section .section-head h2 { font-size: 20px; }
+.vs-section .section-head h1, .vs-section .section-head h2 { font-size: 20px; }
 .vs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
@@ -852,7 +852,7 @@ html { scroll-behavior: smooth; }
      못 채워 1열로 떨어지고, 카드 8개가 3,400px를 차지해 홈 절반이 이 섹션이 된다. */
   .vs-section { padding: 16px 12px 18px; border-radius: 16px; margin: 20px 0 32px; }
   .vs-section .section-head { margin-bottom: 10px; }
-  .vs-section .section-head h2 { font-size: 17px; }
+  .vs-section .section-head h1, .vs-section .section-head h2 { font-size: 17px; }
   .vs-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .vs-card { border-radius: 12px; }
   .vs-body { padding: 8px 10px 10px; gap: 4px; }
@@ -1170,6 +1170,8 @@ html { scroll-behavior: smooth; }
 .calc-back { margin-top: 30px; font-size: 14px; }
 
 .ad-slot { margin: 30px 0; min-height: 90px; }
+/* 모바일 반응형 광고는 250~280px — 자리를 미리 잡아 두지 않으면 광고가 뜰 때 본문이 밀린다(CLS) */
+@media (max-width: 640px) { .ad-slot { min-height: 280px; } }
 .ad-label {
   display: block; font-size: 10px; letter-spacing: .08em; opacity: .4;
   text-transform: uppercase; margin-bottom: 5px;

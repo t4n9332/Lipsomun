@@ -35,7 +35,7 @@ export default async function BlogListPage() {
   return (
     <section className="section">
       <div className="section-head">
-        <h2>📝 가격비교 리포트</h2>
+        <h1>📝 가격비교 리포트</h1>
         <span className="sub">매일 자동 발행되는 쿠팡 vs 토스 최저가 리포트</span>
       </div>
       {posts.length === 0 ? (

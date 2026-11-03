@@ -7,6 +7,10 @@ import {
   siblingCalculators,
   type Calc,
 } from "@/lib/calculators";
+import { INSURANCE, UNEMPLOYMENT } from "@/lib/taxRates";
+import { jsonLdString } from "@/lib/util";
+
+const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
 import LoanSwitchCalc from "@/components/calc/LoanSwitchCalc";
 import SalaryNetCalc from "@/components/calc/SalaryNetCalc";
 import SeverancePayCalc from "@/components/calc/SeverancePayCalc";
@@ -55,7 +59,7 @@ export async function generateMetadata(
     description: c.desc,
     keywords: c.keywords,
     alternates: { canonical: `/calc/${encodeURIComponent(c.slug)}` },
-    openGraph: { title: c.title, description: c.desc },
+    openGraph: { title: c.title, description: c.desc, images: ["/og-default.png"], locale: "ko_KR", siteName: "입소문" },
   };
 }
 
@@ -70,12 +74,40 @@ export default async function CalcPage(
   if (!entry) notFound();
   const { Calc, Guide } = entry;
 
+  const pageUrl = `${SITE}/calc/${encodeURIComponent(c.slug)}`;
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: c.title,
+      description: c.desc,
+      url: pageUrl,
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "All",
+      inLanguage: "ko-KR",
+      offers: { "@type": "Offer", price: 0, priceCurrency: "KRW" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "입소문", item: SITE },
+        { "@type": "ListItem", position: 2, name: "생활 계산기", item: `${SITE}/calc` },
+        { "@type": "ListItem", position: 3, name: c.title, item: pageUrl },
+      ],
+    },
+  ];
+
   return (
     <section className="section">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
+      />
       <div className="section-head">
-        <h2>
+        <h1>
           {c.emoji} {c.short} 계산기
-        </h2>
+        </h1>
         <span className="sub">{c.desc}</span>
       </div>
 
@@ -217,7 +249,9 @@ function SalaryNetGuide() {
 
       <h3>국민연금은 어느 지점부터 더 안 뗀다</h3>
       <p>
-        국민연금에는 상한이 있다. 월 소득 <b>617만원</b>(연봉 약 7,400만원)을 넘으면
+        국민연금에는 상한이 있다. 월 소득{" "}
+        <b>{(INSURANCE.pensionCapMonthly / 10_000).toLocaleString("ko-KR")}만원</b>(연봉 약{" "}
+        {(Math.round((INSURANCE.pensionCapMonthly * 12) / 1_000_000) * 100).toLocaleString("ko-KR")}만원)을 넘으면
         그 위로는 아무리 벌어도 보험료가 더 붙지 않는다. 위 계산기에서 연봉을
         7,000만원과 9,000만원으로 바꿔 국민연금 줄만 보면 금액이 같은 데서 멈춰 있다.
         고연봉일수록 공제율 그래프가 완만해지는 이유다.
@@ -226,7 +260,7 @@ function SalaryNetGuide() {
       <h3>장기요양보험은 소득이 아니라 건강보험료에 붙는다</h3>
       <p>
         자주 틀리는 부분이다. 장기요양보험료는 월급에 요율을 곱하는 게 아니라{" "}
-        <b>건강보험료에 12.95%</b>를 곱해서 나온다. 그래서 금액이 작아 보여도
+        <b>건강보험료에 {(INSURANCE.longTermCareOnHealth * 100).toFixed(2)}%</b>를 곱해서 나온다. 그래서 금액이 작아 보여도
         건강보험료가 오르면 같이 따라 오른다.
       </p>
 
@@ -317,10 +351,11 @@ function UnemploymentGuide() {
       <h3>하루 금액에는 위아래로 벽이 있다</h3>
       <p>
         구직급여일액은 평균임금의 60%인데, 위로는 상한액에서 잘리고 아래로는
-        최저임금의 80%(1일 8시간 기준)로 받쳐준다. 상한은 2019년부터 하루 66,000원에
-        묶여 있는 반면 하한은 최저임금을 따라 매년 올라와서, 지금은 두 값이
-        거의 붙어 있다. 그래서 <b>월급이 얼마든 하루 6만원대 중반에서 크게 벗어나지
-        않는다.</b>
+        최저임금의 80%(1일 8시간 기준)로 받쳐준다. 상한은 2019년부터 66,000원에
+        묶여 있다가, 최저임금을 따라 오른 하한이 이를 넘어서자 2026년 이직자부터 하루{" "}
+        {UNEMPLOYMENT.dailyCap.toLocaleString("ko-KR")}원으로 올랐다. 하한(
+        {UNEMPLOYMENT.dailyFloor.toLocaleString("ko-KR")}원)과 거의 붙어 있어서{" "}
+        <b>월급이 얼마든 하루 6만원대 중후반에서 크게 벗어나지 않는다.</b>
       </p>
 
       <h3>받을 수 있는지부터가 관문이다</h3>

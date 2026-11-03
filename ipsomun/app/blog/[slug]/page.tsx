@@ -78,7 +78,7 @@ export async function generateMetadata({
     title: post.title,
     description: desc,
     alternates: { canonical: url },
-    openGraph: { title: post.title, description: desc, url, type: "article", siteName: "입소문" },
+    openGraph: { title: post.title, description: desc, url, type: "article", siteName: "입소문", images: ["/og-default.png"], locale: "ko_KR" },
   };
 }
 

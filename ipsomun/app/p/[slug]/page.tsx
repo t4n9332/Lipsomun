@@ -170,16 +170,8 @@ export default async function ProductPage({
       description:
         product.review || product.description || product.title,
       category: product.category,
-      ...(product.rating != null && product.rating > 0 && product.ratingCount
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: product.rating,
-              reviewCount: product.ratingCount,
-              bestRating: 5,
-            },
-          }
-        : {}),
+      // aggregateRating 은 넣지 않는다. 쿠팡 등 다른 사이트에서 가져온 평점을 구조화
+      // 데이터로 표시하면 구글 리뷰 스니펫 정책 위반(구조화 데이터 수동조치 대상)이다.
       ...(ldPrices.length >= 2
         ? {
             offers: {

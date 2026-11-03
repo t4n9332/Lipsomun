@@ -17,7 +17,7 @@ export default async function PickListPage() {
   return (
     <section className="section">
       <div className="section-head">
-        <h2>🧺 기획전</h2>
+        <h1>🧺 기획전</h1>
         <span className="sub">주제별로 골라 담은 추천 모음</span>
       </div>
       {picks.length === 0 ? (

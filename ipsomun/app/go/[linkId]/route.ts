@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { getLink, trackClick, trackClickSource } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -56,10 +56,13 @@ export async function GET(
   // 클릭 수 집계 (실패해도 리다이렉트는 진행)
   if (!isBot && !recently) {
     const source = readCookie(cookieHeader, SOURCE_COOKIE) || "direct";
-    await Promise.allSettled([
-      trackClick(link.id, link.productId),
-      trackClickSource(source, link.platform),
-    ]);
+    // 집계는 응답을 보낸 뒤에 한다 — DB 지연만큼 쇼핑몰 이동이 늦어지면 전환을 잃는다
+    after(() =>
+      Promise.allSettled([
+        trackClick(link.id, link.productId),
+        trackClickSource(source, link.platform),
+      ]),
+    );
     res.cookies.set(dedupeName, "1", {
       maxAge: CLICK_DEDUPE_SEC,
       path: "/go",

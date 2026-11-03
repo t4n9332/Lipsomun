@@ -30,7 +30,7 @@ function kstToday(): Date {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.SITE_URL || "https://example.com";
+  const base = process.env.SITE_URL || "https://lipsomun.co.kr";
   let products: { slug: string; updatedAt: Date }[] = [];
   let picks: { slug: string; updatedAt: Date }[] = [];
   let posts: { slug: string; updatedAt: Date }[] = [];

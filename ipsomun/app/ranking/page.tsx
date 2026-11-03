@@ -10,7 +10,7 @@ export default async function RankingPage() {
   return (
     <section className="section">
       <div className="section-head">
-        <h2>🏆 인기 랭킹 TOP {items.length || 30}</h2>
+        <h1>🏆 인기 랭킹 TOP {items.length || 30}</h1>
         <span className="sub">방문자 조회·클릭 기준</span>
       </div>
       {items.length === 0 ? (

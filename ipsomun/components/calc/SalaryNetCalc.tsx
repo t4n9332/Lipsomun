@@ -135,7 +135,7 @@ export default function SalaryNetCalc() {
             <th>장기요양보험</th>
             <td>
               −{won(r.care)}
-              <span className="calc-note"> (건강보험료의 12.95%)</span>
+              <span className="calc-note"> (건강보험료의 {(INSURANCE.longTermCareOnHealth * 100).toFixed(2)}%)</span>
             </td>
           </tr>
           <tr>
@@ -165,7 +165,8 @@ export default function SalaryNetCalc() {
       )}
       {r.capped && (
         <p className="calc-hint">
-          💡 국민연금은 월 소득 <b>617만원</b>까지만 부과됩니다. 이 위로는 연봉이
+          💡 국민연금은 월 소득{" "}
+          <b>{(INSURANCE.pensionCapMonthly / 10_000).toLocaleString("ko-KR")}만원</b>까지만 부과됩니다. 이 위로는 연봉이
           올라도 연금 보험료가 더 늘지 않아 공제율이 오히려 떨어집니다.
         </p>
       )}

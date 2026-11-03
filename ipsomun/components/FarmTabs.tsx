@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import FarmCard, { type FarmItem } from "./FarmCard";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * 산지직송 코너의 가로 탭 — 분류 하나만 펼쳐 보인다.
@@ -9,14 +8,31 @@ import FarmCard, { type FarmItem } from "./FarmCard";
  * 상품이 늘수록 세로 스크롤이 길어지므로(2026-09-04 사장님 지시) 분류를 탭으로 나눈다.
  * 모든 분류의 카드를 HTML 에 그대로 두고(검색엔진이 전부 읽게) 활성 탭 외에는 `hidden` 으로 감춘다.
  * `#과일` 처럼 해시로 들어오면 그 탭을 연다.
+ *
+ * 카드(패널)는 서버에서 그려 children 으로 받는다. 상품 배열을 props 로 넘기면
+ * 수백 개 항목이 HTML 과 RSC 페이로드에 두 번 실려 페이지가 무거워진다 — 여기선 탭
+ * 이름과 개수만 받고, 패널 표시/숨김은 DOM 의 hidden 속성만 바꾼다.
  */
-export default function FarmTabs({ groups }: { groups: [string, FarmItem[]][] }) {
-  const [active, setActive] = useState(groups[0]?.[0] ?? "");
+export default function FarmTabs({
+  tabs,
+  children,
+}: {
+  tabs: { cat: string; count: number }[];
+  children: ReactNode;
+}) {
+  const [active, setActive] = useState(tabs[0]?.cat ?? "");
+  const panels = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const h = decodeURIComponent(window.location.hash.replace(/^#/, ""));
-    if (h && groups.some(([c]) => c === h)) setActive(h);
-  }, [groups]);
+    if (h && tabs.some((t) => t.cat === h)) setActive(h);
+  }, [tabs]);
+
+  useEffect(() => {
+    panels.current
+      ?.querySelectorAll<HTMLElement>("[role=tabpanel]")
+      .forEach((el) => (el.hidden = el.id !== active));
+  }, [active]);
 
   const pick = (cat: string) => {
     setActive(cat);
@@ -28,33 +44,22 @@ export default function FarmTabs({ groups }: { groups: [string, FarmItem[]][] })
   return (
     <>
       <div className="farm-tabs" role="tablist" aria-label="상품 분류">
-        {groups.map(([cat, list]) => (
+        {tabs.map(({ cat, count }) => (
           <button
             key={cat}
             type="button"
             role="tab"
             aria-selected={cat === active}
+            aria-controls={cat}
             className={cat === active ? "on" : ""}
             onClick={() => pick(cat)}
           >
             {cat}
-            <span className="n">{list.length}</span>
+            <span className="n">{count}</span>
           </button>
         ))}
       </div>
-      {groups.map(([cat, list]) => (
-        <section className="section farm-panel" key={cat} id={cat} role="tabpanel" hidden={cat !== active}>
-          <div className="section-head">
-            <h2>{cat}</h2>
-            <span className="sub">{list.length}개</span>
-          </div>
-          <div className="grid">
-            {list.map((p) => (
-              <FarmCard key={p.id} p={p} />
-            ))}
-          </div>
-        </section>
-      ))}
+      <div ref={panels}>{children}</div>
     </>
   );
 }

@@ -37,3 +37,6 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
+
+# 데스크톱 관리도구 설정 — 관리자 비밀번호가 평문으로 저장된다
+관리도구/ipsomun-config.json

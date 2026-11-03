@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getByCategory, withLinks } from "@/lib/db";
 import { CATEGORIES, jsonLdString } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
@@ -31,6 +32,8 @@ export async function generateMetadata({
       url,
       type: "website",
       siteName: "입소문",
+      locale: "ko_KR",
+      images: ["/og-default.png"],
     },
   };
 }
@@ -42,6 +45,8 @@ export default async function CategoryPage({
 }) {
   const { name } = await params;
   const category = decodeURIComponent(name);
+  // 목록에 없는 카테고리는 빈 페이지(200) 대신 404 — 소프트 404·무한 URL 방지
+  if (!(CATEGORIES as readonly string[]).includes(category)) notFound();
   const items = await withLinks(await getByCategory(category, TOP));
 
   const jsonLd = {
@@ -63,9 +68,9 @@ export default async function CategoryPage({
         dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
       <div className="section-head">
-        <h2>
+        <h1>
           {category} TOP {items.length >= TOP ? TOP : items.length}
-        </h2>
+        </h1>
         <span className="sub">입소문이 엄선한 인기 제품 랭킹</span>
       </div>
       {items.length === 0 ? (

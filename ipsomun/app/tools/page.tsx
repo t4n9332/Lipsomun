@@ -19,7 +19,7 @@ export default function ToolsHub() {
   return (
     <section className="section">
       <div className="section-head">
-        <h2>🧰 파일 도구</h2>
+        <h1>🧰 파일 도구</h1>
         <span className="sub">
           설치도, 가입도, 업로드도 없습니다 — 브라우저에서 바로 끝납니다
         </span>
