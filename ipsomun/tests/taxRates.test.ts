@@ -50,3 +50,16 @@ test("노란우산공제 한도 (2025 귀속 상향)", async () => {
   assert.equal(noranUmbrellaCap(80_000_000), 4_000_000);
   assert.equal(noranUmbrellaCap(200_000_000), 2_000_000);
 });
+
+test("연말정산 특별세액공제·월세", async () => {
+  const t = await import("../lib/taxRates.ts");
+  assert.equal(t.insurancePremiumCredit(1_500_000), 120_000);
+  // 총급여 5천만원 → 3% 문턱 150만원, 300만원 쓰면 150만원 × 15%
+  assert.equal(t.medicalExpenseCredit(3_000_000, 50_000_000), 225_000);
+  assert.equal(t.medicalExpenseCredit(1_000_000, 50_000_000), 0);
+  assert.equal(t.educationCredit(3_000_000), 450_000);
+  assert.equal(t.donationCredit(12_000_000), 1_500_000 + 600_000);
+  assert.equal(t.rentCredit(6_000_000, 50_000_000), 1_020_000);
+  assert.equal(t.rentCredit(12_000_000, 70_000_000), 1_500_000);
+  assert.equal(t.rentCredit(6_000_000, 90_000_000), 0);
+});

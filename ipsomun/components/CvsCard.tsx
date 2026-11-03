@@ -1,4 +1,4 @@
-import { brandName, unitPrice, type CvsItem } from "@/lib/cvs";
+import { brandName, coupangQuery, unitPrice, type CvsItem } from "@/lib/cvs";
 import { won, imgUrl } from "@/lib/util";
 
 /** 편의점 행사 상품 카드 — 서버에서 그린다. data-name 은 CvsSearch 가 거른다. */
@@ -22,6 +22,14 @@ export default function CvsCard({ it, showBrand = false }: { it: CvsItem; showBr
           <span className="price">{won(it.p)}</span>
         </div>
         {it.t !== "덤" && <div className="meta">1개당 {won(unitPrice(it))}</div>}
+        <a
+          className="cvs-cp"
+          href={`/cvs/coupang?q=${encodeURIComponent(coupangQuery(it.n))}`}
+          target="_blank"
+          rel="nofollow sponsored noopener"
+        >
+          쿠팡 대용량 가격 ›
+        </a>
       </div>
     </article>
   );
