@@ -181,6 +181,15 @@ async function fetchGS25() {
           diag(`gs25 번들 ${url.split("/").pop()} API 후보 ${hits.length}개`, hits.slice(0, 120).join(" "));
           const bases = [...new Set(js.match(/https?:\/\/[a-z0-9.\-]+gsretail[a-z0-9.\-]*[^"'`\s]{0,60}/gi) || [])];
           diag(`gs25 번들 ${url.split("/").pop()} 호스트`, bases.slice(0, 40).join(" "));
+          // 경로처럼 생긴 문자열 (axios 호출 주소 후보)
+          const paths = [...new Set(js.match(/["'`]\/[a-zA-Z0-9_\-\/.]{3,100}["'`]/g) || [])];
+          diag(`gs25 번들 ${url.split("/").pop()} 경로 ${paths.length}개`, paths.slice(0, 250).join(" "));
+          // baseURL·api 문맥
+          const ctx = (js.match(/.{0,120}(?:baseURL|apiUrl|API_URL|\/api\/).{0,160}/g) || []).slice(0, 12);
+          diag(`gs25 번들 ${url.split("/").pop()} api 문맥`, ctx.join(" ||| "));
+          // 지연 로딩 청크 이름표 (이벤트 화면 코드는 별도 청크에 있을 수 있다)
+          const chunk = js.match(/.{0,80}"js\/".{0,600}/);
+          if (chunk) diag(`gs25 번들 청크 맵`, chunk[0]);
         } catch (e) {
           diag(`gs25 번들 ${url} 실패`, e.message);
         }
