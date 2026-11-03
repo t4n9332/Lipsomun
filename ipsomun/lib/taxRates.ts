@@ -215,3 +215,46 @@ export function noranUmbrellaCap(businessIncome: number) {
 
 /** 기본공제 — 본인·부양가족 1명당 */
 export const BASIC_DEDUCTION_PER_PERSON = 1_500_000;
+
+/* ---------- 연말정산 특별세액공제 · 월세 ---------- */
+// 이 공제들(보험료·의료비·교육비·기부금 세액공제, 월세세액공제)을 하나라도 받으면
+// 근로자 표준세액공제 13만원은 받을 수 없다. 계산기는 두 경우를 모두 계산해 유리한 쪽을 쓴다.
+
+/** 보장성보험료 세액공제 — 연 100만원 한도의 12% (장애인전용 보험은 별도 15%, 단순화로 제외) */
+export function insurancePremiumCredit(paid: number) {
+  return Math.round(Math.min(Math.max(0, paid), 1_000_000) * 0.12);
+}
+
+/**
+ * 의료비 세액공제 — 총급여의 3%를 넘게 쓴 부분의 15%.
+ * 일반 부양가족 의료비는 공제대상 700만원 한도. 본인·65세 이상·장애인 의료비는 한도가 없지만
+ * 계산기에서는 구분 없이 700만원 한도를 적용한다(보수적으로 — 실제 환급이 더 클 수 있다).
+ */
+export function medicalExpenseCredit(paid: number, gross: number) {
+  const over = Math.max(0, paid - gross * 0.03);
+  return Math.round(Math.min(over, 7_000_000) * 0.15);
+}
+
+/**
+ * 교육비 세액공제 — 15%. 한도: 본인 없음, 취학전·초중고 자녀 1인당 300만원, 대학생 900만원.
+ * 계산기는 한도를 반영한 '공제대상 금액'을 입력받는다.
+ */
+export function educationCredit(eligible: number) {
+  return Math.round(Math.max(0, eligible) * 0.15);
+}
+
+/** 기부금 세액공제 — 1천만원까지 15%, 넘는 부분 30% (고향사랑기부금은 별도라 제외) */
+export function donationCredit(donated: number) {
+  const d = Math.max(0, donated);
+  return Math.round(Math.min(d, 10_000_000) * 0.15 + Math.max(0, d - 10_000_000) * 0.3);
+}
+
+/**
+ * 월세 세액공제 — 무주택 세대주, 총급여 8천만원 이하.
+ * 총급여 5,500만원 이하 17%, 8천만원 이하 15%. 연 1천만원 한도 (2024 귀속부터).
+ */
+export function rentCredit(paidRent: number, gross: number) {
+  if (gross > 80_000_000) return 0;
+  const rate = gross <= 55_000_000 ? 0.17 : 0.15;
+  return Math.round(Math.min(Math.max(0, paidRent), 10_000_000) * rate);
+}

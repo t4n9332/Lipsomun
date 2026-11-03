@@ -196,3 +196,18 @@ export function categoryOf(name: string): CvsCategory {
 export const categorySlug = (c: CvsCategory) => c.replace("·", "-");
 export const categoryFromSlug = (s: string) =>
   CATEGORIES.find((c) => categorySlug(c) === decodeURIComponent(s)) || null;
+
+/**
+ * 편의점 상품명 → 쿠팡 검색어. "덴마크)초코초코우유300ml" → "덴마크 초코초코우유 300ml".
+ * 편의점 표기의 '브랜드)' 와 괄호 꼬리표((QR), (1+1기획) 등)를 걷어내 검색이 잘 걸리게 한다.
+ */
+export function coupangQuery(name: string): string {
+  return name
+    .replace(/\([^)]*\)$/g, "")
+    .replace(/\)/g, " ")
+    .replace(/[_*]/g, " ")
+    .replace(/(\d+(?:\.\d+)?)(ml|l|g|kg|입|개)/gi, " $1$2")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60);
+}

@@ -194,6 +194,13 @@ CREATE TABLE IF NOT EXISTS click_sources (
   clicks INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, source, platform)
 );
+-- 편의점 상품 → 쿠팡 검색 제휴 딥링크 캐시 (같은 검색어는 API 를 다시 부르지 않는다)
+CREATE TABLE IF NOT EXISTS cvs_coupang_links (
+  q TEXT PRIMARY KEY,
+  url TEXT NOT NULL,
+  clicks INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 -- 관리자 로그인 실패 기록 (무차별 대입 제한용)
 CREATE TABLE IF NOT EXISTS login_failures (
   ip TEXT NOT NULL,
@@ -952,6 +959,23 @@ export async function claimDailyRun(job: string, day = kstToday()): Promise<bool
     [day, job]
   );
   return rows.length > 0;
+}
+
+/** 편의점 상품 쿠팡 검색 딥링크 캐시 조회 (있으면 클릭 수도 올린다) */
+export async function getCvsCoupangLink(query: string): Promise<string | null> {
+  const rows = await q<{ url: string }>(
+    `UPDATE cvs_coupang_links SET clicks = clicks + 1 WHERE q = $1 RETURNING url`,
+    [query]
+  );
+  return rows[0]?.url ?? null;
+}
+
+export async function saveCvsCoupangLink(query: string, url: string): Promise<void> {
+  await q(
+    `INSERT INTO cvs_coupang_links (q, url, clicks) VALUES ($1, $2, 1)
+     ON CONFLICT (q) DO UPDATE SET url = EXCLUDED.url`,
+    [query, url]
+  );
 }
 
 /** 최근 window 분 안의 로그인 실패 횟수 */

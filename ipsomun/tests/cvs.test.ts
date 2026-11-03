@@ -57,3 +57,9 @@ test("상품 분류", async () => {
   ];
   for (const [n, c] of cases) assert.equal(categoryOf(n), c, n);
 });
+
+test("쿠팡 검색어 정리", async () => {
+  const { coupangQuery } = await import("../lib/cvs.ts");
+  assert.equal(coupangQuery("덴마크)초코초코우유300ml"), "덴마크 초코초코우유 300ml");
+  assert.equal(coupangQuery("풀무원)샘물펫500ml*20입(QR)"), "풀무원 샘물펫 500ml 20입");
+});

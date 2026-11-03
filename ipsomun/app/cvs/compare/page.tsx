@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { brandName, monthLabel, unitPrice } from "@/lib/cvs";
+import { brandName, coupangQuery, monthLabel, unitPrice } from "@/lib/cvs";
 import { CUR, HAS_DATA, CROSS } from "@/lib/cvsData";
 import CvsSearch from "@/components/CvsSearch";
 import { won } from "@/lib/util";
@@ -49,6 +49,14 @@ export default function CvsComparePage() {
                     </span>
                   ))}
                 </div>
+                <a
+                  className="cvs-cp"
+                  href={`/cvs/coupang?q=${encodeURIComponent(coupangQuery(x.name))}`}
+                  target="_blank"
+                  rel="nofollow sponsored noopener"
+                >
+                  쿠팡에서 박스로 사면? ›
+                </a>
                 {x.save > 0 ? (
                   <div className="save">1개당 {won(x.save)} 이득</div>
                 ) : (

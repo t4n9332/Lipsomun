@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function robots(): MetadataRoute.Robots {
   const base = process.env.SITE_URL || "https://lipsomun.co.kr";
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/go/"] }],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/go/", "/cvs/coupang"] }],
     sitemap: `${base}/sitemap.xml`,
   };
 }
