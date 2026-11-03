@@ -37,6 +37,10 @@ jobs:
         id: collect
         continue-on-error: true
         working-directory: ipsomun
+        env:
+          # 세븐일레븐은 해외 IP 를 막아 사이트의 서울 리전 중계로 받는다 (app/api/cvs/proxy)
+          CVS_PROXY_URL: https://lipsomun.co.kr/api/cvs/proxy
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: node scripts/cvs-collect.mjs ${{ inputs.dry && '--dry' || '' }}
 
       - name: 파서 점검용 원문 보관 (수집 실패 시)
@@ -44,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cvs-debug
-          path: ipsomun/scripts/.cvs-debug/
+          path: ipsomun/scripts/cvs-debug/
           if-no-files-found: ignore
 
       - name: 커밋·푸시

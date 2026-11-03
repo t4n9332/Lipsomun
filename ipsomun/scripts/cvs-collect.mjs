@@ -23,10 +23,18 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 const DATA_DIR = path.join(ROOT, "data", "cvs");
-const DEBUG_DIR = path.join(__dirname, ".cvs-debug");
+// 숨김 폴더(.으로 시작)는 Actions 아티팩트 업로드에서 빠지므로 일반 이름으로 둔다
+const DEBUG_DIR = path.join(__dirname, "cvs-debug");
 const args = process.argv.slice(2);
 const DRY = args.includes("--dry");
 const ONLY = args.find((a) => a.startsWith("--only="))?.split("=")[1];
+// --dry 에서는 응답 원문 일부를 로그에 찍는다 — 사이트 구조가 바뀌었을 때 로그만 보고 파서를 고칠 수 있게
+const DIAG = DRY || args.includes("--diag");
+const diag = (label, text) => {
+  if (!DIAG) return;
+  const t = String(text).replace(/\s+/g, " ");
+  console.log(`  [진단] ${label} (${t.length}자): ${t.slice(0, 1500)}`);
+};
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36";
@@ -35,7 +43,26 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ---------------- 공통 유틸 ---------------- */
 
+// 해외 IP 를 막는 사이트(세븐일레븐)는 사이트의 서울 리전 중계(/api/cvs/proxy)로 받는다.
+// Actions 에서는 워크플로가 CVS_PROXY_URL·CRON_SECRET 을 넣어 준다.
+const PROXY = process.env.CVS_PROXY_URL;
+const PROXY_KEY = process.env.CRON_SECRET;
+const viaProxyHosts = new Set();
+
+async function viaProxy(url, init) {
+  const res = await fetch(PROXY, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${PROXY_KEY}` },
+    body: JSON.stringify({ url, method: init.method || "GET", headers: init.headers || {}, body: init.body }),
+    signal: AbortSignal.timeout(40_000),
+  });
+  if (!res.ok) throw new Error(`중계 HTTP ${res.status} (${res.headers.get("x-proxy-region") || "?"}): ${(await res.text()).slice(0, 200)}`);
+  return res;
+}
+
 async function get(url, init = {}) {
+  const host = new URL(url).hostname;
+  if (viaProxyHosts.has(host)) return viaProxy(url, init);
   for (let i = 0; i < 3; i++) {
     try {
       const res = await fetch(url, {
@@ -46,6 +73,13 @@ async function get(url, init = {}) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res;
     } catch (e) {
+      // 연결 자체가 안 되면(HTTP 응답 없음) 해외 IP 차단으로 보고 서울 중계로 전환 — 이후 같은 호스트는 계속 중계
+      const network = !String(e.message).startsWith("HTTP");
+      if (network && PROXY && PROXY_KEY) {
+        console.log(`  ↪ ${host} 직접 연결 실패(${e.cause?.code || e.message}) — 서울 중계로 전환`);
+        viaProxyHosts.add(host);
+        return viaProxy(url, init);
+      }
       if (i === 2) throw e;
       await sleep(1500 * (i + 1));
     }
@@ -73,6 +107,7 @@ function dealType(s) {
   return m ? `${m[1]}+1` : "덤";
 }
 function debugDump(name, body) {
+  diag(`${name} 원문`, body);
   try {
     fs.mkdirSync(DEBUG_DIR, { recursive: true });
     fs.writeFileSync(path.join(DEBUG_DIR, `${name}.txt`), String(body).slice(0, 200_000));
@@ -107,10 +142,14 @@ async function fetchCU() {
         b: "cu",
         n: pick(b, /class="name"[^>]*>\s*<p>([\s\S]*?)<\/p>/),
         p: toPrice(pick(b, /class="price"[^>]*>[\s\S]*?<strong>([\s\S]*?)<\/strong>/)),
-        t: dealType(pick(b, /class="badge"[^>]*>([\s\S]*?)<\/div>/) || (cond === "23" ? "1+1" : "2+1")),
+        // 배지 div 안에 "[D] .plus2 : 2+1 / .plus1 : 1+1" 주석이 있어 div 전체를 읽으면 늘 2+1 로 잡힌다 — span 만 본다
+        t: dealType(pick(b, /<span class="plus\d"[^>]*>([\s\S]*?)<\/span>/) || (cond === "23" ? "1+1" : "2+1")),
         img: absUrl(b.match(/<img[^>]+src="([^"]+)"/)?.[1], "https://cu.bgfretail.com/"),
       }));
-      if (page === 1 && items.length === 0) debugDump(`cu-${cond}`, html);
+      if (page === 1) {
+        if (items.length === 0) debugDump(`cu-${cond}`, html);
+        else diag(`cu-${cond} 1쪽 ${items.length}개, 첫 블록`, blocks(html, /<li class="prod_list/g)[0]);
+      }
       if (items.length === 0) break;
       out.push(...items);
       await sleep(300);
@@ -126,9 +165,52 @@ async function fetchGS25() {
   const pageRes = await get("https://gs25.gsretail.com/gscvs/ko/products/event-goods");
   const pageHtml = await pageRes.text();
   const token = pageHtml.match(/name="CSRFToken"\s+value="([^"]+)"/)?.[1] || pageHtml.match(/CSRFToken\s*=\s*'([^']+)'/)?.[1];
-  const cookie = (pageRes.headers.getSetCookie?.() || []).map((c) => c.split(";")[0]).join("; ");
+  const cookie =
+    (pageRes.headers.getSetCookie?.() || []).map((c) => c.split(";")[0]).join("; ") ||
+    pageRes.headers.get("x-upstream-set-cookie") || ""; // 중계를 거치면 여기에 담겨 온다
+  diag(`gs25 페이지 상태 ${pageRes.status}, 쿠키 ${cookie ? "있음" : "없음"}, CSRF 언급`, (pageHtml.match(/.{0,200}csrf.{0,200}/gi) || ["(없음)"]).join(" | "));
   if (!token) {
     debugDump("gs25-page", pageHtml);
+    // 2026 개편 후 홈페이지가 Vue 앱이 됐다 — 진단 모드에서는 번들 JS 에서 API 경로 후보를 뽑아 로그에 남긴다
+    if (DIAG) {
+      for (const src of pageHtml.match(/src="([^"]+\.js)"/g) || []) {
+        const url = src.slice(5, -1);
+        try {
+          const js = await (await get(url)).text();
+          const hits = [...new Set(js.match(/["'`][^"'`\s]{0,80}(?:event|Event|goods|Goods|promotion|prod)[^"'`\s]{0,80}["'`]/g) || [])];
+          diag(`gs25 번들 ${url.split("/").pop()} API 후보 ${hits.length}개`, hits.slice(0, 120).join(" "));
+          const bases = [...new Set(js.match(/https?:\/\/[a-z0-9.\-]+gsretail[a-z0-9.\-]*[^"'`\s]{0,60}/gi) || [])];
+          diag(`gs25 번들 ${url.split("/").pop()} 호스트`, bases.slice(0, 40).join(" "));
+          // 경로처럼 생긴 문자열 (axios 호출 주소 후보)
+          const paths = [...new Set(js.match(/["'`]\/[a-zA-Z0-9_\-\/.]{3,100}["'`]/g) || [])];
+          diag(`gs25 번들 ${url.split("/").pop()} 경로 ${paths.length}개`, paths.slice(0, 250).join(" "));
+          // baseURL·api 문맥
+          const ctx = (js.match(/.{0,120}(?:baseURL|apiUrl|API_URL|\/api\/).{0,160}/g) || []).slice(0, 12);
+          diag(`gs25 번들 ${url.split("/").pop()} api 문맥`, ctx.join(" ||| "));
+          // 지연 로딩 청크 이름표 (이벤트 화면 코드는 별도 청크에 있을 수 있다)
+          // 지연 로딩 청크를 전부 받아 gsapi 호출·이벤트 문맥을 찾는다 (행사 화면 코드는 여기에 있다)
+          const map = js.match(/return"js\/"\+\w+\+"\."\+(\{[^}]+\})/);
+          if (map) {
+            const ids = [...map[1].matchAll(/(\d+):"([0-9a-f]+)"/g)];
+            const base = url.replace(/[^/]+$/, "");
+            const found = new Set();
+            for (const [, id, hash] of ids) {
+              try {
+                const cjs = await (await get(`${base}${id}.${hash}.js`)).text();
+                for (const m of cjs.match(/["'`]\/gsapi\/[^"'`]{2,120}["'`]/g) || []) found.add(m);
+                if (/event|행사|1\+1|ONE_TO_ONE|evtGoods|eventGoods/i.test(cjs)) {
+                  const ctx = (cjs.match(/.{0,100}(?:gsapi|ONE_TO_ONE|eventGoods|evtGoods|1\+1).{0,160}/g) || []).slice(0, 6);
+                  if (ctx.length) diag(`gs25 청크 ${id} 행사 문맥`, ctx.join(" ||| "));
+                }
+              } catch {}
+            }
+            diag(`gs25 청크 ${ids.length}개의 gsapi 경로`, [...found].join(" "));
+          }
+        } catch (e) {
+          diag(`gs25 번들 ${url} 실패`, e.message);
+        }
+      }
+    }
     throw new Error("CSRFToken 을 찾지 못함");
   }
   const out = [];
@@ -270,7 +352,9 @@ async function main() {
       if (DRY && items[0]) console.log("   예:", items.slice(0, 3));
       if (items.length === 0) failed.push(brand);
     } catch (e) {
-      console.error(`✗ ${brand}: ${e.message}`);
+      // fetch failed 같은 네트워크 오류는 진짜 원인이 e.cause 에 있다 (TLS·DNS·연결 거부 등)
+      const cause = e.cause ? ` — 원인: ${e.cause.code || ""} ${e.cause.message || e.cause}` : "";
+      console.error(`✗ ${brand}: ${e.message}${cause}`);
       failed.push(brand);
     }
   }
