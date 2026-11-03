@@ -160,7 +160,7 @@ export default function GlobalIncomeTaxCalc() {
         )}
       </div>
 
-      <div className={`calc-result ${r.isRefund ? "ok" : "no"}`}>
+      <div aria-live="polite" className={`calc-result ${r.isRefund ? "ok" : "no"}`}>
         <div className="calc-verdict">
           {r.isRefund ? "돌려받는 금액 (환급)" : "더 내야 하는 금액 (추가납부)"}
         </div>

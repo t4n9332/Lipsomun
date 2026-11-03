@@ -19,19 +19,20 @@ self.addEventListener("notificationclick", (event) => {
   const url = (event.notification.data && event.notification.data.url) || "/";
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
-      for (const c of list) {
-        if ("focus" in c) {
-          c.navigate(url);
-          return c.focus();
-        }
-      }
-      return clients.openWindow(url);
+      // 이 SW 가 제어하지 않는 탭(includeUncontrolled)에 navigate() 를 부르면 reject 된다.
+      // 그러면 알림 클릭이 통째로 실패하므로, 실패하면 새 창으로 연다.
+      const c = list.find((w) => "focus" in w);
+      if (!c) return clients.openWindow(url);
+      return c
+        .navigate(url)
+        .then((w) => (w || c).focus())
+        .catch(() => clients.openWindow(url));
     })
   );
 });
 
-// 홈 화면 설치(PWA) 요건용 — 네트워크 그대로 통과
-self.addEventListener("fetch", () => {});
+// 빈 fetch 핸들러는 두지 않는다 — 설치 요건이 아니게 됐고, 있으면 모든 요청마다
+// SW 를 깨워 네비게이션만 느려진다.
 
 self.addEventListener("install", () => {
   self.skipWaiting();

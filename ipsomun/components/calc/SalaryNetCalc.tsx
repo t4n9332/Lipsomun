@@ -106,7 +106,7 @@ export default function SalaryNetCalc() {
         </Field>
       </div>
 
-      <div className="calc-result ok">
+      <div aria-live="polite" className="calc-result ok">
         <div className="calc-verdict">매달 통장에 들어오는 금액</div>
         <div className="calc-net">{won(r.net)}</div>
         <div className="calc-netsub">

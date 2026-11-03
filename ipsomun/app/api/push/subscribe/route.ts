@@ -28,17 +28,25 @@ function validEndpoint(endpoint: unknown): endpoint is string {
   }
 }
 
+/** base64url 키를 디코드했을 때 길이가 정확히 맞는지 (p256dh 65바이트, auth 16바이트) */
+function validKey(v: unknown, bytes: number): boolean {
+  if (typeof v !== "string" || v.length > 200 || !/^[A-Za-z0-9_-]+=*$/.test(v)) return false;
+  return Buffer.from(v, "base64url").length === bytes;
+}
+
 export async function POST(req: Request) {
+  // 브라우저의 구독 요청에는 항상 Sec-Fetch-Site 가 붙는다. 헤더가 없는 요청(curl 등)은
+  // 가짜 구독을 대량으로 넣어 실제 구독자를 발송 대상에서 밀어낼 수 있어 거절한다.
   const site = req.headers.get("sec-fetch-site");
-  if (site && site !== "same-origin") {
+  if (site !== "same-origin") {
     return NextResponse.json({ error: "허용되지 않은 출처" }, { status: 403 });
   }
   const sub = await req.json().catch(() => null);
   if (
     !sub ||
     !validEndpoint(sub.endpoint) ||
-    typeof sub.keys?.p256dh !== "string" ||
-    typeof sub.keys?.auth !== "string"
+    !validKey(sub.keys?.p256dh, 65) ||
+    !validKey(sub.keys?.auth, 16)
   ) {
     return NextResponse.json({ error: "잘못된 구독 정보" }, { status: 400 });
   }

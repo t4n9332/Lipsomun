@@ -112,12 +112,12 @@ export default function SeverancePayCalc() {
       </div>
 
       {r.invalid ? (
-        <div className="calc-result no">
+        <div aria-live="polite" className="calc-result no">
           <div className="calc-verdict">날짜를 확인해주세요</div>
           <div className="calc-netsub">퇴사일이 입사일보다 뒤여야 합니다</div>
         </div>
       ) : r.tooShort ? (
-        <div className="calc-result no">
+        <div aria-live="polite" className="calc-result no">
           <div className="calc-verdict">퇴직금 지급 대상이 아닙니다</div>
           <div className="calc-net">{r.workDays}일</div>
           <div className="calc-netsub">
@@ -125,7 +125,7 @@ export default function SeverancePayCalc() {
           </div>
         </div>
       ) : (
-        <div className="calc-result ok">
+        <div aria-live="polite" className="calc-result ok">
           <div className="calc-verdict">세금 떼고 실제로 받는 금액</div>
           <div className="calc-net">{won(r.net)}</div>
           <div className="calc-netsub">

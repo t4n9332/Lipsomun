@@ -76,7 +76,7 @@ export default function PensionCreditCalc() {
         </Field>
       </div>
 
-      <div className="calc-result ok">
+      <div aria-live="polite" className="calc-result ok">
         <div className="calc-verdict">연말정산에서 돌려받는 금액</div>
         <div className="calc-net">{won(r.credit)}</div>
         <div className="calc-netsub">

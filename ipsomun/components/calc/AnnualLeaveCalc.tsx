@@ -93,13 +93,13 @@ export default function AnnualLeaveCalc() {
       </div>
 
       {r.invalid ? (
-        <div className="calc-result no">
+        <div aria-live="polite" className="calc-result no">
           <div className="calc-verdict">날짜를 확인해주세요</div>
           <div className="calc-netsub">기준일이 입사일보다 뒤여야 합니다</div>
         </div>
       ) : (
         <>
-          <div className="calc-result ok">
+          <div aria-live="polite" className="calc-result ok">
             <div className="calc-verdict">남은 연차를 수당으로 받으면</div>
             <div className="calc-net">{won(r.pay)}</div>
             <div className="calc-netsub">

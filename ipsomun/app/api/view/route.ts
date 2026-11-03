@@ -18,8 +18,9 @@ const MAX_REMEMBERED = 80;
  * 교차 출처 요청은 무시하고, 최근 조회 목록 쿠키로 상품당 하루 1회만 센다.
  */
 export async function POST(req: Request) {
+  // 브라우저 fetch 에는 Sec-Fetch-Site 가 항상 붙는다. 헤더가 없는 요청(curl 루프)은 세지 않는다.
   const site = req.headers.get("sec-fetch-site");
-  if (site && site !== "same-origin") {
+  if (site !== "same-origin") {
     return NextResponse.json({ ok: true, skipped: "cross-site" });
   }
 

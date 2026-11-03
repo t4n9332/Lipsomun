@@ -7,6 +7,7 @@ import {
   reviveDeal,
   unsetDealsBySource,
   snapshotPrices,
+  claimDailyRun,
 } from "@/lib/db";
 import { cronOrAdmin } from "@/lib/auth";
 import { sendPushToAll, sendFavoritePriceDropPush } from "@/lib/push";
@@ -32,10 +33,15 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "권한 없음" }, { status: 401 });
   }
 
+  // 같은 날 다시 돌려도(크론 중복 호출·관리자 수동 실행) 푸시는 하루 한 번만.
+  // 일부러 다시 보내려면 ?force=1
+  const force = new URL(req.url).searchParams.get("force") === "1";
+  const once = (job: string) => (force ? Promise.resolve(true) : claimDailyRun(job).catch(() => false));
+
   // 찜 상품 가격 인하 알림 (어제 스냅샷과 비교 — 오늘 스냅샷 저장 전에 계산)
   let dropPush = { users: 0, sent: 0 };
   try {
-    dropPush = await sendFavoritePriceDropPush();
+    if (await once("goldbox:fav-drop")) dropPush = await sendFavoritePriceDropPush();
   } catch {}
 
   // 전 상품 가격 스냅샷 저장 (역대 최저가 뱃지/그래프용) — 유일한 호출처이므로 반드시 먼저
@@ -87,11 +93,13 @@ export async function GET(req: Request) {
     // 구독자에게 웹푸시 발송 (실패해도 갱신 결과에는 영향 없음)
     let push = { sent: 0, removed: 0 };
     try {
-      push = await sendPushToAll({
-        title: "🔥 오늘의 특가 도착!",
-        body: `쿠팡 골드박스 새 딜 ${created + revived}개가 올라왔어요. 놓치기 전에 확인하세요!`,
-        url: "/deals?utm_source=push&utm_medium=push",
-      });
+      if (await once("goldbox:push")) {
+        push = await sendPushToAll({
+          title: "🔥 오늘의 특가 도착!",
+          body: `쿠팡 골드박스 새 딜 ${created + revived}개가 올라왔어요. 놓치기 전에 확인하세요!`,
+          url: "/deals?utm_source=push&utm_medium=push",
+        });
+      }
     } catch {}
 
     if (snapshotError) {

@@ -100,7 +100,7 @@ export default function LoanSwitchCalc() {
         </Field>
       </div>
 
-      <div className={`calc-result ${good ? "ok" : "no"}`}>
+      <div aria-live="polite" className={`calc-result ${good ? "ok" : "no"}`}>
         <div className="calc-verdict">
           {good ? "갈아타면 이득입니다" : "지금은 갈아타면 손해입니다"}
         </div>

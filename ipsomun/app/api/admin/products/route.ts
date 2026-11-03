@@ -22,8 +22,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "권한 없음" }, { status: 401 });
   }
   const url = new URL(req.url);
-  const limit = Math.min(Number(url.searchParams.get("limit") || 500), 20000);
-  const offset = Math.max(Number(url.searchParams.get("offset") || 0), 0);
+  const num = (k: string, d: number) => {
+    const n = Math.floor(Number(url.searchParams.get(k)));
+    return Number.isFinite(n) ? n : d; // limit=abc 같은 값이 NaN 으로 SQL 에 넘어가 500 나지 않게
+  };
+  const limit = Math.min(Math.max(num("limit", 500), 1), 20000);
+  const offset = Math.max(num("offset", 0), 0);
   const [total, list] = await Promise.all([
     adminCountProducts(),
     adminListProducts(limit, offset),

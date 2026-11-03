@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = path.join(__dirname, ".toss-config.json");
-// 인수로 배치 파일을 지정할 수 있다 (예: node scripts/apply-reviews.mjs scripts/reviews-batch-2.json)
+// 인수로 배치 파일을 지정할 수 있다 (예: node scripts/apply-reviews.mjs scripts/archive/reviews-batch-2.json)
 const BATCH_PATH = process.argv[2]
   ? path.resolve(process.argv[2])
   : path.join(__dirname, "reviews-batch.json");

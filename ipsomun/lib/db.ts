@@ -68,10 +68,16 @@ const globalStore = globalThis as unknown as {
 
 function pool(): Pool {
   if (!globalStore.__pgPool) {
-    globalStore.__pgPool = new Pool({
+    const p = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: 3,
+      // 서버리스에서 유휴 커넥션을 오래 쥐고 있으면 DB/프록시 쪽에서 먼저 끊는다
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 5_000,
     });
+    // 유휴 커넥션이 끊기면 pool 이 'error' 를 내는데, 리스너가 없으면 프로세스가 죽는다
+    p.on("error", (e) => console.error("[pg pool]", e.message));
+    globalStore.__pgPool = p;
   }
   return globalStore.__pgPool;
 }
@@ -188,7 +194,19 @@ CREATE TABLE IF NOT EXISTS click_sources (
   clicks INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, source, platform)
 );
+-- 관리자 로그인 실패 기록 (무차별 대입 제한용)
+CREATE TABLE IF NOT EXISTS login_failures (
+  ip TEXT NOT NULL,
+  at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_login_failures_ip_at ON login_failures(ip, at);
+-- 찜 가격인하 푸시(user_id 조회)·크론의 출처별 조회가 전체 스캔이 되지 않게
+CREATE INDEX IF NOT EXISTS idx_push_user ON push_subscriptions(user_id);
+CREATE INDEX IF NOT EXISTS idx_products_source_title ON products(source, title);
 `;
+
+/** 스키마 내용이 바뀔 때만 SCHEMA_SQL 을 다시 돌리기 위한 지문 */
+const SCHEMA_VERSION = crypto.createHash("sha256").update(SCHEMA_SQL).digest("hex").slice(0, 16);
 
 /**
  * 상품의 '실효 최저가' SQL 식 — 쿠팡 가격(products.price)과 토스 링크 가격 중 낮은 쪽.
@@ -199,9 +217,16 @@ const EFFECTIVE_PRICE_SQL = `LEAST(p.price, (SELECT MIN(l.price) FROM affiliate_
 
 async function ready(): Promise<void> {
   if (!globalStore.__schemaReady) {
-    globalStore.__schemaReady = pool()
-      .query(SCHEMA_SQL)
-      .then(() => undefined)
+    // 콜드 스타트마다 SCHEMA_SQL 전체(ALTER·중복 정리 DELETE)를 돌리면 ALTER 가
+    // ACCESS EXCLUSIVE 락을 잡아 읽기까지 막는다. 지문이 같으면 건너뛴다.
+    globalStore.__schemaReady = (async () => {
+      const db = pool();
+      await db.query("CREATE TABLE IF NOT EXISTS schema_meta (version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())");
+      const { rowCount } = await db.query("SELECT 1 FROM schema_meta WHERE version = $1", [SCHEMA_VERSION]);
+      if (rowCount) return;
+      await db.query(SCHEMA_SQL);
+      await db.query("INSERT INTO schema_meta (version) VALUES ($1) ON CONFLICT DO NOTHING", [SCHEMA_VERSION]);
+    })()
       .catch((e) => {
         globalStore.__schemaReady = undefined;
         throw e;
@@ -385,6 +410,11 @@ const SORT_SQL: Record<SearchSort, string> = {
   rating: "rating DESC NULLS LAST, rating_count DESC NULLS LAST",
 };
 
+/** ILIKE 패턴용 — 사용자 입력의 %·_ 를 글자 그대로 찾고, 길이를 잘라 전체 스캔 비용을 묶는다 */
+function likePattern(query: string): string {
+  return `%${query.slice(0, 50).replace(/[\\%_]/g, (c) => "\\" + c)}%`;
+}
+
 export async function searchProductsDb(
   query: string,
   limit = 60,
@@ -392,7 +422,7 @@ export async function searchProductsDb(
   category?: string
 ): Promise<Product[]> {
   const orderBy = SORT_SQL[sort] || SORT_SQL.relevance;
-  const params: unknown[] = [`%${query}%`];
+  const params: unknown[] = [likePattern(query)];
   let where = `is_published AND (title ILIKE $1 OR description ILIKE $1 OR category ILIKE $1)`;
   if (category) {
     params.push(category);
@@ -412,7 +442,7 @@ export async function suggestTitles(query: string, limit = 8): Promise<string[]>
   const rows = await q<{ title: string }>(
     `SELECT title FROM products WHERE is_published AND title ILIKE $1
      ORDER BY clicks DESC, views DESC LIMIT $2`,
-    [`%${query}%`, limit]
+    [likePattern(query), limit]
   );
   return rows.map((r) => r.title);
 }
@@ -912,6 +942,26 @@ export async function claimDailyRun(job: string, day = kstToday()): Promise<bool
   return rows.length > 0;
 }
 
+/** 최근 window 분 안의 로그인 실패 횟수 */
+export async function recentLoginFailures(ip: string, windowMin = 15): Promise<number> {
+  const rows = await q<{ n: string }>(
+    `SELECT COUNT(*) AS n FROM login_failures WHERE ip = $1 AND at > now() - ($2 || ' minutes')::interval`,
+    [ip, String(windowMin)]
+  );
+  return Number(rows[0]?.n || 0);
+}
+
+export async function recordLoginFailure(ip: string): Promise<void> {
+  await q(`INSERT INTO login_failures (ip) VALUES ($1)`, [ip]);
+  // 하루 지난 기록은 정리 (테이블이 무한정 커지지 않게)
+  await q(`DELETE FROM login_failures WHERE at < now() - interval '1 day'`);
+}
+
+/** claimDailyRun 도장을 되돌린다 — 작업이 실패했을 때 안전망이 다시 시도할 수 있게 */
+export async function releaseDailyRun(job: string, day = kstToday()): Promise<void> {
+  await q(`DELETE FROM cron_runs WHERE day = $1::date AND job = $2`, [day, job]);
+}
+
 export async function stampAttendance(userId: string): Promise<boolean> {
   const rows = await q(
     `INSERT INTO attendance (user_id, day) VALUES ($1, $2)
@@ -1227,14 +1277,19 @@ export async function updateCollection(input: {
     `UPDATE collections SET title=$2, slug=$3, description=$4, is_published=$5, updated_at=now() WHERE id=$1`,
     [input.id, input.title.trim(), slug, input.description, input.isPublished]
   );
-  await q(`DELETE FROM collection_items WHERE collection_id = $1`, [input.id]);
-  for (let i = 0; i < input.productIds.length && i < 100; i++) {
-    await q(
-      `INSERT INTO collection_items (collection_id, product_id, position) VALUES ($1,$2,$3)
-       ON CONFLICT DO NOTHING`,
-      [input.id, input.productIds[i], i]
-    );
-  }
+  // 비우고 다시 채우는 사이에 실패하면 기획전이 빈 채로 남으므로 한 트랜잭션으로 묶는다
+  const ids = input.productIds.slice(0, 100);
+  await tx(async (run) => {
+    await run(`DELETE FROM collection_items WHERE collection_id = $1`, [input.id]);
+    if (ids.length) {
+      await run(
+        `INSERT INTO collection_items (collection_id, product_id, position)
+         SELECT $1, pid, ord - 1 FROM unnest($2::text[]) WITH ORDINALITY AS t(pid, ord)
+         ON CONFLICT DO NOTHING`,
+        [input.id, ids]
+      );
+    }
+  });
 }
 
 export async function deleteCollection(id: string): Promise<void> {

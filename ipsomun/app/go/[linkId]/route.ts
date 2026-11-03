@@ -45,7 +45,9 @@ export async function GET(
 
   const ua = req.headers.get("user-agent") || "";
   // UA가 아예 없는 요청도 정상 브라우저가 아니다
-  const isBot = !ua || BOT_UA.test(ua);
+  // Sec-Fetch-Site 가 없으면 브라우저 이동이 아니다(스크립트 반복 호출로 클릭 수 조작 방지).
+  // 이동은 그대로 시켜 주고 집계만 뺀다.
+  const isBot = !ua || BOT_UA.test(ua) || !req.headers.get("sec-fetch-site");
 
   const cookieHeader = req.headers.get("cookie") || "";
   const dedupeName = `c_${link.id.slice(0, 8)}`;
