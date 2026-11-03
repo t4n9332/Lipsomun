@@ -13,7 +13,15 @@ export default function CvsChangeRow({ c }: { c: CvsChange }) {
       <span className="what">
         {c.before && c.after ? (
           <>
-            {c.before.t} → <b>{c.after.t}</b>
+            {c.typeChanged ? (
+              <>
+                {c.before.t} → <b>{c.after.t}</b>
+              </>
+            ) : (
+              <>
+                {c.after.t} 유지 · 정가 {won(c.before.p)} → <b>{won(c.after.p)}</b>
+              </>
+            )}
             <em>
               1개당 {won(c.before.unit)} → {won(c.after.unit)} ({c.pct > 0 ? "+" : ""}
               {Math.round(c.pct * 100)}%)

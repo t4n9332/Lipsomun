@@ -40,7 +40,7 @@ const siteJsonLd = [
     name: "입소문",
     alternateName: "입소문 — 쇼핑 가격비교·특가",
     description:
-      "쿠팡·토스 가격비교, 오늘의 특가, 카테고리별 인기 랭킹과 솔직 리뷰를 한곳에서.",
+      "쿠팡·토스 가격비교, 편의점 행사, 생활 계산기와 오늘의 특가를 한곳에서.",
     inLanguage: "ko-KR",
     publisher: { "@id": `${SITE}/#org` },
     potentialAction: {
@@ -90,12 +90,48 @@ export default async function Home() {
       />
       <section className="hero">
         <h1>
-          진짜 써본 사람들의 <em>입소문</em>
+          사기 전에 한 번 더, <em>입소문</em>
         </h1>
         <p>
-          오늘의 특가, 카테고리별 인기 랭킹, 솔직 리뷰까지 — 사기 전에 여기서
-          먼저 확인하세요.
+          쿠팡·토스 가격비교, 이번 달 편의점 행사, 내 월급 계산까지 — 사기 전에
+          여기서 먼저 확인하세요.
         </p>
+      </section>
+
+      {/* 직접 만든 정보 콘텐츠를 상품 목록보다 먼저 — 사이트의 고유 가치가 첫 화면에 보이게 */}
+      <section className="section">
+        <div className="section-head">
+          <h2>📌 생활 정보</h2>
+          <Link className="more" href="/about">
+            입소문 소개 →
+          </Link>
+        </div>
+        <div className="home-info">
+          <Link href="/cvs">
+            <strong>🏪 편의점 행사</strong>
+            <span>4사 1+1·2+1, 버프·너프, 어디가 이득</span>
+          </Link>
+          <Link href="/calc/연봉실수령액">
+            <strong>💰 연봉 실수령액</strong>
+            <span>2026 4대보험 요율 반영</span>
+          </Link>
+          <Link href="/calc/연말정산환급금">
+            <strong>🧧 연말정산 환급금</strong>
+            <span>얼마 돌려받나 미리 계산</span>
+          </Link>
+          <Link href="/calc/실업급여">
+            <strong>🧾 실업급여</strong>
+            <span>하루 얼마, 며칠 받나</span>
+          </Link>
+          <Link href="/calc/퇴직금">
+            <strong>💼 퇴직금</strong>
+            <span>퇴직소득세까지</span>
+          </Link>
+          <Link href="/tools">
+            <strong>🧰 파일 도구</strong>
+            <span>업로드 없이 PDF 합치기</span>
+          </Link>
+        </div>
       </section>
 
       {compare.length > 0 && (

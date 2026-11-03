@@ -1670,3 +1670,24 @@ textarea:focus-visible,
 .shorts-offers li span:last-of-type { text-align: right; }
 .shorts-offers li em { font-style: normal; color: #ffd43b; font-weight: 900; }
 .shorts-offers .shorts-brand { font-size: 4cqw; }
+
+/* ---------- 소개·약관 같은 글 페이지 ---------- */
+.prose-page { max-width: 720px; margin: 40px auto; font-size: 15px; line-height: 1.8; }
+.prose-page h1 { font-size: 26px; font-weight: 900; margin: 0 0 14px; }
+.prose-page h2 { font-size: 18px; margin: 30px 0 8px; }
+.prose-page .lead { font-size: 16px; color: var(--ink-soft); }
+.prose-page ul { padding-left: 20px; }
+.prose-page li { margin: 6px 0; }
+.prose-page .muted { color: var(--ink-faint); font-size: 13.5px; margin-top: 30px; }
+
+/* ---------- 홈: 생활 정보 바로가기 ---------- */
+.home-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.home-info a {
+  display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 14px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+.home-info a strong { font-size: 16px; }
+.home-info a span { font-size: 13px; color: var(--ink-soft); }
+@media (max-width: 640px) { .home-info { grid-template-columns: 1fr 1fr; } }
+.shorts-deal.price { flex-direction: column; gap: 1cqw; }
+.shorts-deal.price small { font-size: 4.6cqw; font-weight: 700; opacity: .85; }

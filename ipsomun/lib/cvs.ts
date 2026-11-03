@@ -85,6 +85,8 @@ export interface CvsChange {
   after?: { t: DealType; p: number; unit: number };
   /** 1개당 가격 변화율 (음수 = 싸짐). new/ended 는 0 */
   pct: number;
+  /** 행사 종류가 바뀌었나 (1+1 ↔ 2+1). 아니면 정가만 바뀐 것 */
+  typeChanged: boolean;
 }
 
 /** 지난달 → 이번 달, 편의점별로 같은 상품의 행사 조건 변화를 찾는다 */
@@ -98,7 +100,7 @@ export function diffMonths(prev: CvsItem[], cur: CvsItem[]): CvsChange[] {
   for (const [k, a] of after) {
     const p = before.get(k);
     if (!p) {
-      out.push({ kind: "new", b: a.b, n: a.n, img: a.img, after: snap(a), pct: 0 });
+      out.push({ kind: "new", b: a.b, n: a.n, img: a.img, after: snap(a), pct: 0, typeChanged: false });
       continue;
     }
     const pu = unitPrice(p);
@@ -109,13 +111,16 @@ export function diffMonths(prev: CvsItem[], cur: CvsItem[]): CvsChange[] {
       b: a.b, n: a.n, img: a.img || p.img,
       before: snap(p), after: snap(a),
       pct: pu > 0 ? (au - pu) / pu : 0,
+      typeChanged: a.t !== p.t,
     });
   }
   for (const [k, p] of before) {
-    if (!after.has(k)) out.push({ kind: "ended", b: p.b, n: p.n, img: p.img, before: snap(p), pct: 0 });
+    if (!after.has(k)) out.push({ kind: "ended", b: p.b, n: p.n, img: p.img, before: snap(p), pct: 0, typeChanged: false });
   }
-  // 체감이 큰 변화부터
-  return out.sort((x, y) => Math.abs(y.pct) - Math.abs(x.pct));
+  // 행사 종류가 바뀐 것(1+1 ↔ 2+1 — 진짜 '패치')이 먼저, 그 안에서 체감이 큰 순
+  return out.sort(
+    (x, y) => Number(y.typeChanged) - Number(x.typeChanged) || Math.abs(y.pct) - Math.abs(x.pct)
+  );
 }
 
 export interface CrossDeal {

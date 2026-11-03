@@ -32,3 +32,12 @@ test("같은 상품 어디가 이득", () => {
   assert.equal(x[0].offers[0].b, "gs25");
   assert.equal(x[0].save, 450);
 });
+
+test("행사 종류가 바뀐 변화가 정가만 바뀐 변화보다 먼저", () => {
+  const prev = [it("cu", "A상품", 3000, "1+1"), it("gs25", "B상품", 2000, "2+1")];
+  const cur = [it("cu", "A상품", 1000, "1+1"), it("gs25", "B상품", 2000, "1+1")];
+  const d = diffMonths(prev, cur);
+  assert.equal(d[0].n, "B상품"); // -25% 지만 2+1→1+1 이라 먼저
+  assert.equal(d[0].typeChanged, true);
+  assert.equal(d[1].typeChanged, false);
+});

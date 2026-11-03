@@ -66,6 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     { url: `${base}/blog`, lastModified: today, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/calc`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/about`, changeFrequency: "yearly" as const, priority: 0.5 },
     ...CALCULATORS.map((c) => ({
       url: `${base}/calc/${encodeURIComponent(c.slug)}`,
       changeFrequency: "monthly" as const,

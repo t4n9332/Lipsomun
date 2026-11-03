@@ -14,6 +14,7 @@ export const metadata: Metadata = { title: "편의점 패치노트 쇼츠", robo
 
 export default function ShortsPage() {
   const M = monthLabel(CUR.month || "0000-00");
+  // 행사 종류가 바뀐 것만으로 채우고, 모자라면 정가 변동으로 메운다 (CHANGES 가 이미 그 순서)
   const buffs = CHANGES.filter((c) => c.kind === "buff").slice(0, 5);
   const nerfs = CHANGES.filter((c) => c.kind === "nerf").slice(0, 4);
   const slides: Slide[] = [
@@ -22,11 +23,13 @@ export default function ShortsPage() {
       kind: "buff",
       brand: brandName(c.b), brandId: c.b, name: c.n, img: c.img ? imgUrl(c.img, 600) : undefined,
       from: c.before?.t, to: c.after?.t, fromUnit: c.before?.unit, toUnit: c.after?.unit, pct: c.pct,
+      fromPrice: c.before?.p, toPrice: c.after?.p,
     })),
     ...nerfs.map((c): Slide => ({
       kind: "nerf",
       brand: brandName(c.b), brandId: c.b, name: c.n, img: c.img ? imgUrl(c.img, 600) : undefined,
       from: c.before?.t, to: c.after?.t, fromUnit: c.before?.unit, toUnit: c.after?.unit, pct: c.pct,
+      fromPrice: c.before?.p, toPrice: c.after?.p,
     })),
     ...CROSS.slice(0, 2).map((x): Slide => ({
       kind: "versus", name: x.name, img: x.img ? imgUrl(x.img, 600) : undefined,

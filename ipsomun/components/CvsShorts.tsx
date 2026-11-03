@@ -8,6 +8,7 @@ export type Slide =
       kind: "buff" | "nerf";
       brand: string; brandId: string; name: string; img?: string;
       from?: string; to?: string; fromUnit?: number; toUnit?: number; pct: number;
+      fromPrice?: number; toPrice?: number;
     }
   | {
       kind: "versus"; name: string; img?: string;
@@ -73,11 +74,20 @@ export default function CvsShorts({ slides }: { slides: Slide[] }) {
             <div className={`shorts-brand b-${s.brandId}`}>{s.brand}</div>
             <div className="shorts-img">{s.img ? <img src={s.img} alt="" /> : <span>🏪</span>}</div>
             <h2 className="shorts-name">{s.name}</h2>
-            <div className="shorts-deal">
-              <span className="old">{s.from}</span>
-              <span className="arrow">→</span>
-              <span className="new">{s.to}</span>
-            </div>
+            {s.from !== s.to ? (
+              <div className="shorts-deal">
+                <span className="old">{s.from}</span>
+                <span className="arrow">→</span>
+                <span className="new">{s.to}</span>
+              </div>
+            ) : (
+              <div className="shorts-deal price">
+                <span className="new">{s.to}</span>
+                <small>
+                  정가 {won(s.fromPrice)} → {won(s.toPrice)}
+                </small>
+              </div>
+            )}
             <div className="shorts-unit">
               1개당 {won(s.fromUnit)} → <b>{won(s.toUnit)}</b>
               <em>

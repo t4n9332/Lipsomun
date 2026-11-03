@@ -67,7 +67,7 @@ export async function generateMetadata({
     ? `쿠팡 ${won(cPrice)} vs 토스쇼핑 ${won(tPrice)} — 오늘 더 싼 곳에서 구매하세요. ` +
       (product.review || product.description || "").slice(0, 90)
     : (product.review || product.description || "").slice(0, 150) ||
-      `${product.title} 최저가 비교와 솔직 리뷰를 입소문에서 확인하세요.`;
+      `${product.title} 쿠팡·토스쇼핑 가격과 가격 변동을 입소문에서 비교하세요.`;
   // 슬러그가 한글이라 인코딩하지 않으면 canonical이 구글이 크롤하는 주소
   // (퍼센트 인코딩된 형태)와 달라진다.
   const url = `${SITE}/p/${encodeURIComponent(product.slug)}`;
