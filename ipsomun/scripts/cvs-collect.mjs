@@ -188,8 +188,24 @@ async function fetchGS25() {
           const ctx = (js.match(/.{0,120}(?:baseURL|apiUrl|API_URL|\/api\/).{0,160}/g) || []).slice(0, 12);
           diag(`gs25 번들 ${url.split("/").pop()} api 문맥`, ctx.join(" ||| "));
           // 지연 로딩 청크 이름표 (이벤트 화면 코드는 별도 청크에 있을 수 있다)
-          const chunk = js.match(/.{0,80}"js\/".{0,600}/);
-          if (chunk) diag(`gs25 번들 청크 맵`, chunk[0]);
+          // 지연 로딩 청크를 전부 받아 gsapi 호출·이벤트 문맥을 찾는다 (행사 화면 코드는 여기에 있다)
+          const map = js.match(/return"js\/"\+\w+\+"\."\+(\{[^}]+\})/);
+          if (map) {
+            const ids = [...map[1].matchAll(/(\d+):"([0-9a-f]+)"/g)];
+            const base = url.replace(/[^/]+$/, "");
+            const found = new Set();
+            for (const [, id, hash] of ids) {
+              try {
+                const cjs = await (await get(`${base}${id}.${hash}.js`)).text();
+                for (const m of cjs.match(/["'`]\/gsapi\/[^"'`]{2,120}["'`]/g) || []) found.add(m);
+                if (/event|행사|1\+1|ONE_TO_ONE|evtGoods|eventGoods/i.test(cjs)) {
+                  const ctx = (cjs.match(/.{0,100}(?:gsapi|ONE_TO_ONE|eventGoods|evtGoods|1\+1).{0,160}/g) || []).slice(0, 6);
+                  if (ctx.length) diag(`gs25 청크 ${id} 행사 문맥`, ctx.join(" ||| "));
+                }
+              } catch {}
+            }
+            diag(`gs25 청크 ${ids.length}개의 gsapi 경로`, [...found].join(" "));
+          }
         } catch (e) {
           diag(`gs25 번들 ${url} 실패`, e.message);
         }
