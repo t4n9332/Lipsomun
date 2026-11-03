@@ -1691,3 +1691,5 @@ textarea:focus-visible,
 @media (max-width: 640px) { .home-info { grid-template-columns: 1fr 1fr; } }
 .shorts-deal.price { flex-direction: column; gap: 1cqw; }
 .shorts-deal.price small { font-size: 4.6cqw; font-weight: 700; opacity: .85; }
+.cvs-more { display: flex; justify-content: center; margin: 22px 0 6px; }
+.cvs-more .btn { min-width: 220px; }
