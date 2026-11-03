@@ -1,0 +1,24 @@
+# 임시 진단: /cvs/coupang 이 파트너스 딥링크(lptag)로 이동하는지 확인. 확인 후 삭제.
+name: 진단 - 편의점 쿠팡 딥링크
+on:
+  push:
+    branches: ["claude/clever-pascal-f353qk"]
+    paths: [".github/workflows/diag-cvs-coupang.yml"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          sleep 120
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
+          for q in "덴마크 초코초코우유 300ml" "CJ 맥스봉빅소시지 150g"; do
+            enc=$(python3 -c "import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1]))" "$q")
+            loc=$(curl -sS -A "$UA" -o /dev/null -w "%{http_code} %{redirect_url}" "https://lipsomun.co.kr/cvs/coupang?q=$enc")
+            echo "[$q] 1단계: $loc"
+            url=$(echo "$loc" | cut -d' ' -f2)
+            case "$url" in *link.coupang.com*)
+              nxt=$(curl -sS -A "$UA" -o /dev/null -w "%{http_code} %{redirect_url}" "$url"); echo "   2단계: $nxt" | cut -c1-300;;
+            esac
+          done
+          echo "== 카드에 버튼 노출 =="
+          curl -sS -A "$UA" https://lipsomun.co.kr/cvs/seven | grep -o 'cvs-cp' | wc -l
