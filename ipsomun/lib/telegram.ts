@@ -3,6 +3,9 @@
  * - 봇 생성: 텔레그램에서 @BotFather → /newbot → 토큰 발급
  * - 채널 생성 후 봇을 관리자로 추가
  * - 환경변수: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID(@채널아이디 또는 -100으로 시작하는 숫자)
+ * - 운영 경고(자동화 점검·크론 실패·세션 만료)는 TELEGRAM_ADMIN_CHAT_ID(운영자 개인 대화)로만 보낸다.
+ *   예전에는 경고도 공개 채널로 나가 구독자에게 "PC 전원 확인하세요" 같은 내부 메시지가 보였다.
+ *   개인 대화 ID 얻기: 봇에게 아무 말이나 보낸 뒤 https://api.telegram.org/bot<토큰>/getUpdates 의 chat.id
  */
 
 /**
@@ -67,16 +70,32 @@ export async function sendTelegram(html: string): Promise<{ ok: boolean; error?:
   if (!telegramConfigured()) {
     return { ok: false, error: "TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID 미설정" };
   }
+  return sendTo(process.env.TELEGRAM_CHAT_ID!, html);
+}
+
+/** 운영자 개인 대화로만 보내는 경고 — 공개 채널로는 절대 보내지 않는다 */
+export function adminAlertConfigured(): boolean {
+  return !!(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_ADMIN_CHAT_ID);
+}
+export async function sendAdminAlert(html: string): Promise<{ ok: boolean; error?: string }> {
+  if (!adminAlertConfigured()) {
+    console.warn("[admin alert] TELEGRAM_ADMIN_CHAT_ID 미설정 — 경고를 보내지 않음:", html.slice(0, 200));
+    return { ok: false, error: "TELEGRAM_ADMIN_CHAT_ID 미설정 (운영 경고는 공개 채널로 보내지 않음)" };
+  }
+  return sendTo(process.env.TELEGRAM_ADMIN_CHAT_ID!, html);
+}
+
+async function sendTo(chatId: string, html: string): Promise<{ ok: boolean; error?: string }> {
   const chunks = splitForTelegram(html).slice(0, MAX_CHUNKS);
   for (let i = 0; i < chunks.length; i++) {
-    const r = await sendOne(chunks[i], i === 0);
+    const r = await sendOne(chatId, chunks[i], i === 0);
     // 한 통이라도 실패하면 즉시 알린다 — 조용히 반쪽만 나가지 않게
     if (!r.ok) return { ok: false, error: `${i + 1}/${chunks.length}통 실패: ${r.error}` };
   }
   return { ok: true };
 }
 
-async function sendOne(text: string, preview: boolean): Promise<{ ok: boolean; error?: string }> {
+async function sendOne(chatId: string, text: string, preview: boolean): Promise<{ ok: boolean; error?: string }> {
   try {
     const res = await fetch(
       `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
@@ -84,7 +103,7 @@ async function sendOne(text: string, preview: boolean): Promise<{ ok: boolean; e
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          chat_id: process.env.TELEGRAM_CHAT_ID,
+          chat_id: chatId,
           text,
           parse_mode: "HTML",
           // 미리보기는 첫 통에만 — 나머지까지 붙으면 채널이 지저분해진다
