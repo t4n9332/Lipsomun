@@ -61,7 +61,7 @@ export async function generateMetadata(
     description: c.desc,
     keywords: c.keywords,
     alternates: { canonical: `/calc/${encodeURIComponent(c.slug)}` },
-    openGraph: { title: c.title, description: c.desc, images: ["/og-default.png"], locale: "ko_KR", siteName: "입소문" },
+    openGraph: { title: c.title, description: c.desc, images: [`/calc/og/${encodeURIComponent(c.slug)}`], locale: "ko_KR", siteName: "입소문" },
   };
 }
 
