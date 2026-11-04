@@ -42,9 +42,12 @@ const BRAND = (s) => {
   if (/^(이마트|emart)/.test(v)) return "emart24";
   return null;
 };
+// 정확히 1+1·2+1·3+1·덤(증정)만 받는다. 2+2·할인·페이백·쿠폰 등은 null → 건너뜀(임의로 '덤'으로 바꾸지 않음)
 const TYPE = (s) => {
-  const m = String(s).replace(/\s/g, "").match(/([123])\+1/);
-  return m ? `${m[1]}+1` : "덤";
+  const v = String(s ?? "").replace(/\s/g, "");
+  const m = v.match(/^([123])\+1(행사|상품)?$/);
+  if (m) return `${m[1]}+1`;
+  return /^(덤|덤증정|증정|덤행사|증정행사)$/.test(v) ? "덤" : null;
 };
 
 /** 따옴표·쉼표가 섞인 CSV 한 줄 파싱 */
@@ -94,7 +97,7 @@ function readItems() {
 }
 
 const all = readItems();
-const items = all.filter((x) => x.b && x.n && x.p > 0);
+const items = all.filter((x) => x.b && x.n && x.p > 0 && x.t);
 const skipped = all.length - items.length;
 if (!items.length) {
   console.error("읽은 상품이 없습니다 — 형식을 확인하세요.");
@@ -120,4 +123,4 @@ fs.writeFileSync(
 );
 const by = items.reduce((m, x) => ((m[x.b] = (m[x.b] || 0) + 1), m), {});
 console.log(`저장: ${path.relative(process.cwd(), outFile)} — ${month}, ${items.length}개`, by);
-if (skipped) console.warn(`⚠ 형식이 맞지 않아 건너뛴 줄 ${skipped}개 (편의점 이름·가격 확인)`);
+if (skipped) console.warn(`⚠ 형식이 맞지 않아 건너뛴 줄 ${skipped}개 (편의점 이름·가격·행사 유형 확인 — 1+1·2+1·3+1·덤 외 유형은 받지 않음)`);

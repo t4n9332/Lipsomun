@@ -1,0 +1,9 @@
+{
+  "match": { "urlIncludes": "/synthetic/promo/list", "method": "GET" },
+  "itemsPath": "result.list",
+  "totalPath": "result.total",
+  "fields": { "product_code": "gdCd", "barcode": "bc", "name": "gdNm", "price": "prc", "promo_type_raw": "evt", "gift_name": "gift", "gift_code": "giftCd", "start_date": "st", "end_date": "ed" },
+  "promoMap": { "ONE_PLUS_ONE": "1+1", "TWO_PLUS_ONE": "2+1", "GIFT": "덤" },
+  "scopeNote": "합성 테스트 데이터",
+  "terms": "해당 없음(합성)"
+}
