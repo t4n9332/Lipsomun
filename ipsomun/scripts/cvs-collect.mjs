@@ -196,6 +196,10 @@ async function fetchSeven() {
         }))
         .filter((x) => x.n);
       if (page === 1 && items.length === 0) debugDump(`seven-${tab}`, html);
+      // 진단: 쪽마다 몇 개 읽었는지 (증정 탭이 일찍 끊기는지 확인용)
+      if (DIAG && (page <= 3 || items.length < 10)) {
+        diag(`seven-${tab} ${page}쪽 ${items.length}개 (원문 블록 ${blocks(html, /<ul class=["']tag_list_01["']/g).length})`, tab === "3" && page <= 2 ? html.slice(-1500) : "");
+      }
       // 마지막 쪽을 넘기면 빈 응답이거나 같은 쪽을 다시 줄 수 있다
       if (items.length === 0 || items[0].n === out.at(-items.length)?.n) break;
       out.push(...items);

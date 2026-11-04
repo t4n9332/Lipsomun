@@ -31,6 +31,8 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     images: ["/og-default.png"],
   },
+  // X(트위터)는 twitter:card 가 없으면 작은 썸네일로 보인다. 큰 카드로 — 이미지는 각 페이지의 og:image 를 그대로 쓴다
+  twitter: { card: "summary_large_image" },
   // 구글 디스커버·리치결과 전제 조건 (큰 이미지 미리보기 허용)
   robots: {
     index: true,
@@ -38,7 +40,7 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   alternates: {
-    types: { "application/rss+xml": [{ url: "/feed.xml", title: "입소문 — 특가·가격비교 RSS" }] },
+    types: { "application/rss+xml": [{ url: "/feed.xml", title: "입소문 — 편의점 행사·가격비교 RSS" }] },
   },
 };
 
