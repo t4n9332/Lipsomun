@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "입소문",
     locale: "ko_KR",
-    images: ["/og-default.png"],
+    images: ["/cvs/og"],
   },
 };
 

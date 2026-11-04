@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: TITLE,
   description: "지난달과 비교해 1+1·2+1 조건이 좋아진(버프)·나빠진(너프)·새로 생긴·끝난 편의점 행사를 게임 패치노트처럼 정리했습니다.",
   alternates: { canonical: `${SITE}/cvs/patch` },
-  openGraph: { title: TITLE, url: `${SITE}/cvs/patch`, type: "article", siteName: "입소문", locale: "ko_KR", images: ["/og-default.png"] },
+  openGraph: { title: TITLE, url: `${SITE}/cvs/patch`, type: "article", siteName: "입소문", locale: "ko_KR", images: ["/cvs/og"] },
 };
 
 const SECTIONS: { kind: ChangeKind; title: string; desc: string }[] = [

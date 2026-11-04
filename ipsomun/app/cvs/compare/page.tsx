@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: `${M} 같은 상품 편의점별 행사 비교 — 어디서 사야 1개당 가장 쌀까`,
   description: `${M} CU·세븐일레븐·이마트24에서 동시에 행사하는 같은 상품 ${CROSS.length}개를 1개당 실제 가격으로 비교했습니다. 1+1과 2+1이 엇갈리는 상품을 한눈에.`,
   alternates: { canonical: `${SITE}/cvs/compare` },
-  openGraph: { title: `${M} 편의점 행사 비교 | 입소문`, url: `${SITE}/cvs/compare`, type: "article", siteName: "입소문", locale: "ko_KR", images: ["/og-default.png"] },
+  openGraph: { title: `${M} 편의점 행사 비교 | 입소문`, url: `${SITE}/cvs/compare`, type: "article", siteName: "입소문", locale: "ko_KR", images: ["/cvs/og"] },
 };
 
 export default function CvsComparePage() {
