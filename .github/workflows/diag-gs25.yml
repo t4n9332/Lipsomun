@@ -1,0 +1,14 @@
+# 임시 진단: 우리동네GS 웹 공개 JS 에서 행사 데이터 API 경로 찾기 (읽기만). 확인 후 삭제.
+name: 진단 - GS25 행사 데이터 경로
+on:
+  push:
+    branches: ["claude/clever-pascal-f353qk"]
+    paths: [".github/workflows/diag-gs25.yml", ".github/diag/gs25-probe.mjs"]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node .github/diag/gs25-probe.mjs
