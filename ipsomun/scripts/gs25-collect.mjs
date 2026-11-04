@@ -5,10 +5,13 @@
  * GS25 는 2026 개편 뒤 공식 웹에 행사 목록이 없다. 그래서 "어디서 받을지"는 실제 응답을 보고 정한다.
  * 이 스크립트는 받는 곳(소스)과 응답 구조(매핑 파일)를 분리해 두고, 받은 뒤의 일은 전부 자동으로 한다.
  *
- * ── 소스 3가지 ─────────────────────────────────────────────
+ * ── 소스 4가지 ─────────────────────────────────────────────
  *  har  : 브라우저/앱 화면에서 정상 조회하며 저장한 HAR(.har) — 인증값은 읽는 즉시 버린다
  *  http : 매핑 파일의 request 에 적힌 목록 주소를 페이지 단위로 직접 조회(요청 간격·재시도·이어받기)
  *  csv  : 운영자가 직접 정리한 표(cvs-import.mjs 형식 + 확장 열)
+ *  ui   : adb uiautomator 로 받은 화면 덤프(.xml). 통신을 가로채지 않고 화면에 보이는 글자만 읽는다.
+ *         만드는 법: node scripts/gs25/adb-dump.mjs --tab=1+1 (운영자 PC). 폴더째 --in 으로 넘긴다.
+ *         node scripts/gs25-collect.mjs --source=ui --in=gs25-dumps [--ui-config=scripts/gs25/ui-config.json]
  *
  * ── 순서 ───────────────────────────────────────────────────
  *  1) node scripts/gs25-collect.mjs --source=har --in=gs25.har --discover
@@ -51,7 +54,7 @@ const writeJson = (f, v) => { fs.mkdirSync(path.dirname(f), { recursive: true })
 const month = flag("month") || L.kstMonth();
 if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) die(`--month 형식 오류: ${month} (YYYY-MM)`);
 const source = flag("source");
-if (!["har", "http", "csv"].includes(source)) die("--source=har|http|csv 필요. 사용법은 파일 맨 위 주석.");
+if (!["har", "http", "csv", "ui"].includes(source)) die("--source=har|http|csv|ui 필요. 사용법은 파일 맨 위 주석.");
 const SAMPLE = has("sample");
 const input = flag("in");
 const mapFile = flag("map");
@@ -63,7 +66,7 @@ const ctxBase = { month, collected_at };
 /* ---------------- 소스별 수집 ---------------- */
 
 const failures = [];
-let rawRows = [], declaredTotal = null, sourceUrls = new Set(), live = false, manual = false;
+let rawRows = [], declaredTotal = null, sourceUrls = new Set(), live = false, manual = false, uiDiag = null;
 let mapping = null;
 if (mapFile) {
   mapping = readJson(mapFile);
@@ -101,13 +104,36 @@ if (source === "har") {
   const res = await fetchPaged(mapping);
   rawRows = res.rows; declaredTotal = res.total; sourceUrls = new Set([mapping.request.url.split("?")[0]]);
   live = !SAMPLE;
-} else {
+} else if (source === "csv") {
   if (!input || !fs.existsSync(input)) die("--in=파일.csv 필요");
   const { rows, unknownHeaders } = L.parseCsv(fs.readFileSync(input, "utf8"));
   if (unknownHeaders.length) console.warn(`무시한 열: ${unknownHeaders.join(", ")}`);
   rawRows = rows;
   sourceUrls.add(`file:${path.basename(input)}`);
   manual = !SAMPLE;
+} else { // ui: adb uiautomator 덤프(화면에 보이는 글자). --in=덤프폴더 또는 한 파일
+  if (!input || !fs.existsSync(input)) die("--in=덤프폴더 또는 .xml 필요 (adb-dump.mjs 로 만든 것)");
+  const uiCfg = flag("ui-config") ? readJson(flag("ui-config")) : {};
+  const dumps = loadDumps(input);
+  if (!dumps.length) die(`덤프 XML 을 못 찾음: ${input}`);
+  const { rows, diag } = L.uiExtract(dumps, uiCfg);
+  rawRows = rows;
+  uiDiag = diag;
+  sourceUrls.add(`uidump:${path.basename(input)} (${dumps.length}장${uiCfg.resId ? ", resId" : ", bounds"})`);
+  live = !SAMPLE; // 화면을 실제로 읽었으면 실측. 다만 전체 건수 근거는 없어 관측 범위로 판정됨
+  if (!rows.length) failures.push({ stage: "ui", reason: "덤프에서 상품을 못 뽑음 — ui-config 자원ID 보정 필요(실제 덤프 1장 확인)" });
+}
+
+/** 폴더면 그 안의 *.xml 모두, 파일이면 하나. 파일명에 1+1/2+1/덤이 있으면 탭으로 본다 */
+function loadDumps(p) {
+  const files = fs.statSync(p).isDirectory()
+    ? fs.readdirSync(p).filter((f) => f.endsWith(".xml")).map((f) => path.join(p, f))
+    : [p];
+  return files.map((f) => {
+    const name = path.basename(f);
+    const tab = /1\+1/.test(name) ? "1+1" : /2\+1/.test(name) ? "2+1" : /3\+1/.test(name) ? "3+1" : /덤|증정|gift/i.test(name) ? "덤" : null;
+    return { xml: fs.readFileSync(f, "utf8"), tab };
+  });
 }
 
 /** 유형별 탭처럼 같은 주소가 조건만 바꿔 여러 번 불릴 때, 조건별 전체 건수를 따로 더하기 위한 키 */
@@ -214,6 +240,7 @@ const run = {
   failures: failures.length,
   previous: prev ? path.relative(ROOT, prevFile) : null,
   diff: diff ? { added: diff.added.length, changed: diff.changed.length, ended: diff.ended.length, type_changed: diff.type_changed.length } : null,
+  ...(uiDiag ? { ui: uiDiag } : {}),
   ...verdict,
 };
 

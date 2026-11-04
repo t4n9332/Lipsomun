@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hierarchy rotation="0">
+ <node class="android.widget.FrameLayout" bounds="[0,0][1080,2340]">
+  <node resource-id="com.woodongs:id/cardGoods" bounds="[20,320][1060,560]">
+   <node resource-id="com.woodongs:id/tvGoodsName" text="삼양)불닭볶음면" bounds="[300,340][900,390]"/>
+   <node resource-id="com.woodongs:id/tvPrice" text="1,500원" bounds="[300,400][600,450]"/>
+   <node resource-id="com.woodongs:id/tvEvent" text="1+1" bounds="[40,340][180,400]"/>
+  </node>
+  <node resource-id="com.woodongs:id/cardGoods" bounds="[20,580][1060,820]">
+   <node resource-id="com.woodongs:id/tvGoodsName" text="코카콜라 제로 500ml" bounds="[300,600][900,650]"/>
+   <node resource-id="com.woodongs:id/tvPrice" text="2,000원" bounds="[300,660][600,710]"/>
+   <node resource-id="com.woodongs:id/tvEvent" text="1+1" bounds="[40,600][180,660]"/>
+  </node>
+  <node resource-id="com.woodongs:id/cardGoods" bounds="[20,840][1060,1080]">
+   <node resource-id="com.woodongs:id/tvGoodsName" text="해태)홈런볼" bounds="[300,860][900,910]"/>
+   <node resource-id="com.woodongs:id/tvPrice" text="3,000원" bounds="[300,920][600,970]"/>
+   <node resource-id="com.woodongs:id/tvEvent" text="1+1" bounds="[40,860][180,920]"/>
+  </node>
+ </node>
+</hierarchy>

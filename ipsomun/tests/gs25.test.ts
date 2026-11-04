@@ -171,3 +171,48 @@ test("CLI http: 페이지 넘김·재시도·전체 건수 검증 → 실제 조
     assert.match(JSON.parse(fs.readFileSync(path.join(out3, "failures.json"), "utf8")).failures[0].reason, /403/);
   } finally { srv.close(); }
 });
+
+test("UI 덤프: 화면 글자 파싱, 개인정보 노드 제외", () => {
+  const xml = fs.readFileSync(path.join(FX, "synthetic-ui-1+1.xml"), "utf8");
+  const nodes = L.parseUiDump(xml);
+  assert.ok(nodes.find((n: any) => n.text === "몬스터 울트라 355ml"));
+  assert.ok(nodes.find((n: any) => n.text === "홍길동님 · 1,250 P")); // 파싱은 되지만
+  assert.ok(L.PERSONAL_RX.test("홍길동님 · 1,250 P")); // 가격 짝 찾기에서 걸러짐
+});
+
+test("UI 덤프: resId 모드로 상품 추출", () => {
+  const cfg = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "..", "scripts", "gs25", "ui-config.example.json"), "utf8"));
+  const dumps = [{ xml: fs.readFileSync(path.join(FX, "synthetic-ui-1+1.xml"), "utf8"), tab: "1+1" }];
+  const { rows } = L.uiExtract(dumps, cfg);
+  assert.equal(rows.length, 2);
+  assert.deepEqual(rows[0], { name: "몬스터 울트라 355ml", price: "2,700", promo_type_raw: "1+1", gift_name: null, source_screen: "1+1" });
+});
+
+test("UI 덤프: bounds 모드(설정 없이 좌표)로도 뽑고 개인정보 가격 제외", () => {
+  const dumps = [{ xml: fs.readFileSync(path.join(FX, "synthetic-ui-1+1.xml"), "utf8"), tab: "1+1" }];
+  const { rows, diag } = L.uiExtract(dumps, {});
+  assert.equal(diag.mode, "bounds");
+  assert.equal(rows.length, 2); // 1,250 P 는 가격 후보에서 빠짐
+  assert.ok(rows.every((r: any) => r.promo_type_raw === "1+1"));
+  assert.ok(rows.find((r: any) => r.name === "몬스터 울트라 355ml" && r.price === "2,700"));
+});
+
+test("CLI ui: 덤프 폴더 2장 → 겹친 상품은 중복 제거, 탭명으로 유형 보강", () => {
+  const dir = tmp();
+  for (const f of ["synthetic-ui-1+1.xml", "synthetic-ui-1+1-b.xml"]) fs.copyFileSync(path.join(FX, f), path.join(dir, f));
+  const cfg = path.join(dir, "cfg.json");
+  fs.copyFileSync(path.join(import.meta.dirname, "..", "scripts", "gs25", "ui-config.example.json"), cfg);
+  const out = tmp();
+  const r = run("--source=ui", `--in=${dir}`, `--ui-config=${cfg}`, "--month=2026-11", `--out=${out}`, "--prev=/nonexistent");
+  const j = JSON.parse(fs.readFileSync(path.join(out, "promotions.json"), "utf8"));
+  // 1+1.xml: 몬스터·불닭 / b.xml: 불닭(중복)·콜라·홈런볼 → 4종
+  assert.equal(j.items.length, 4, JSON.stringify(j.items.map((x: any) => x.name)));
+  assert.ok(j.items.every((x: any) => x.promo_type_norm === "1+1"));
+  const run1 = JSON.parse(fs.readFileSync(path.join(out, "run.json"), "utf8"));
+  assert.equal(run1.ui.dumps, 2);
+  assert.equal(run1.ui.mode, "resId");
+  // 실측이지만 전체 건수 근거 없음 → 관측 범위. 단 2+1·덤 유형이 없어 '일부 누락'으로 떨어짐
+  assert.equal(run1.status, L.STATUS.PARTIAL);
+  assert.ok(run1.reasons.some((x: string) => /유형 누락/.test(x)));
+  assert.equal(r.status, 2, r.stderr);
+});

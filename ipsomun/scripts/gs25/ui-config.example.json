@@ -1,0 +1,14 @@
+{
+  "_주의": "실제 덤프 1장을 보고 자원ID 끝부분을 채운 뒤 쓴다. 아래는 예시 구조. resId 가 있으면 좌표 추정 대신 자원ID 로 정확히 집는다.",
+  "resId": {
+    "card": "cardGoods",
+    "name": "tvGoodsName",
+    "price": "tvPrice",
+    "promo": "tvEvent",
+    "gift": "tvGift"
+  },
+  "rowGap": 220,
+  "cardWidth": 1040,
+  "scopeNote": "우리동네GS 앱 > 행사 > 1+1/2+1/덤 탭을 각각 끝까지 스크롤하며 덤프. 매장 미지정(전국 공통 행사)",
+  "terms": "앱 화면 글자를 자동으로 읽어 모으는 것이 허용되는지 미확인 — 약관 확인 후 적을 것"
+}

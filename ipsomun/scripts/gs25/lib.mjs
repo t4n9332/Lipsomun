@@ -430,3 +430,114 @@ export function blockReason(status, contentType, text) {
   }
   return null;
 }
+
+/* ---------------- UI 덤프(화면에 보이는 글자) → 상품 레코드 ----------------
+ * 통신을 가로채지 않는다. adb uiautomator dump 가 만든 XML(접근성 트리)의 text 속성만 읽는다.
+ * 두 모드:
+ *   resId : 설정(ui-config)의 자원ID 로 상품 카드·이름·가격·행사 노드를 정확히 집는다(실제 덤프 1개 보면 이걸로 고정).
+ *   bounds: 설정이 없을 때 좌표로 묶는 임시 모드 — 가격 노드를 기준으로 가까운 이름·행사 글자를 붙인다.
+ */
+
+const PRICE_RX = /^\s*[₩]?\s*([\d][\d,]{1,8})\s*원?\s*$/;
+const PROMO_RX = /(\d\s*\+\s*\d|덤\s*증정|덤행사|증정행사|^덤$|^증정$|1\+1|2\+1|3\+1)/;
+
+/** uiautomator XML 의 모든 노드를 좌표와 함께. withEmpty=true 면 글자 없는 컨테이너(카드)도 포함 */
+export function parseUiNodes(xml, withEmpty = false) {
+  const nodes = [];
+  const re = /<node\b([^>]*?)\/?>/g;
+  let m;
+  while ((m = re.exec(xml))) {
+    const attrs = m[1];
+    const text = decodeXml(attr(attrs, "text")).trim();
+    if (!text && !withEmpty) continue;
+    nodes.push({
+      text,
+      resId: attr(attrs, "resource-id") || "",
+      cls: attr(attrs, "class") || "",
+      desc: decodeXml(attr(attrs, "content-desc")) || "",
+      ...parseBounds(attr(attrs, "bounds")),
+    });
+  }
+  return nodes;
+}
+/** 화면에 보이는 글자 노드만(빈 것 제외) */
+export const parseUiDump = (xml) => parseUiNodes(xml, false);
+const attr = (s, name) => { const m = s.match(new RegExp(`\\b${name}="([^"]*)"`)); return m ? m[1] : ""; };
+const decodeXml = (s) => String(s).replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'");
+function parseBounds(s) {
+  const m = String(s).match(/\[(\-?\d+),(\-?\d+)\]\[(\-?\d+),(\-?\d+)\]/);
+  if (!m) return { x1: 0, y1: 0, x2: 0, y2: 0, cx: 0, cy: 0 };
+  const [x1, y1, x2, y2] = m.slice(1).map(Number);
+  return { x1, y1, x2, y2, cx: (x1 + x2) / 2, cy: (y1 + y2) / 2 };
+}
+
+/** 개인정보로 보이는 글자(화면 상단 내 정보 등) — 수집 레코드에 섞이면 안 되므로 가격 짝 찾기에서 제외 */
+export const PERSONAL_RX = /(\d{3,4}[-\s]?\d{3,4}[-\s]?\d{4})|(\d{1,3}(,\d{3})*\s*P\b)|(포인트|적립금|마이|내\s?지갑|님\s|로그아웃|바코드)/;
+
+/**
+ * 덤프 여러 장(스크롤하며 찍은) → 원천 행들. 같은 상품이 여러 장에 겹쳐 나오면 dedupe 가 합친다.
+ * @param dumps [{ xml, tab?: "1+1"|"2+1"|"덤" }]  tab 은 어느 탭에서 찍었는지(행사 유형 보강용, 있으면)
+ * @param cfg   ui-config(없으면 bounds 모드). { resId:{card,name,price,promo,gift}, rowGap?, cardWidth? }
+ */
+export function uiExtract(dumps, cfg = {}) {
+  const rows = [];
+  const diag = { dumps: dumps.length, textNodes: 0, priceNodes: 0, cards: 0, dropped_personal: 0, mode: cfg.resId ? "resId" : "bounds" };
+  for (const d of dumps) {
+    const all = parseUiNodes(d.xml, true);
+    diag.textNodes += all.filter((n) => n.text).length;
+    const got = cfg.resId?.card ? byResId(all, cfg, d.tab, diag) : byBounds(all.filter((n) => n.text), cfg, d.tab, diag);
+    rows.push(...got);
+  }
+  diag.rawRows = rows.length;
+  return { rows, diag };
+}
+
+// 정밀 모드: 카드 컨테이너(resId=card) bounds 안에 든 글자 노드를 이름/가격/행사 자원ID 로 집는다
+function byResId(all, cfg, tab, diag) {
+  const r = cfg.resId;
+  const idEnds = (n, want) => want && n.resId.endsWith(want);
+  const cards = all.filter((n) => idEnds(n, r.card));
+  diag && (diag.cards += cards.length);
+  const out = [];
+  for (const card of cards) {
+    const inside = all.filter((n) => n.text && within(n, card));
+    const nameN = inside.find((n) => idEnds(n, r.name));
+    const priceN = inside.find((n) => idEnds(n, r.price));
+    const promoN = inside.find((n) => idEnds(n, r.promo));
+    const giftN = r.gift ? inside.find((n) => idEnds(n, r.gift)) : null;
+    if (!nameN && !priceN) continue;
+    out.push(mkRow(nameN?.text, priceN?.text, promoN?.text || promoN?.desc, giftN?.text, tab));
+  }
+  return out.filter(Boolean);
+}
+// 자식 노드 중심이 카드 bounds 안에 있나(미세 오차 허용)
+const within = (n, card) => n.cx >= card.x1 - 2 && n.cx <= card.x2 + 2 && n.cy >= card.y1 - 2 && n.cy <= card.y2 + 2;
+
+// 임시 모드: 가격 노드마다 같은 카드로 보이는 이름·행사 글자를 좌표로 붙인다
+function byBounds(nodes, cfg, tab, diag) {
+  const prices = nodes.filter((n) => { const m = n.text.match(PRICE_RX); return m && Number(m[1].replace(/,/g, "")) >= 100 && !PERSONAL_RX.test(n.text); });
+  diag.priceNodes += prices.length;
+  const gapY = cfg.rowGap || 220; // 가격 위/아래로 한 카드로 볼 세로 범위(px). 실제 덤프로 보정.
+  const out = [];
+  for (const p of prices) {
+    const near = nodes.filter((n) => n !== p && Math.abs(n.cy - p.cy) <= gapY && horizOverlap(n, p, cfg));
+    const promoN = near.find((n) => PROMO_RX.test(n.text)) || near.find((n) => PROMO_RX.test(n.desc));
+    // 이름: 가격·행사·개인정보가 아니고 글자수 2 이상, 가격과 가장 가까운(주로 바로 위) 것
+    const nameCands = near.filter((n) => !PRICE_RX.test(n.text) && !PROMO_RX.test(n.text) && n.text.replace(/\s/g, "").length >= 2 && !PERSONAL_RX.test(n.text));
+    if (PERSONAL_RX.test(p.text)) { diag.dropped_personal++; continue; }
+    const nameN = nameCands.sort((a, b) => dist(a, p) - dist(b, p))[0];
+    if (!nameN) continue;
+    out.push(mkRow(nameN.text, p.text, promoN?.text || promoN?.desc, null, tab));
+  }
+  return out.filter(Boolean);
+}
+const horizOverlap = (a, b, cfg) => cfg.cardWidth ? Math.abs(a.cx - b.cx) <= cfg.cardWidth : (a.x1 <= b.x2 && a.x2 >= b.x1) || Math.abs(a.cx - b.cx) <= 260;
+const dist = (a, b) => Math.hypot(a.cx - b.cx, a.cy - b.cy);
+
+function mkRow(name, price, promoRaw, gift, tab) {
+  if (!name && !price) return null;
+  let raw = promoRaw ? String(promoRaw).replace(/\s+/g, "") : null;
+  if (raw) { const m = raw.match(/(\d\+\d)/); if (m) raw = m[1]; else if (/덤|증정/.test(raw)) raw = "덤"; }
+  if (!raw && tab) raw = tab; // 탭에서 찍었으면 그 유형으로 보강(단, 화면 배지가 우선)
+  return { name, price: price ? String(price).match(PRICE_RX)?.[1] : null, promo_type_raw: raw, gift_name: gift || null, source_screen: tab || null };
+}
