@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ brand: st
       type: "website",
       siteName: "입소문",
       locale: "ko_KR",
-      images: ["/og-default.png"],
+      images: ["/cvs/og"],
     },
   };
 }

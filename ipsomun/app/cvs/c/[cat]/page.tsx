@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ cat: stri
     title,
     description: `${M} CU·세븐일레븐·이마트24 ${c} 행사를 한데 모아 1개당 실제 가격이 싼 순서로 정리했습니다. 매월 1일 갱신.`,
     alternates: { canonical: url },
-    openGraph: { title: `${title} | 입소문`, url, type: "website", siteName: "입소문", locale: "ko_KR", images: ["/og-default.png"] },
+    openGraph: { title: `${title} | 입소문`, url, type: "website", siteName: "입소문", locale: "ko_KR", images: ["/cvs/og"] },
   };
 }
 
