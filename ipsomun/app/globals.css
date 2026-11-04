@@ -1729,3 +1729,7 @@ textarea:focus-visible,
   .section-head .sub { flex-basis: 100%; }
   .section-head .more { margin-left: 0; }
 }
+.list-insight {
+  margin: -4px 0 18px; padding: 12px 14px; border-radius: 12px; background: var(--surface);
+  border: 1px solid var(--line); color: var(--ink-soft); font-size: 14px; line-height: 1.7;
+}
