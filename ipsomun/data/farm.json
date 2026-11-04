@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T17:24+09:00",
+ "generated_at": "2026-11-04T17:31+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2159,7 +2159,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745796984",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16403246471",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2179,7 +2179,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745796993",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16403246471",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -2292,31 +2292,6 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745805112",
-   "coupang_url": "",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685143442",
-   "group_id": "G10000267",
-   "title": "프리미엄 멸치 액젓 500ml (본)프리미엄·(본)프리미엄",
-   "category": "김치·반찬",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000267_thumb.jpg",
-   "price_from": 20100,
-   "options": [
-    {
-     "name": "3개×3박스",
-     "price": 20100,
-     "soldout": false
-    },
-    {
-     "name": "4개×4박스",
-     "price": 25300,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745805122",
    "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
@@ -2582,11 +2557,6 @@
     {
      "name": "1.8L",
      "price": 18700,
-     "soldout": false
-    },
-    {
-     "name": "1.8L x 2개×2박스",
-     "price": 32600,
      "soldout": false
     }
    ],
@@ -4354,26 +4324,6 @@
    "created_at": "2026-09-28"
   },
   {
-   "id": "13717467527",
-   "group_id": "G10003572",
-   "title": "민물장어진액(장어즙) 70ml 2박스",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10003572_thumb.jpg",
-   "price_from": 43800,
-   "options": [
-    {
-     "name": "30개×30포",
-     "price": 43800,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778466065",
-   "coupang_url": "https://www.coupang.com/vp/products/16409753468",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-28"
-  },
-  {
    "id": "13717471401",
    "group_id": "G10004529",
    "title": "리얼 망고수박 410ml + 리얼 수박 410ml",
@@ -4910,26 +4860,6 @@
     10,
     11
    ],
-   "created_at": "2026-09-28"
-  },
-  {
-   "id": "13717581708",
-   "group_id": "G10001219",
-   "title": "민물장어진액(장어즙) 70ml 1박스",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001219_thumb.jpg",
-   "price_from": 21900,
-   "options": [
-    {
-     "name": "30개×30포",
-     "price": 21900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13778581222",
-   "coupang_url": "https://www.coupang.com/vp/products/16428089446",
-   "season_kind": "상시",
-   "peak_months": [],
    "created_at": "2026-09-28"
   },
   {
@@ -9345,6 +9275,126 @@
     10
    ],
    "created_at": "2026-11-03"
+  },
+  {
+   "id": "13789769623",
+   "group_id": "G10005414",
+   "title": "(본)멸치(지리 볶음용) [무배]",
+   "category": "건어물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005414_thumb.jpg",
+   "price_from": 22200,
+   "options": [
+    {
+     "name": "0.5kg",
+     "price": 22200,
+     "soldout": false
+    },
+    {
+     "name": "1kg (500g×2박스)",
+     "price": 40000,
+     "soldout": false
+    },
+    {
+     "name": "1.5kg (500g×3박스)",
+     "price": 57800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13851293393",
+   "coupang_url": "",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-04"
+  },
+  {
+   "id": "13789776270",
+   "group_id": "G10005422",
+   "title": "(본)멸치(고바(중멸) 조림볶음용) [무배]",
+   "category": "건어물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005422_thumb.jpg",
+   "price_from": 17200,
+   "options": [
+    {
+     "name": "0.5kg",
+     "price": 17200,
+     "soldout": false
+    },
+    {
+     "name": "1kg (500g×2박스)",
+     "price": 30100,
+     "soldout": false
+    },
+    {
+     "name": "1.5kg (500g×3박스)",
+     "price": 42900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13851300076",
+   "coupang_url": "https://www.coupang.com/vp/products/16439372742",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-04"
+  },
+  {
+   "id": "13789781600",
+   "group_id": "G10005426",
+   "title": "(본)멸치(주바(대멸) 국물용) [무배]",
+   "category": "건어물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005426_thumb.jpg",
+   "price_from": 16300,
+   "options": [
+    {
+     "name": "0.5kg",
+     "price": 16300,
+     "soldout": false
+    },
+    {
+     "name": "1kg (500g×2박스)",
+     "price": 28300,
+     "soldout": false
+    },
+    {
+     "name": "1.5kg (500g×3박스)",
+     "price": 40300,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13851305434",
+   "coupang_url": "https://www.coupang.com/vp/products/16439376483",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-04"
+  },
+  {
+   "id": "13789793988",
+   "group_id": "G10005418",
+   "title": "(본)멸치(가이리 볶음용) [무배]",
+   "category": "건어물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005418_thumb.jpg",
+   "price_from": 21200,
+   "options": [
+    {
+     "name": "0.5kg",
+     "price": 21200,
+     "soldout": false
+    },
+    {
+     "name": "1kg (500g×2박스)",
+     "price": 37900,
+     "soldout": false
+    },
+    {
+     "name": "1.5kg (500g×3박스)",
+     "price": 54700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13851317913",
+   "coupang_url": "",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-04"
   }
  ]
 }
