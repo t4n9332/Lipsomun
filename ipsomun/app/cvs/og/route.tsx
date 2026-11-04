@@ -1,6 +1,5 @@
 import { ImageResponse } from "next/og";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { loadOgFont, defaultOgImage } from "@/lib/ogFont";
 import { brandName, monthLabel, unitPrice } from "@/lib/cvs";
 import { CUR, CROSS, HAS_DATA, HAS_PREV, CHANGES } from "@/lib/cvsData";
 
@@ -13,41 +12,12 @@ import { CUR, CROSS, HAS_DATA, HAS_PREV, CHANGES } from "@/lib/cvsData";
  */
 export const dynamic = "force-static";
 
-const FONT_URLS = [
-  "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/public/static/Pretendard-Bold.otf",
-  "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff/Pretendard-Bold.woff",
-];
-
-async function loadFont(): Promise<ArrayBuffer | null> {
-  // 1순위: 저장소에 포함한 서브셋 글꼴 (빌드 때 외부 CDN 접속이 실패해 기본 이미지로 대체된 적이 있다)
-  try {
-    const b = await fs.readFile(path.join(process.cwd(), "assets", "fonts", "Pretendard-Bold.og.woff"));
-    return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer;
-  } catch {}
-  if (process.env.OG_FONT_PATH) {
-    try {
-      const b = await fs.readFile(process.env.OG_FONT_PATH);
-      return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer;
-    } catch {}
-  }
-  for (const u of FONT_URLS) {
-    try {
-      const r = await fetch(u, { signal: AbortSignal.timeout(15_000) });
-      if (r.ok) return await r.arrayBuffer();
-    } catch {}
-  }
-  return null;
-}
-
 const won = (n: number) => n.toLocaleString("ko-KR") + "원";
 
 export async function GET() {
-  const font = await loadFont();
-  if (!font || !HAS_DATA) {
-    // 글꼴이 없으면 한글이 깨진 이미지를 내보내느니 기본 이미지를 준다
-    const png = await fs.readFile(path.join(process.cwd(), "public", "og-default.png"));
-    return new Response(new Uint8Array(png), { headers: { "Content-Type": "image/png" } });
-  }
+  const font = await loadOgFont();
+  // 글꼴이 없으면 한글이 깨진 이미지를 내보내느니 기본 이미지를 준다
+  if (!font || !HAS_DATA) return defaultOgImage();
 
   const M = monthLabel(CUR.month);
   const best = CROSS.find((x) => x.save > 0);
