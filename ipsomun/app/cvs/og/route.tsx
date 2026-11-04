@@ -8,7 +8,7 @@ import { CUR, CROSS, HAS_DATA, HAS_PREV, CHANGES } from "@/lib/cvsData";
  * 편의점 행사 공유 미리보기 이미지 (1200×630) — 텔레그램·카톡에 링크를 올릴 때 뜬다.
  * 기본 로고 대신 '이번 달 숫자'가 보이면 클릭률이 오른다. 데이터가 바뀌는 매월 빌드 때 다시 만든다.
  *
- * 글꼴: 사이트가 쓰는 Pretendard 를 빌드 때 받아 쓴다(한글 글리프가 필요). 받지 못하면 기본 이미지로.
+ * 글꼴: 저장소의 Pretendard 서브셋(assets/fonts) → 없으면 CDN → 그래도 없으면 기본 이미지로.
  * 로컬 시험은 OG_FONT_PATH 로 TTF/OTF 경로를 줄 수 있다.
  */
 export const dynamic = "force-static";
@@ -19,6 +19,11 @@ const FONT_URLS = [
 ];
 
 async function loadFont(): Promise<ArrayBuffer | null> {
+  // 1순위: 저장소에 포함한 서브셋 글꼴 (빌드 때 외부 CDN 접속이 실패해 기본 이미지로 대체된 적이 있다)
+  try {
+    const b = await fs.readFile(path.join(process.cwd(), "assets", "fonts", "Pretendard-Bold.og.woff"));
+    return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer;
+  } catch {}
   if (process.env.OG_FONT_PATH) {
     try {
       const b = await fs.readFile(process.env.OG_FONT_PATH);
