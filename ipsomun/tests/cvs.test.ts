@@ -70,3 +70,17 @@ test("분류 — 생활용품·국 오분류 방지", async () => {
   assert.equal(categoryOf("CJ)소고기듬뿍무국500g"), "간편식");
   assert.equal(categoryOf("오뚜기)한우미역국500g"), "간편식");
 });
+
+test("상품 목록 요약 문장", async () => {
+  const { listInsight } = await import("../lib/insight.ts");
+  const mk = (title: string, price: number, orig: number | null, views: number, toss?: number) => ({
+    title, price, originalPrice: orig, views, clicks: 0,
+    links: [{ platform: "coupang", price: null }, ...(toss ? [{ platform: "toss", price: toss }] : [])],
+  });
+  const s = listInsight([mk("A", 10000, 20000, 5, 9000), mk("B", 30000, 40000, 50, 31000), mk("C", 20000, null, 1)], "주방용품");
+  assert.match(s[0], /10,000원~30,000원/);
+  assert.match(s[1], /평균 할인율은 38%/);
+  assert.match(s[2], /토스가 더 싼 상품이 1개, 쿠팡이 더 싼 상품이 1개/);
+  assert.match(s[3], /'B'/);
+  assert.deepEqual(listInsight([mk("A", 1, null, 0)], "x"), []);
+});
