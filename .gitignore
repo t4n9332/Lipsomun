@@ -45,3 +45,9 @@ Desktop.ini
 *.har
 !ipsomun/tests/fixtures/gs25/synthetic.har
 ipsomun/scripts/gs25/headers*.json
+
+# GS25 앱 화면 덤프(화면 글자 — 개인정보 섞일 수 있어 커밋 금지). 수집 결과(data/gs25)만 커밋.
+gs25-dumps/
+ipsomun/gs25-dumps/
+scripts/gs25/ui-config.json
+ipsomun/scripts/gs25/ui-config.json

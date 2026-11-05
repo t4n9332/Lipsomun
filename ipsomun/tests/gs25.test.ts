@@ -216,3 +216,10 @@ test("CLI ui: 덤프 폴더 2장 → 겹친 상품은 중복 제거, 탭명으�
   assert.ok(run1.reasons.some((x: string) => /유형 누락/.test(x)));
   assert.equal(r.status, 2, r.stderr);
 });
+
+test("UI 덤프: 탭 버튼 좌표 찾기(행사 배지와 구분)", () => {
+  const nodes = L.parseUiDump(fs.readFileSync(path.join(FX, "synthetic-ui-1+1.xml"), "utf8"));
+  const t = L.findTab(nodes, "1+1", "tab"); // tabName 노드(위쪽) 선택, tvEvent 배지 아님
+  assert.deepEqual(t, { cx: 120, cy: 250 });
+  assert.equal(L.findTab(nodes, "없는탭"), null);
+});

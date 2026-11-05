@@ -541,3 +541,18 @@ function mkRow(name, price, promoRaw, gift, tab) {
   if (!raw && tab) raw = tab; // 탭에서 찍었으면 그 유형으로 보강(단, 화면 배지가 우선)
   return { name, price: price ? String(price).match(PRICE_RX)?.[1] : null, promo_type_raw: raw, gift_name: gift || null, source_screen: tab || null };
 }
+
+/**
+ * 덤프에서 탭 버튼 위치 찾기(좌표 하드코딩 없이 탭 전환하려고). label 과 글자가 정확히 같은 노드 중,
+ * resIdHint(예 "tab")가 resource-id 에 든 것을 먼저, 없으면 화면 위쪽(작은 y) 것을 고른다.
+ * 행사 배지(tvEvent)도 "1+1" 이라 label 만으로는 안 되므로 hint 로 가른다.
+ * @returns {cx,cy} 또는 null
+ */
+export function findTab(nodes, label, resIdHint = "tab") {
+  const want = String(label).replace(/\s/g, "");
+  const hits = nodes.filter((n) => n.text.replace(/\s/g, "") === want && (n.x2 > n.x1));
+  if (!hits.length) return null;
+  const byHint = resIdHint ? hits.filter((n) => n.resId.toLowerCase().includes(resIdHint.toLowerCase())) : [];
+  const pick = (byHint.length ? byHint : hits).sort((a, b) => a.cy - b.cy)[0];
+  return { cx: Math.round(pick.cx), cy: Math.round(pick.cy) };
+}
