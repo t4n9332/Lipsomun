@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hierarchy rotation="0">
+ <node class="android.widget.FrameLayout" bounds="[0,0][1080,2340]">
+  <node resource-id="com.woodongs:id/tvMyPoint" text="홍길동님 · 1,250 P" bounds="[40,120][700,170]"/>
+  <node resource-id="com.woodongs:id/tabName" text="1+1" bounds="[40,220][200,280]"/>
+  <node resource-id="com.woodongs:id/cardGoods" bounds="[20,320][1060,560]">
+   <node resource-id="com.woodongs:id/tvGoodsName" text="몬스터 울트라 355ml" bounds="[300,340][900,390]"/>
+   <node resource-id="com.woodongs:id/tvPrice" text="2,700원" bounds="[300,400][600,450]"/>
+   <node resource-id="com.woodongs:id/tvEvent" text="1+1" bounds="[40,340][180,400]"/>
+  </node>
+  <node resource-id="com.woodongs:id/cardGoods" bounds="[20,580][1060,820]">
+   <node resource-id="com.woodongs:id/tvGoodsName" text="삼양)불닭볶음면" bounds="[300,600][900,650]"/>
+   <node resource-id="com.woodongs:id/tvPrice" text="1,500원" bounds="[300,660][600,710]"/>
+   <node resource-id="com.woodongs:id/tvEvent" text="1+1" bounds="[40,600][180,660]"/>
+  </node>
+ </node>
+</hierarchy>

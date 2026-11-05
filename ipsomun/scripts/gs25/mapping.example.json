@@ -1,0 +1,34 @@
+{
+  "_주의": "예시 형식일 뿐 — 아래 주소·필드 이름은 실제 GS25 응답에서 확인한 값이 아니다. --discover 결과를 보고 전부 바꿔 쓸 것. 이 파일 그대로는 실제 수집에 쓰지 말 것.",
+  "match": { "urlIncludes": "/REPLACE/promotion/list", "method": "GET" },
+  "itemsPath": "REPLACE.list",
+  "totalPath": "REPLACE.totalCount",
+  "pageParams": ["page"],
+  "fields": {
+    "product_code": "REPLACE_goodsCode",
+    "barcode": "REPLACE_barcode",
+    "name": "REPLACE_goodsName",
+    "price": "REPLACE_price",
+    "promo_type_raw": "REPLACE_eventType",
+    "promo_condition": "REPLACE_eventDesc",
+    "gift_name": "REPLACE_giftName",
+    "gift_code": "REPLACE_giftCode",
+    "start_date": "REPLACE_startDate",
+    "end_date": "REPLACE_endDate",
+    "category": "REPLACE_category",
+    "image_url": "REPLACE_imageUrl"
+  },
+  "promoMap": { "REPLACE_코드값_예_ONE_PLUS_ONE": "1+1" },
+  "scopeNote": "어느 화면·탭·지역(매장) 기준으로 본 목록인지 적는다. 예: 우리동네GS 앱 > 행사 > 1+1/2+1/덤 탭 전체, 매장 미지정",
+  "terms": "자동 수집·재사용 허용 여부를 확인한 근거(약관 조항·허가 메일 등)를 적는다. 확인 전이면 '미확인'",
+  "request": {
+    "_설명": "--source=http 일 때만. 정상 조회로 확인된 주소만 넣는다. {page} {size} {offset} {month} 와 scopes 의 키를 치환한다. 인증 헤더는 여기 말고 --headers-file 로.",
+    "url": "https://REPLACE/promotion/list?type={promo}&page={page}&size={size}",
+    "method": "GET",
+    "pageStart": 1,
+    "pageSize": 50,
+    "delayMs": 1500,
+    "maxPages": 200,
+    "scopes": [{ "promo": "REPLACE_1+1코드" }, { "promo": "REPLACE_2+1코드" }, { "promo": "REPLACE_덤코드" }]
+  }
+}
