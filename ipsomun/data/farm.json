@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-04T17:31+09:00",
+ "generated_at": "2026-11-05T17:30+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -1986,31 +1986,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685125116",
-   "group_id": "G10004892",
-   "title": "국물용 대멸치",
-   "category": "건어물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004892_thumb.jpg",
-   "price_from": 21900,
-   "options": [
-    {
-     "name": "1.5kg",
-     "price": 21900,
-     "soldout": false
-    },
-    {
-     "name": "3kg (1.5kg×2박스)",
-     "price": 39400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745786772",
-   "coupang_url": "https://www.coupang.com/vp/products/16435209697",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685127250",
    "group_id": "G10001007",
    "title": "거봉포도",
@@ -2962,26 +2937,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745949521",
    "coupang_url": "https://www.coupang.com/vp/products/16405282350",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685307318",
-   "group_id": "G10000496",
-   "title": "국내산 명주 갈미 조개살",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000496_thumb.jpg",
-   "price_from": 30400,
-   "options": [
-    {
-     "name": "0.5kg (40미내외)",
-     "price": 30400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745970223",
-   "coupang_url": "https://www.coupang.com/vp/products/16405282485",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -9301,7 +9256,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13851293393",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16440261085",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-11-04"
@@ -9391,10 +9346,60 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13851317913",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16439384258",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-11-04"
+  },
+  {
+   "id": "13792595047",
+   "group_id": "G10005430",
+   "title": "(본)멸치(디포리 육수용) [무배]",
+   "category": "건어물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005430_thumb.jpg",
+   "price_from": 17800,
+   "options": [
+    {
+     "name": "0.5kg",
+     "price": 17800,
+     "soldout": false
+    },
+    {
+     "name": "1kg (500g×2박스)",
+     "price": 31200,
+     "soldout": false
+    },
+    {
+     "name": "1.5kg (500g×3박스)",
+     "price": 44600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13854132867",
+   "coupang_url": "https://www.coupang.com/vp/products/16440779493",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-05"
+  },
+  {
+   "id": "13792613116",
+   "group_id": "G10005433",
+   "title": "(본)멸치(디포리 육수용)",
+   "category": "건어물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005433_thumb.jpg",
+   "price_from": 17800,
+   "options": [
+    {
+     "name": "0.5kg",
+     "price": 17800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13854151054",
+   "coupang_url": "https://www.coupang.com/vp/products/16440788437",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-05"
   }
  ]
 }
