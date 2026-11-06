@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-05T17:30+09:00",
+ "generated_at": "2026-11-06T17:38+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2443,7 +2443,7 @@
     {
      "name": "1.5kg",
      "price": 113800,
-     "soldout": false
+     "soldout": true
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745827455",
@@ -6295,36 +6295,6 @@
    "created_at": "2026-10-13"
   },
   {
-   "id": "13746058518",
-   "group_id": "G10000133",
-   "title": "국내산 반건조 오징어",
-   "category": "건어물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000133_thumb.jpg",
-   "price_from": 34900,
-   "options": [
-    {
-     "name": "0.6kg (10미)",
-     "price": 34900,
-     "soldout": false
-    },
-    {
-     "name": "0.9kg (10미)",
-     "price": 40700,
-     "soldout": false
-    },
-    {
-     "name": "1.7kg (10미)",
-     "price": 67000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13807248289",
-   "coupang_url": "https://www.coupang.com/vp/products/16425064745",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-10-13"
-  },
-  {
    "id": "13746058637",
    "group_id": "G10002286",
    "title": "원양산 반건조 오징어 [대왕특대] 0.85kg·0.95kg",
@@ -6480,11 +6450,6 @@
     {
      "name": "0.35kg (5미)",
      "price": 17400,
-     "soldout": false
-    },
-    {
-     "name": "0.7kg (350g×2박스)",
-     "price": 29400,
      "soldout": false
     }
    ],
@@ -9400,6 +9365,140 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-11-05"
+  },
+  {
+   "id": "13795224975",
+   "group_id": "G10002460",
+   "title": "제주 콜라비 로얄과 3kg·5kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002460_thumb.jpg",
+   "price_from": 15000,
+   "options": [
+    {
+     "name": "3kg",
+     "price": 15000,
+     "soldout": false
+    },
+    {
+     "name": "5kg",
+     "price": 20600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13856776939",
+   "coupang_url": "https://www.coupang.com/vp/products/16442205283",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-06"
+  },
+  {
+   "id": "13795225048",
+   "group_id": "G10002460",
+   "title": "제주 콜라비 로얄과 10kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002460_thumb.jpg",
+   "price_from": 33600,
+   "options": [
+    {
+     "name": "10kg",
+     "price": 33600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13856777012",
+   "coupang_url": "https://www.coupang.com/vp/products/16442205283",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-06"
+  },
+  {
+   "id": "13795231819",
+   "group_id": "G10001865",
+   "title": "구운계란(대란) 90구",
+   "category": "축산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10001865_thumb.jpg",
+   "price_from": 32900,
+   "options": [
+    {
+     "name": "(위)구운계란(대란) 90구",
+     "price": 32900,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13856783816",
+   "coupang_url": "https://www.coupang.com/vp/products/16442208555",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-06"
+  },
+  {
+   "id": "13795237806",
+   "group_id": "G10005498",
+   "title": "제주 감귤 (프리엄과 S) 실중량 [실중량 9kg]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005498_thumb.jpg",
+   "price_from": 21200,
+   "options": [
+    {
+     "name": "10kg (실중량)",
+     "price": 21200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13856789747",
+   "coupang_url": "https://www.coupang.com/vp/products/16442211478",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-11-06"
+  },
+  {
+   "id": "13795244673",
+   "group_id": "G10002665",
+   "title": "제주 콜라비 혼합과",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002665_thumb.jpg",
+   "price_from": 15000,
+   "options": [
+    {
+     "name": "5kg",
+     "price": 15000,
+     "soldout": false
+    },
+    {
+     "name": "10kg",
+     "price": 22600,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13856796734",
+   "coupang_url": "https://www.coupang.com/vp/products/16442214925",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-06"
+  },
+  {
+   "id": "13795250729",
+   "group_id": "G10004045",
+   "title": "구운계란(대란) 60구",
+   "category": "축산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10004045_thumb.jpg",
+   "price_from": 23200,
+   "options": [
+    {
+     "name": "(위)구운계란(대란) 60구",
+     "price": 23200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13856802829",
+   "coupang_url": "https://www.coupang.com/vp/products/16442218398",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-06"
   }
  ]
 }
