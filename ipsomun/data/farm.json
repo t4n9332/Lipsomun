@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-06T17:38+09:00",
+ "generated_at": "2026-11-07T17:29+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -6426,11 +6426,6 @@
      "name": "0.45kg (5미)",
      "price": 20400,
      "soldout": false
-    },
-    {
-     "name": "0.9kg (450g×2박스)",
-     "price": 35200,
-     "soldout": false
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13807248717",
@@ -6631,34 +6626,6 @@
     12
    ],
    "created_at": "2026-10-15"
-  },
-  {
-   "id": "13753400748",
-   "group_id": "G10001881",
-   "title": "가을 겨울 복숭아",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001881_thumb.jpg",
-   "price_from": 34300,
-   "options": [
-    {
-     "name": "1kg (4-6과)",
-     "price": 34300,
-     "soldout": false
-    },
-    {
-     "name": "2kg (7-12과)",
-     "price": 63400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13814637100",
-   "coupang_url": "https://www.coupang.com/vp/products/16425065606",
-   "season_kind": "시즌",
-   "peak_months": [
-    7,
-    8
-   ],
-   "created_at": "2026-10-16"
   },
   {
    "id": "13753412282",
@@ -9499,6 +9466,98 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-11-06"
+  },
+  {
+   "id": "13797351360",
+   "group_id": "G10005504",
+   "title": "제주 감귤 (랜덤과 2S-M) 실중량 [실중량 9kg]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005504_thumb.jpg",
+   "price_from": 18700,
+   "options": [
+    {
+     "name": "10kg (실중량)",
+     "price": 18700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13858915623",
+   "coupang_url": "https://www.coupang.com/vp/products/16443392785",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-11-07"
+  },
+  {
+   "id": "13797353818",
+   "group_id": "G10004046",
+   "title": "구운계란(대란) 30구",
+   "category": "축산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10004046_thumb.jpg",
+   "price_from": 13500,
+   "options": [
+    {
+     "name": "(위)구운계란(대란) 30구",
+     "price": 13500,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13858918098",
+   "coupang_url": "https://www.coupang.com/vp/products/16443394727",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-07"
+  },
+  {
+   "id": "13797357127",
+   "group_id": "G10005505",
+   "title": "제주 감귤 (랜덤과 2S-M) 실중량 [실중량 4.5kg]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005505_thumb.jpg",
+   "price_from": 12700,
+   "options": [
+    {
+     "name": "5kg (실중량)",
+     "price": 12700,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13858921425",
+   "coupang_url": "https://www.coupang.com/vp/products/16443396540",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-11-07"
+  },
+  {
+   "id": "13797366909",
+   "group_id": "G10005506",
+   "title": "제주 감귤 (랜덤과 2S-M) 실중량 [실중량 2.5kg]",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005506_thumb.jpg",
+   "price_from": 9300,
+   "options": [
+    {
+     "name": "3kg (실중량)",
+     "price": 9300,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13858931283",
+   "coupang_url": "https://www.coupang.com/vp/products/16443403386",
+   "season_kind": "시즌",
+   "peak_months": [
+    11,
+    12,
+    1
+   ],
+   "created_at": "2026-11-07"
   }
  ]
 }
