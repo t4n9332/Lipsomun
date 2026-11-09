@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-07T17:29+09:00",
+ "generated_at": "2026-11-09T17:33+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -9379,26 +9379,6 @@
    "created_at": "2026-11-06"
   },
   {
-   "id": "13795231819",
-   "group_id": "G10001865",
-   "title": "구운계란(대란) 90구",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001865_thumb.jpg",
-   "price_from": 32900,
-   "options": [
-    {
-     "name": "(위)구운계란(대란) 90구",
-     "price": 32900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13856783816",
-   "coupang_url": "https://www.coupang.com/vp/products/16442208555",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-11-06"
-  },
-  {
    "id": "13795237806",
    "group_id": "G10005498",
    "title": "제주 감귤 (프리엄과 S) 실중량 [실중량 9kg]",
@@ -9448,26 +9428,6 @@
    "created_at": "2026-11-06"
   },
   {
-   "id": "13795250729",
-   "group_id": "G10004045",
-   "title": "구운계란(대란) 60구",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004045_thumb.jpg",
-   "price_from": 23200,
-   "options": [
-    {
-     "name": "(위)구운계란(대란) 60구",
-     "price": 23200,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13856802829",
-   "coupang_url": "https://www.coupang.com/vp/products/16442218398",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-11-06"
-  },
-  {
    "id": "13797351360",
    "group_id": "G10005504",
    "title": "제주 감귤 (랜덤과 2S-M) 실중량 [실중량 9kg]",
@@ -9489,26 +9449,6 @@
     12,
     1
    ],
-   "created_at": "2026-11-07"
-  },
-  {
-   "id": "13797353818",
-   "group_id": "G10004046",
-   "title": "구운계란(대란) 30구",
-   "category": "축산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004046_thumb.jpg",
-   "price_from": 13500,
-   "options": [
-    {
-     "name": "(위)구운계란(대란) 30구",
-     "price": 13500,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13858918098",
-   "coupang_url": "https://www.coupang.com/vp/products/16443394727",
-   "season_kind": "상시",
-   "peak_months": [],
    "created_at": "2026-11-07"
   },
   {
