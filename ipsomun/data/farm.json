@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-10T17:28+09:00",
+ "generated_at": "2026-11-11T17:21+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2613,26 +2613,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13745887715",
    "coupang_url": "https://www.coupang.com/vp/products/16404085221",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
-   "id": "13685231535",
-   "group_id": "G10001442",
-   "title": "양념 LA갈비 (냉동)",
-   "category": "김치·반찬",
-   "image": "https://t4n9332.github.io/witak-images/images/G10001442_thumb.jpg",
-   "price_from": 28500,
-   "options": [
-    {
-     "name": "0.7kg",
-     "price": 28500,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745893875",
-   "coupang_url": "https://www.coupang.com/vp/products/16404085498",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
@@ -6197,7 +6177,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13802682031",
-   "coupang_url": "https://www.coupang.com/vp/products/16419372964",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     11,
@@ -6221,7 +6201,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13802682102",
-   "coupang_url": "https://www.coupang.com/vp/products/16419372964",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     11,
@@ -6376,26 +6356,6 @@
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13807248650",
    "coupang_url": "https://www.coupang.com/vp/products/16406550704",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-10-13"
-  },
-  {
-   "id": "13746058942",
-   "group_id": "G10002291",
-   "title": "원양산 반건조 오징어 [중]",
-   "category": "건어물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002291_thumb.jpg",
-   "price_from": 20400,
-   "options": [
-    {
-     "name": "0.45kg (5미)",
-     "price": 20400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13807248717",
-   "coupang_url": "https://www.coupang.com/vp/products/16406551775",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-13"
@@ -6742,61 +6702,6 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
-  },
-  {
-   "id": "13762098043",
-   "group_id": "G10000735",
-   "title": "부사 사과 (랜덤과) 못난이 [못난이/쥬스용] 2.5kg·4.5kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000735_thumb.jpg",
-   "price_from": 12200,
-   "options": [
-    {
-     "name": "2.5kg",
-     "price": 12200,
-     "soldout": false
-    },
-    {
-     "name": "4.5kg",
-     "price": 16400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13823385980",
-   "coupang_url": "https://www.coupang.com/vp/products/16421103778",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-10-20"
-  },
-  {
-   "id": "13762098102",
-   "group_id": "G10000735",
-   "title": "부사 사과 (랜덤과) 못난이 [못난이/쥬스용] 9kg",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000735_thumb.jpg",
-   "price_from": 24900,
-   "options": [
-    {
-     "name": "9kg",
-     "price": 24900,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13823386039",
-   "coupang_url": "https://www.coupang.com/vp/products/16421103778",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
-   "created_at": "2026-10-20"
   },
   {
    "id": "13762102014",
@@ -7777,41 +7682,6 @@
    "coupang_url": "https://www.coupang.com/vp/products/16426400904",
    "season_kind": "상시",
    "peak_months": [],
-   "created_at": "2026-10-25"
-  },
-  {
-   "id": "13769436060",
-   "group_id": "G10000738",
-   "title": "부사 사과 소과 가정용 [가정용]",
-   "category": "과일",
-   "image": "https://shop-phinf.pstatic.net/20261025_297/1792869636068QIAeU_JPEG/73912118484674397_920111730.jpg",
-   "price_from": 11000,
-   "options": [
-    {
-     "name": "2kg (13-17과)",
-     "price": 11000,
-     "soldout": false
-    },
-    {
-     "name": "3kg (17-22과)",
-     "price": 13200,
-     "soldout": false
-    },
-    {
-     "name": "4.5kg (28-35과)",
-     "price": 16500,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13830787232",
-   "coupang_url": "https://www.coupang.com/vp/products/16426424227",
-   "season_kind": "시즌",
-   "peak_months": [
-    9,
-    10,
-    11,
-    12
-   ],
    "created_at": "2026-10-25"
   },
   {
@@ -9120,51 +8990,6 @@
    "created_at": "2026-11-05"
   },
   {
-   "id": "13795224975",
-   "group_id": "G10002460",
-   "title": "제주 콜라비 로얄과 3kg·5kg",
-   "category": "기타",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002460_thumb.jpg",
-   "price_from": 15000,
-   "options": [
-    {
-     "name": "3kg",
-     "price": 15000,
-     "soldout": false
-    },
-    {
-     "name": "5kg",
-     "price": 20600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13856776939",
-   "coupang_url": "https://www.coupang.com/vp/products/16442205283",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-11-06"
-  },
-  {
-   "id": "13795225048",
-   "group_id": "G10002460",
-   "title": "제주 콜라비 로얄과 10kg",
-   "category": "기타",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002460_thumb.jpg",
-   "price_from": 33600,
-   "options": [
-    {
-     "name": "10kg",
-     "price": 33600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13856777012",
-   "coupang_url": "https://www.coupang.com/vp/products/16442205283",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-11-06"
-  },
-  {
    "id": "13795237806",
    "group_id": "G10005498",
    "title": "제주 감귤 (프리엄과 S) 실중량 [실중량 9kg]",
@@ -9186,31 +9011,6 @@
     12,
     1
    ],
-   "created_at": "2026-11-06"
-  },
-  {
-   "id": "13795244673",
-   "group_id": "G10002665",
-   "title": "제주 콜라비 혼합과",
-   "category": "기타",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002665_thumb.jpg",
-   "price_from": 15000,
-   "options": [
-    {
-     "name": "5kg",
-     "price": 15000,
-     "soldout": false
-    },
-    {
-     "name": "10kg",
-     "price": 22600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13856796734",
-   "coupang_url": "https://www.coupang.com/vp/products/16442214925",
-   "season_kind": "상시",
-   "peak_months": [],
    "created_at": "2026-11-06"
   },
   {
@@ -9284,6 +9084,51 @@
     1
    ],
    "created_at": "2026-11-07"
+  },
+  {
+   "id": "13805539063",
+   "group_id": "G10002122",
+   "title": "여수 껍질 홍합 3kg·5kg",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002122_thumb.jpg",
+   "price_from": 12000,
+   "options": [
+    {
+     "name": "3kg",
+     "price": 12000,
+     "soldout": false
+    },
+    {
+     "name": "5kg",
+     "price": 15200,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13867152442",
+   "coupang_url": "https://www.coupang.com/vp/products/16449024207",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-11"
+  },
+  {
+   "id": "13805539148",
+   "group_id": "G10002122",
+   "title": "여수 껍질 홍합 10kg",
+   "category": "수산물",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002122_thumb.jpg",
+   "price_from": 25500,
+   "options": [
+    {
+     "name": "10kg",
+     "price": 25500,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13867152528",
+   "coupang_url": "https://www.coupang.com/vp/products/16449024207",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-11"
   }
  ]
 }
