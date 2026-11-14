@@ -5,6 +5,7 @@ import { CATEGORIES, TELEGRAM_CHANNEL_URL } from "@/lib/util";
 import UserMenu from "@/components/UserMenu";
 import SearchBar from "@/components/SearchBar";
 import ShopNav from "@/components/ShopNav";
+import HeaderNav from "@/components/HeaderNav";
 import InstallPrompt from "@/components/InstallPrompt";
 import SourceTracker from "@/components/SourceTracker";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -102,11 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* 큰 갈래만 — 휴대폰에서 옆으로 밀지 않고 한 줄에 보이게(2026-11-14 정리).
                 오늘의 딜·랭킹·기획전·카테고리는 쇼핑 페이지의 ShopNav, 리포트·도구·특가알림은 푸터. */}
             <nav className="header-links">
-              <Link href="/compare">가격비교</Link>
-              <Link href="/cvs">편의점</Link>
-              <Link href="/calc">계산기</Link>
-              <Link href="/farm">산지직송</Link>
-              <Link href="/favorites">찜 ♥</Link>
+              <HeaderNav />
               <UserMenu />
             </nav>
           </div>

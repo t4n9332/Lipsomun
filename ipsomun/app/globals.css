@@ -91,7 +91,8 @@ button { font-family: inherit; }
   font-size: 15px;
 }
 .header-links { display: flex; gap: 14px; margin-left: auto; font-size: 14px; color: var(--ink-soft); flex-shrink: 0; }
-.header-links a:hover { color: var(--brand); }
+.header-links a:hover, .header-links a.on { color: var(--brand); }
+.header-links a.on { font-weight: 700; }
 
 .cat-nav {
   display: flex;

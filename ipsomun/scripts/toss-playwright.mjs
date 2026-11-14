@@ -1390,6 +1390,14 @@ async function main() {
   process.exit(0);
 }
 
+// 실패 회차에서 곧장 process.exit 하면 플레이라이트 연결 핸들이 닫히는 중이라 윈도우 Node 가
+// "Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)" 로 죽으며 로그를 어지럽혔다(2026-11-14 확인).
+// 종료 코드만 정해 두고 스스로 끝나게 하되, 잔류 핸들이 있으면 3초 뒤 강제 종료한다.
+function finish(code) {
+  process.exitCode = code;
+  setTimeout(() => process.exit(code), 3000).unref();
+}
+
 // --auto·--match-only·--crawl-test는 try 블록 안에서 return하므로 main() 말미의
 // process.exit(0)에 도달하지 않는다. 어느 경로로 끝나든 여기서 명시적으로 끝낸다.
 main().then(
@@ -1404,6 +1412,6 @@ main().then(
     // 실패도 [요약] 한 줄로 — grep "\[요약\]" 하나로 성공률·실패 사유를 볼 수 있게
     const reason = String(e?.message || e).split("\n")[0].slice(0, 80);
     printRunSummary(mode, null, 0, 0, `실패(${reason})`);
-    process.exit(1);
+    finish(1);
   }
 );
