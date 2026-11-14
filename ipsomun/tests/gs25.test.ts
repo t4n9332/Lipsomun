@@ -5,8 +5,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-// @ts-ignore — 순수 JS 모듈
-import * as L from "../scripts/gs25/lib.mjs";
+// 순수 JS 모듈 — allowJs 가 기본값(null 등)으로 매개변수 타입을 좁게 추론해 tsc 가 실패하므로 any 로 받는다
+// @ts-ignore
+import * as Lmod from "../scripts/gs25/lib.mjs";
+const L: any = Lmod;
 
 const FX = path.join(import.meta.dirname, "fixtures", "gs25");
 const CLI = path.join(import.meta.dirname, "..", "scripts", "gs25-collect.mjs");
