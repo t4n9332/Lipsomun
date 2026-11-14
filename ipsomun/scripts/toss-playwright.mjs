@@ -40,11 +40,13 @@ const CONFIG_PATH = path.join(__dirname, ".toss-config.json");
 // 로그인 성공 시 지워진다. 끊겨 있는 동안 24시간에 한 번 다시 알린다 — 최초 1회만 알리면
 // 그 한 통을 놓친 사람은 영영 모른다.
 const LOGIN_ALERT_MARKER = path.join(__dirname, ".toss-login-alert-sent");
-const SHARELINK_RE = /https:\/\/toss\.im\/_m\/[A-Za-z0-9]+/;
+// 2026-11 개편 후 발급 링크가 toss.shopping/_m/… 으로 나온다(클립보드엔 고지문·상품명 줄이 앞에 붙음).
+// 예전 toss.im/_m/… 도 그대로 받는다.
+const SHARELINK_RE = /https:\/\/(?:toss\.im|toss\.shopping)\/_m\/[A-Za-z0-9]+/;
 
 /** 카탈로그를 수집할 어드민 페이지들 */
+// 2026-11-14: '프로모션 상품'(links/recommended-products)은 토스가 메뉴에서 없애 /home 으로 돌려보낸다.
 const CATALOG_PAGES = [
-  { name: "프로모션 상품", url: "https://sharelink.toss.im/links/recommended-products" },
   { name: "베스트 랭킹", url: "https://sharelink.toss.im/links/best-ranking" },
   { name: "홈(하루특가)", url: "https://sharelink.toss.im/home" },
 ];
@@ -80,17 +82,17 @@ const TRIED_PATH = path.join(__dirname, ".discover-tried.json");
 const DISCOVER_RETRY_DAYS = 14;
 
 
-/** 상품 조회 페이지 — 카테고리 필터를 적용해 카탈로그를 넓히는 데 쓴다 */
-const FILTER_PAGE_URL = "https://sharelink.toss.im/links/recommended-products";
-
-/** 상품 조회 페이지 cursor 증가 폭 (화면 1페이지 = 120개) */
-const CURSOR_STEP = 120;
-
-/** 목록 API에서 총 개수를 못 읽었을 때 쓸 보수적 기본값 */
-const CURSOR_FALLBACK_TOTAL = 1200;
-
-/** 한 회차에 수집할 상한 — 회차 시간이 과도해지지 않도록 제한 */
-const CURSOR_MAX_ITEMS = 4800;
+/**
+ * 2026-11-14 토스 개편: 전체 카탈로그 '상품 조회' 화면과 목록 API(/sharelink/products)가 사라졌다
+ * (API 는 200·limitStatus AVAILABLE 인데 items 0·totalCount 0). 남은 상품 출처는 '베스트 랭킹'의
+ * 큐레이션 섹션뿐이라, 섹션·탭별 items API 를 읽어 카탈로그를 만들고(읽기 GET),
+ * 발급은 섹션의 '전체 보기' 목록 화면에서 행을 찾아 버튼을 누른다(기존과 같은 방식).
+ */
+const CURATION_API = "/api-public/v3/shopping/sharelink/curation-sections";
+/** 섹션 '전체 보기' 목록 화면 — ?sectionCode=… 로 섹션을 고른다(tabCode 는 화면이 무시한다) */
+const SECTION_LIST_URL = "https://sharelink.toss.im/links/best-ranking/daily-deals";
+/** 섹션·탭 하나에서 읽을 최대 쪽수(쪽당 20개) — 실측 섹션당 200개 안팎 */
+const CURATION_MAX_PAGES = 15;
 
 /**
  * 한 회차 전체 실행 예산(분). 작업 스케줄러의 ExecutionTimeLimit(1시간)보다
@@ -414,105 +416,102 @@ async function issueLinkByIndex(page, btnIndex) {
 }
 
 /**
- * 상품 조회 페이지에서 카테고리 필터 하나를 적용하고 상품 행을 수집.
- * 필터 상태가 남지 않도록 매번 페이지를 새로 연다.
+ * 섹션 '전체 보기' 목록 화면을 열고, 목록이 더 늘지 않을 때까지 스크롤한 뒤 행을 수집한다.
+ * 화면은 무한 스크롤이라 한 번에 다 뜨지 않는다(실측 섹션당 190~200행, 스크롤 10회 안팎).
  */
-async function collectRowsWithCategory(page, category) {
-  await page.goto(FILTER_PAGE_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
-  await page.waitForTimeout(3500);
-
-  // '카테고리' 필터 패널 열기
-  const opened = await page.evaluate(() => {
-    const b = [...document.querySelectorAll("button")].find(
-      (x) => (x.textContent || "").trim() === "카테고리"
-    );
-    if (!b) return false;
-    b.click();
-    return true;
-  });
-  if (!opened) throw new Error("카테고리 필터 버튼을 찾지 못함");
-  await page.waitForTimeout(1500);
-
-  // 해당 카테고리 체크박스 선택
-  const picked = await page.evaluate((cat) => {
-    const l = [...document.querySelectorAll("label")].find(
-      (x) => (x.textContent || "").trim() === cat
-    );
-    if (!l) return false;
-    l.click();
-    return true;
-  }, category);
-  if (!picked) throw new Error(`'${category}' 항목을 찾지 못함`);
-  await page.waitForTimeout(2500);
-
-  // 적용 버튼이 있으면 누르고, 없으면 패널만 닫는다
-  await page.evaluate(() => {
-    const b = [...document.querySelectorAll("button")].find(
-      (x) => /^(적용|확인|검색)$/.test((x.textContent || "").trim()) && x.offsetParent
-    );
-    if (b) b.click();
-  });
-  await page.keyboard.press("Escape").catch(() => {});
-  await page.waitForTimeout(3000);
-
-  // 지연 로딩 대비 스크롤
-  for (let i = 0; i < 3; i++) {
-    await page.mouse.wheel(0, 4000);
-    await page.waitForTimeout(800);
-  }
-  return collectRows(page);
-}
-
-/**
- * 상품 조회 페이지를 cursor 파라미터로 넘겨 수집.
- * 화면에는 한 번에 120개만 보이지만 ?cursor=N 으로 다음 구간이 표시되므로,
- * 카탈로그 전체(4,000여 개)를 화면에 띄울 수 있고 그대로 링크 발급도 된다.
- */
-async function collectRowsWithCursor(page, cursor) {
-  const url = cursor > 0 ? `${FILTER_PAGE_URL}?cursor=${cursor}` : FILTER_PAGE_URL;
-  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+async function collectRowsInSection(page, sectionCode) {
+  await page.goto(`${SECTION_LIST_URL}?sectionCode=${encodeURIComponent(sectionCode)}`, { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForTimeout(4000);
-  for (let i = 0; i < 3; i++) {
-    await page.mouse.wheel(0, 5000);
-    await page.waitForTimeout(700);
+  const count = () =>
+    page.evaluate(() => [...document.querySelectorAll("button")].filter((b) => b.textContent.includes("링크 발급")).length);
+  let last = -1;
+  let n = await count();
+  for (let i = 0; i < 25 && n !== last; i++) {
+    last = n;
+    await page.mouse.wheel(0, 6000);
+    await page.waitForTimeout(1200);
+    n = await count();
   }
   return collectRows(page);
 }
 
+/** 베스트 랭킹 메인에서 카테고리 탭 하나를 눌러(상위 5개 표시) 행을 수집한다 */
+async function collectRowsInMainTab(page, tabName) {
+  await page.goto(CATALOG_PAGES[0].url, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page.waitForTimeout(4000);
+  const tab = page.getByText(tabName, { exact: true }).first();
+  if (!(await tab.count())) throw new Error(`카테고리 탭 '${tabName}'을 찾지 못함`);
+  await tab.scrollIntoViewIfNeeded();
+  await tab.click();
+  await page.waitForTimeout(2500);
+  return collectRows(page);
+}
+
 /**
- * 목록 API를 읽어 총 개수와 '상품명 → 카테고리명' 표를 만든다(읽기 전용).
- * 화면이 이미 호출하는 요청과 동일하다. 카테고리는 신규 등록 시 사이트
- * 카테고리를 정하는 데 쓴다(없으면 전부 '기타'로 들어간다).
+ * 베스트 랭킹 큐레이션 섹션(카테고리 베스트는 탭별로)을 items API 로 끝까지 읽는다 — 읽기 전용,
+ * 화면이 '상품 더보기'에서 부르는 요청과 같다. 품절·발급 불가 상품은 뺀다.
+ * ok=false 면 API 자체를 못 읽은 것(세션 문제 가능)이라 상위에서 회차를 실패로 남긴다.
  */
-async function fetchCatalogMeta(page, maxItems) {
+async function fetchCurationCatalog(page) {
   try {
-    return await page.evaluate(async (max) => {
-      const out = { total: null, categories: {} };
-      let cursor = 0;
-      for (let i = 0; i < 60; i++) {
-        const qs = cursor ? `?size=120&nextCursor=${cursor}` : "?size=120";
-        const r = await fetch("/api-public/v3/shopping/sharelink/products" + qs, {
-          credentials: "include",
-        });
-        const j = await r.json().catch(() => null);
-        const body = j?.success;
-        if (!body?.items?.length) break;
-        if (out.total == null) out.total = body.paging?.totalCount ?? null;
-        for (const it of body.items) {
-          // displayName은 taca.productView 안, categoryName은 아이템 최상위에 있다
-          const name = it?.taca?.productView?.displayName;
-          const cat = it?.categoryName;
-          if (name && cat) out.categories[name] = cat;
+    return await page.evaluate(
+      async ({ api, maxPages }) => {
+        const get = async (u) => {
+          const r = await fetch(u, { credentials: "include" });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json();
+        };
+        const top = await get(`${api}?surface=BEST_RANKING&size=10`);
+        const sections = top?.success?.sections || [];
+        const items = [];
+        const seen = new Set();
+        for (const s of sections) {
+          // 탭 섹션(카테고리 베스트): '전체 보기' 화면은 tabCode 를 무시하고 기본 탭만 보여주고,
+          // 다른 탭은 베스트 랭킹 메인에서 탭을 눌러야 상위 5개만 뜬다(2026-11-14 실측).
+          // 화면에서 발급할 수 없는 상품을 카탈로그에 넣으면 매칭만 되고 발급이 실패하므로 그만큼만 읽는다.
+          const tabs = (s.tabs || []).filter((t) => t?.tabCode);
+          const defCode = s.selectedTabCode || tabs.find((t) => t.isDefault)?.tabCode || tabs[0]?.tabCode;
+          for (const tab of tabs.length ? tabs : [null]) {
+            const isDef = !tab || tab.tabCode === defCode;
+            let cursor = null;
+            for (let i = 0; i < (isDef ? maxPages : 1); i++) {
+              const qs = new URLSearchParams({ size: isDef ? "20" : "5" });
+              if (cursor) qs.set("nextCursor", cursor);
+              if (tab && !isDef) qs.set("tabCode", tab.tabCode);
+              const j = await get(`${api}/${s.sectionCode}/items?${qs}`);
+              const list = j?.success?.items || [];
+              for (const it of list) {
+                const v = it?.taca?.productView;
+                const title = v?.displayName;
+                if (!title || seen.has(title)) continue;
+                if (v.isSoldOut || it?.linkIssueAvailability?.available === false) continue;
+                seen.add(title);
+                items.push({
+                  title: title.slice(0, 200),
+                  price: v.displayPrice ?? null,
+                  rating: v.reviewScore ?? null,
+                  ratingCount: v.reviewCount ?? null,
+                  imageUrl: v.thumbnailUrl || "",
+                  sectionCode: s.sectionCode,
+                  sectionName: s.displayName || s.sectionCode,
+                  tabName: tab?.displayName || null,
+                  // 기본 탭이 아니면 메인 화면에서 이 탭을 눌러 발급한다
+                  mainTab: tab && !isDef ? tab.displayName : null,
+                  category: it?.categoryName || tab?.displayName || null,
+                });
+              }
+              cursor = j?.success?.paging?.nextCursor;
+              if (!isDef || !list.length || !cursor) break;
+            }
+          }
         }
-        const next = body.paging?.nextCursor;
-        if (!next || Number(next) <= cursor) break;
-        cursor = Number(next);
-        if (cursor >= max) break;
-      }
-      return out;
-    }, maxItems);
-  } catch {
-    return { total: null, categories: {} };
+        return { ok: sections.length > 0, items };
+      },
+      { api: CURATION_API, maxPages: CURATION_MAX_PAGES }
+    );
+  } catch (e) {
+    console.log(`  [베스트 섹션] API 읽기 실패: ${e.message}`);
+    return { ok: false, items: [] };
   }
 }
 
@@ -522,17 +521,18 @@ async function fetchCatalogMeta(page, maxItems) {
  * 이름 표기용)는 키에 넣지 않는다 — 넣으면 같은 구간이 불필요하게 쪼개진다.
  */
 function pageKey(cat) {
-  if (cat.cursor != null) return `${cat.pageUrl}|cursor=${cat.cursor}`;
-  return `${cat.pageUrl}|${cat.filterCategory || ""}`;
+  if (cat.mainTab) return `${CATALOG_PAGES[0].url}|tab=${cat.mainTab}`;
+  if (cat.sectionCode) return `${SECTION_LIST_URL}|${cat.sectionCode}`;
+  return cat.pageUrl;
 }
 
 /**
  * 카탈로그 항목이 수집됐던 화면을 그대로 다시 열고 행 목록을 반환.
- * 커서로 수집한 항목이면 같은 커서 구간을, 필터로 수집한 항목이면 같은 필터를 다시 적용한다.
+ * 베스트 섹션 API 로 모은 항목이면 그 섹션(·탭)의 '전체 보기' 목록을 연다.
  */
 async function openCatalogPage(page, cat) {
-  if (cat.cursor != null) return collectRowsWithCursor(page, cat.cursor);
-  if (cat.filterCategory) return collectRowsWithCategory(page, cat.filterCategory);
+  if (cat.mainTab) return collectRowsInMainTab(page, cat.mainTab);
+  if (cat.sectionCode) return collectRowsInSection(page, cat.sectionCode);
   await page.goto(cat.pageUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForTimeout(4000);
   for (let i = 0; i < 3; i++) {
@@ -575,52 +575,33 @@ async function crawlCatalog(page) {
     }
   }
 
-  // 상품 조회 페이지를 cursor로 끝까지 넘기며 카탈로그 전체를 수집한다.
-  // 화면은 한 번에 120개만 보여주지만 ?cursor=N 으로 다음 구간이 나오므로,
-  // 카테고리 필터 순회(1,100여 개)보다 훨씬 넓은 전체 카탈로그를 담을 수 있다.
-  const meta = await fetchCatalogMeta(page, CURSOR_MAX_ITEMS);
-  const total = meta.total ?? CURSOR_FALLBACK_TOTAL;
-  const maxCursor = Math.min(total, CURSOR_MAX_ITEMS);
-  lastCrawlMeta = { reportedTotal: total, maxCursor, metaOk: meta.total != null, collected: 0 };
-  const catNames = meta.categories || {};
-  console.log(
-    `  [상품조회] 카탈로그 총 ${total}개 — cursor로 ${maxCursor}개까지 수집` +
-      ` (카테고리 정보 ${Object.keys(catNames).length}건)`
-  );
-  let emptyStreak = 0;
-  for (let cursor = 0; cursor < maxCursor; cursor += CURSOR_STEP) {
-    try {
-      const rows = await collectRowsWithCursor(page, cursor);
-      let added = 0;
-      for (const r of rows) {
-        if (seen.has(r.title)) continue;
-        seen.add(r.title);
-        catalog.push({
-          ...r,
-          pageUrl: FILTER_PAGE_URL,
-          pageName: `상품조회:${cursor}`,
-          cursor, // 발급 단계에서 같은 구간을 다시 열어야 행을 찾을 수 있다
-          filterCategory: catNames[r.title] || null, // 신규 등록 시 사이트 카테고리 결정용
-        });
-        added++;
-      }
-      if (added === 0) {
-        // 같은 구간이 반복되면(파라미터 무시 등) 무한 루프를 막기 위해 중단
-        if (++emptyStreak >= 3) {
-          console.log(`  [상품조회] 신규 없음 3회 연속 — cursor ${cursor}에서 중단`);
-          break;
-        }
-      } else {
-        emptyStreak = 0;
-      }
-      if (cursor % (CURSOR_STEP * 5) === 0 || added === 0) {
-        console.log(`  [상품조회/cursor=${cursor}] ${rows.length}개 (신규 ${added}개) · 누적 ${catalog.length}`);
-      }
-    } catch (e) {
-      console.log(`  [상품조회/cursor=${cursor}] 수집 실패: ${e.message}`);
-      if (++emptyStreak >= 3) break;
-    }
+  // 베스트 랭킹 섹션·탭을 API 로 끝까지 읽어 카탈로그를 넓힌다(2026-11-14 상품 조회 화면 폐지 대응).
+  // 총계 '정답지'는 이 회차에 API 가 돌려준 발급 가능 상품 수다.
+  const cur = await fetchCurationCatalog(page);
+  let added = 0;
+  for (const it of cur.items) {
+    if (seen.has(it.title)) continue;
+    seen.add(it.title);
+    catalog.push({
+      ...it,
+      pageUrl: SECTION_LIST_URL,
+      pageName: `베스트:${it.sectionName}${it.tabName ? "/" + it.tabName : ""}`,
+      filterCategory: it.category, // 신규 등록 시 사이트 카테고리 결정용 (siteCategoryFor)
+    });
+    added++;
   }
+  const bySection = {};
+  for (const it of cur.items) bySection[it.sectionCode] = (bySection[it.sectionCode] || 0) + 1;
+  console.log(
+    `  [베스트 섹션 API] 발급 가능 ${cur.items.length}개 (신규 ${added}개) — ` +
+      Object.entries(bySection).map(([k, v]) => `${k} ${v}`).join(", ")
+  );
+  lastCrawlMeta = {
+    reportedTotal: cur.items.length,
+    maxCursor: cur.items.length,
+    metaOk: cur.ok && cur.items.length > 0,
+    collected: 0,
+  };
   lastCrawlMeta.collected = catalog.length;
   return catalog;
 }
@@ -663,11 +644,11 @@ function assertCatalogHealthy(catalog) {
     );
   }
 
-  // 총계조차 못 읽으면 fallback(1200)이 쓰인다. 세션이 반쯤 풀린 상태의 지문이라
+  // 베스트 섹션 API 를 못 읽었거나 0개면 세션이 반쯤 풀린 상태의 지문이라
   // 수집량이 얼마든 이 회차의 결과는 믿을 수 없다.
   if (!metaOk) {
     throw sessionError(
-      `카탈로그 총계를 읽지 못했습니다 (fallback ${CURSOR_FALLBACK_TOTAL}개로 진행됨).\n` +
+      "베스트 섹션 목록 API 를 읽지 못했거나 발급 가능한 상품이 0개입니다.\n" +
         "       세션이 반쯤 풀린 상태일 수 있어 이번 회차를 중단합니다.\n" +
         "       확인:  node scripts/toss-login.mjs"
     );
