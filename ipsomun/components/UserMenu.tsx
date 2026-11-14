@@ -23,15 +23,15 @@ export default function UserMenu() {
 
   if (!me.user) {
     return (
-      <Link href="/my" className="user-chip">
-        ⭐ 출석체크
+      <Link href="/my" className="user-chip" aria-label="출석체크">
+        ⭐<span className="uc-txt"> 출석체크</span>
       </Link>
     );
   }
 
   return (
-    <Link href="/my" className="user-chip on">
-      {me.level?.emoji} {me.level?.name}
+    <Link href="/my" className="user-chip on" aria-label={me.level?.name || "내 정보"}>
+      {me.level?.emoji}<span className="uc-txt"> {me.level?.name}</span>
       {me.stats && !me.stats.todayDone && <span className="dot" />}
     </Link>
   );

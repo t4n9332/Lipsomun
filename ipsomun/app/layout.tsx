@@ -4,7 +4,7 @@ import "./globals.css";
 import { CATEGORIES, TELEGRAM_CHANNEL_URL } from "@/lib/util";
 import UserMenu from "@/components/UserMenu";
 import SearchBar from "@/components/SearchBar";
-import CatNav from "@/components/CatNav";
+import ShopNav from "@/components/ShopNav";
 import InstallPrompt from "@/components/InstallPrompt";
 import SourceTracker from "@/components/SourceTracker";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -99,37 +99,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               입<span>소문</span>
             </Link>
             <SearchBar />
+            {/* 큰 갈래만 — 휴대폰에서 옆으로 밀지 않고 한 줄에 보이게(2026-11-14 정리).
+                오늘의 딜·랭킹·기획전·카테고리는 쇼핑 페이지의 ShopNav, 리포트·도구·특가알림은 푸터. */}
             <nav className="header-links">
-              <a
-                href={TELEGRAM_CHANNEL_URL}
-                target="_blank"
-                rel="noopener"
-                className="tg-link"
-              >
-                📣 특가알림
-              </a>
-              {/* 쇼핑 축 */}
               <Link href="/compare">가격비교</Link>
-              <Link href="/deals">오늘의 딜</Link>
-              <Link href="/ranking">랭킹</Link>
-              <Link href="/pick">기획전</Link>
-              <Link href="/farm">산지직송</Link>
-              <Link href="/cvs">편의점 행사</Link>
-              {/* 정보 축 — 성격이 다르므로 선으로 갈라준다.
-                  섞어두면 계산기가 쇼핑 메뉴에 얹힌 남의 물건처럼 보인다. */}
-              <span className="nav-div" aria-hidden />
-              <Link href="/blog">리포트</Link>
+              <Link href="/cvs">편의점</Link>
               <Link href="/calc">계산기</Link>
-              <Link href="/tools">도구</Link>
-              <span className="nav-div" aria-hidden />
+              <Link href="/farm">산지직송</Link>
               <Link href="/favorites">찜 ♥</Link>
               <UserMenu />
             </nav>
           </div>
-          <div className="container">
-            <CatNav categories={CATEGORIES} />
-          </div>
         </header>
+        <ShopNav categories={CATEGORIES} />
 
         <main className="container">{children}</main>
 
@@ -151,6 +133,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               11번가, 오늘의집 등 제휴 링크를 통한 구매 시에도 수수료를 받을
               수 있습니다. 구매자에게 추가 비용은 발생하지 않으며, 표시된
               가격은 쿠폰 보유 등에 따라 변동될 수 있습니다.
+            </p>
+            <p className="footer-links">
+              <Link href="/deals">오늘의 딜</Link>
+              <span aria-hidden> · </span>
+              <Link href="/ranking">랭킹</Link>
+              <span aria-hidden> · </span>
+              <Link href="/pick">기획전</Link>
+              <span aria-hidden> · </span>
+              <Link href="/blog">리포트</Link>
+              <span aria-hidden> · </span>
+              <Link href="/tools">파일 도구</Link>
             </p>
             <p className="footer-links">
               <Link href="/about">소개</Link>

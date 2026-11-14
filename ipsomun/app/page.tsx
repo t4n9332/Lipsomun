@@ -1,16 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
-import {
-  getDeals,
-  getPopular,
-  getRecentReviewed,
-  getPublishedCollections,
-  getPriceCompareProducts,
-  withLinks,
-} from "@/lib/db";
-import ProductCard from "@/components/ProductCard";
+import { getPriceCompareProducts } from "@/lib/db";
 import CompareCard, { comparePrices } from "@/components/CompareCard";
-import { TELEGRAM_CHANNEL_URL, imgUrl, jsonLdString } from "@/lib/util";
+import { TELEGRAM_CHANNEL_URL, jsonLdString } from "@/lib/util";
 import farm from "@/data/farm.json";
 import FarmCard, { type FarmItem } from "@/components/FarmCard";
 import { CROSS, CUR as CVS, HAS_DATA as CVS_READY } from "@/lib/cvsData";
@@ -73,17 +64,11 @@ const siteJsonLd = [
 ];
 
 export default async function Home() {
-  const [deals, popular, recent, picks, compareRaw] = await Promise.all([
-    getDeals(8).then(withLinks),
-    getPopular(5),
-    getRecentReviewed(4).then(withLinks),
-    getPublishedCollections(4).catch(() => []),
-    getPriceCompareProducts(40).catch(() => []),
-  ]);
+  const compareRaw = await getPriceCompareProducts(40).catch(() => []);
   // 절약액(두 플랫폼 가격차) 큰 순으로 상단 노출
   const compare = compareRaw
     .sort((a, b) => comparePrices(b).savings - comparePrices(a).savings)
-    .slice(0, 8);
+    .slice(0, 6);
 
   return (
     <>
@@ -110,10 +95,18 @@ export default async function Home() {
           </Link>
         </div>
         <div className="home-info">
-          <Link href="/cvs">
-            <strong>🏪 편의점 행사</strong>
-            <span>4사 1+1·2+1, 버프·너프, 어디가 이득</span>
-          </Link>
+          {/* 편의점 섹션이 바로 아래 있으면 같은 칸을 두 번 보여주지 않는다 */}
+          {CVS_READY && CROSS.length > 0 ? (
+            <Link href="/tools">
+              <strong>🧰 파일 도구</strong>
+              <span>PDF 합치기 등, 업로드 없이</span>
+            </Link>
+          ) : (
+            <Link href="/cvs">
+              <strong>🏪 편의점 행사</strong>
+              <span>4사 1+1·2+1, 버프·너프, 어디가 이득</span>
+            </Link>
+          )}
           <Link href="/calc/연봉실수령액">
             <strong>💰 연봉 실수령액</strong>
             <span>2026 4대보험 요율 반영</span>
@@ -211,117 +204,27 @@ export default async function Home() {
             </Link>
           </div>
           <div className="grid">
-            {(farm.items as FarmItem[]).slice(0, 8).map((p) => (
+            {(farm.items as FarmItem[]).slice(0, 4).map((p) => (
               <FarmCard key={p.id} p={p} />
             ))}
           </div>
         </section>
       )}
 
+      {/* 2026-11-14 정리: 오늘의 딜·랭킹·기획전·최신 리뷰를 홈에 길게 늘어놓던 것을 바로가기로.
+          휴대폰에서 홈이 10화면 넘게 길어져 정작 위쪽 고유 콘텐츠가 묻혔다. 각 페이지는 그대로다. */}
       <section className="section">
         <div className="section-head">
-          <h2>🔥 오늘의 딜</h2>
-          <span className="sub">매일 갱신되는 특가 모음</span>
-          <Link className="more" href="/deals">
-            전체보기 →
-          </Link>
+          <h2>더 둘러보기</h2>
         </div>
-        {deals.length === 0 ? (
-          <div className="empty">
-            아직 등록된 딜이 없습니다. 곧 특가 소식으로 찾아올게요!
-          </div>
-        ) : (
-          <div className="grid">
-            {deals.map((p) => (
-              <ProductCard key={p.id} p={p} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="section">
-        <div className="section-head">
-          <h2>🏆 지금 인기 랭킹</h2>
-          <span className="sub">방문자들이 가장 많이 찾은 제품</span>
-          <Link className="more" href="/ranking">
-            전체보기 →
-          </Link>
-        </div>
-        {popular.length === 0 ? (
-          <div className="empty">데이터가 쌓이는 중입니다.</div>
-        ) : (
-          <div className="rank-list">
-            {popular.map((p, i) => (
-              <Link key={p.id} href={`/p/${p.slug}`} className="rank-item">
-                <span className="rank-num">{i + 1}</span>
-                <span className="thumb">
-                  {p.imageUrl && (
-                    <Image
-                      src={imgUrl(p.imageUrl, 160)}
-                      alt={p.title}
-                      fill
-                      sizes="64px"
-                      style={{ objectFit: "cover" }}
-                    />
-                  )}
-                </span>
-                <span className="info">
-                  <span className="title">{p.title}</span>
-                  {p.price != null && (
-                    <div className="price">{p.price.toLocaleString()}원</div>
-                  )}
-                </span>
-                <span className="clicks">조회 {p.views + p.clicks}</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {picks.length > 0 && (
-        <section className="section">
-          <div className="section-head">
-            <h2>🧺 기획전</h2>
-            <span className="sub">주제별로 골라 담은 추천 모음</span>
-            <Link className="more" href="/pick">
-              전체보기 →
-            </Link>
-          </div>
-          <div className="pick-grid">
-            {picks.map((c) => (
-              <Link key={c.id} href={`/pick/${c.slug}`} className="pick-card">
-                <span className="pick-thumbs">
-                  {c.images.slice(0, 4).map((img, i) => (
-                    <span key={i} className="pt">
-                      <Image src={imgUrl(img, 200)} alt="" fill sizes="80px" style={{ objectFit: "cover" }} />
-                    </span>
-                  ))}
-                </span>
-                <span className="pick-info">
-                  <b>{c.title}</b>
-                  {c.description && <span className="d">{c.description}</span>}
-                  <span className="n">{c.itemCount}개 제품</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section className="section">
-        <div className="section-head">
-          <h2>✍️ 최신 리뷰</h2>
-          <span className="sub">직접 정리한 솔직 사용기</span>
-        </div>
-        {recent.length === 0 ? (
-          <div className="empty">첫 리뷰를 준비하고 있어요.</div>
-        ) : (
-          <div className="grid">
-            {recent.map((p) => (
-              <ProductCard key={p.id} p={p} />
-            ))}
-          </div>
-        )}
+        <nav className="home-more" aria-label="더 둘러보기">
+          <Link href="/deals">🔥 오늘의 딜</Link>
+          <Link href="/ranking">🏆 인기 랭킹</Link>
+          <Link href="/pick">🧺 기획전</Link>
+          <Link href="/blog">📝 가격 리포트</Link>
+          <Link href={`/category/${encodeURIComponent("식품")}`}>🍚 식품</Link>
+          <Link href={`/category/${encodeURIComponent("생활용품")}`}>🧴 생활용품</Link>
+        </nav>
       </section>
     </>
   );
