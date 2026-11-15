@@ -76,87 +76,8 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdString(siteJsonLd) }}
       />
-      <section className="hero">
-        <h1>
-          사기 전에 한 번 더, <em>입소문</em>
-        </h1>
-        <p>
-          쿠팡·토스 가격비교, 이번 달 편의점 행사, 내 월급 계산까지 — 사기 전에
-          여기서 먼저 확인하세요.
-        </p>
-      </section>
-
-      {/* 직접 만든 정보 콘텐츠를 상품 목록보다 먼저 — 사이트의 고유 가치가 첫 화면에 보이게 */}
-      <section className="section">
-        <div className="section-head">
-          <h2>📌 생활 정보</h2>
-          <Link className="more" href="/about">
-            입소문 소개 →
-          </Link>
-        </div>
-        <div className="home-info">
-          {/* 편의점 섹션이 바로 아래 있으면 같은 칸을 두 번 보여주지 않는다 */}
-          {CVS_READY && CROSS.length > 0 ? (
-            <Link href="/tools">
-              <strong>🧰 파일 도구</strong>
-              <span>PDF 합치기 등, 업로드 없이</span>
-            </Link>
-          ) : (
-            <Link href="/cvs">
-              <strong>🏪 편의점 행사</strong>
-              <span>4사 1+1·2+1, 버프·너프, 어디가 이득</span>
-            </Link>
-          )}
-          <Link href="/calc/연봉실수령액">
-            <strong>💰 연봉 실수령액</strong>
-            <span>2026 4대보험 요율 반영</span>
-          </Link>
-          <Link href="/calc/연말정산환급금">
-            <strong>🧧 연말정산 환급금</strong>
-            <span>의료비·월세까지 미리 계산</span>
-          </Link>
-          <Link href="/calc/실업급여">
-            <strong>🧾 실업급여</strong>
-            <span>하루 얼마, 며칠 받나</span>
-          </Link>
-          <Link href="/calc/퇴직금">
-            <strong>💼 퇴직금</strong>
-            <span>퇴직소득세까지</span>
-          </Link>
-          <Link href="/calc/시급월급">
-            <strong>⏱️ 시급·주휴수당</strong>
-            <span>2026 최저임금 월급 계산</span>
-          </Link>
-        </div>
-      </section>
-
-      {CVS_READY && CROSS.length > 0 && (
-        <section className="section">
-          <div className="section-head">
-            <h2>🏪 {monthLabel(CVS.month)} 편의점, 여기서 사면 이득</h2>
-            <Link className="more" href="/cvs/compare">
-              전체 {CROSS.length}개 →
-            </Link>
-          </div>
-          <ul className="cvs-cross">
-            {CROSS.filter((x) => x.save > 0)
-              .slice(0, 4)
-              .map((x) => (
-                <li key={x.name}>
-                  <div className="nm">{x.name}</div>
-                  <div className="offers">
-                    {x.offers.map((o, i) => (
-                      <span key={o.b} className={`cvs-offer b-${o.b}${i === 0 ? " win" : ""}`}>
-                        {brandName(o.b)} <b>{o.t}</b> {won(unitPrice(o))}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="save">1개당 {won(x.save)} 이득</div>
-                </li>
-              ))}
-          </ul>
-        </section>
-      )}
+      {/* 첫 화면 소개 문구는 자리만 차지해 뺐다(2026-11-16). 제목은 검색엔진·스크린리더용으로만 남긴다. */}
+      <h1 className="sr-only">입소문 — 쿠팡·토스 가격비교, 편의점 행사, 산지직송, 생활 계산기</h1>
 
       {compare.length > 0 && (
         <section className="vs-section">
@@ -194,6 +115,34 @@ export default async function Home() {
         <span className="tg-cta">무료 구독 →</span>
       </a>
 
+      {CVS_READY && CROSS.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>🏪 {monthLabel(CVS.month)} 편의점, 여기서 사면 이득</h2>
+            <Link className="more" href="/cvs/compare">
+              전체 {CROSS.length}개 →
+            </Link>
+          </div>
+          <ul className="cvs-cross">
+            {CROSS.filter((x) => x.save > 0)
+              .slice(0, 4)
+              .map((x) => (
+                <li key={x.name}>
+                  <div className="nm">{x.name}</div>
+                  <div className="offers">
+                    {x.offers.map((o, i) => (
+                      <span key={o.b} className={`cvs-offer b-${o.b}${i === 0 ? " win" : ""}`}>
+                        {brandName(o.b)} <b>{o.t}</b> {won(unitPrice(o))}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="save">1개당 {won(x.save)} 이득</div>
+                </li>
+              ))}
+          </ul>
+        </section>
+      )}
+
       {farm.items.length > 0 && (
         <section className="section">
           <div className="section-head">
@@ -210,6 +159,50 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* 2026-11-16: 순서는 헤더와 같게 — 가격비교 · 편의점 · 산지직송 · 계산기 */}
+      <section className="section">
+        <div className="section-head">
+          <h2>🧮 계산기</h2>
+          <Link className="more" href="/calc">
+            전체보기 →
+          </Link>
+        </div>
+        <div className="home-info">
+          {/* 편의점 섹션이 바로 아래 있으면 같은 칸을 두 번 보여주지 않는다 */}
+          {CVS_READY && CROSS.length > 0 ? (
+            <Link href="/tools">
+              <strong>🧰 파일 도구</strong>
+              <span>PDF 합치기 등, 업로드 없이</span>
+            </Link>
+          ) : (
+            <Link href="/cvs">
+              <strong>🏪 편의점 행사</strong>
+              <span>4사 1+1·2+1, 버프·너프, 어디가 이득</span>
+            </Link>
+          )}
+          <Link href="/calc/연봉실수령액">
+            <strong>💰 연봉 실수령액</strong>
+            <span>2026 4대보험 요율 반영</span>
+          </Link>
+          <Link href="/calc/연말정산환급금">
+            <strong>🧧 연말정산 환급금</strong>
+            <span>의료비·월세까지 미리 계산</span>
+          </Link>
+          <Link href="/calc/실업급여">
+            <strong>🧾 실업급여</strong>
+            <span>하루 얼마, 며칠 받나</span>
+          </Link>
+          <Link href="/calc/퇴직금">
+            <strong>💼 퇴직금</strong>
+            <span>퇴직소득세까지</span>
+          </Link>
+          <Link href="/calc/시급월급">
+            <strong>⏱️ 시급·주휴수당</strong>
+            <span>2026 최저임금 월급 계산</span>
+          </Link>
+        </div>
+      </section>
 
       {/* 2026-11-14 정리: 오늘의 딜·랭킹·기획전·최신 리뷰를 홈에 길게 늘어놓던 것을 바로가기로.
           휴대폰에서 홈이 10화면 넘게 길어져 정작 위쪽 고유 콘텐츠가 묻혔다. 각 페이지는 그대로다. */}
