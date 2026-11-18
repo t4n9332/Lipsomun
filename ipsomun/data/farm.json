@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-16T17:34+09:00",
+ "generated_at": "2026-11-18T17:17+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2972,66 +2972,6 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-04"
-  },
-  {
-   "id": "13687309751",
-   "group_id": "G10000351",
-   "title": "맵싹 맛김치 1kg",
-   "category": "김치·반찬",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000351_thumb.jpg",
-   "price_from": 15000,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 15000,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13747995895",
-   "coupang_url": "https://www.coupang.com/vp/products/16456170599",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-05"
-  },
-  {
-   "id": "13687309758",
-   "group_id": "G10000351",
-   "title": "맵싹 맛김치 3kg",
-   "category": "김치·반찬",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000351_thumb.jpg",
-   "price_from": 32600,
-   "options": [
-    {
-     "name": "3kg",
-     "price": 32600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13747995902",
-   "coupang_url": "https://www.coupang.com/vp/products/16456170599",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-05"
-  },
-  {
-   "id": "13687309768",
-   "group_id": "G10000351",
-   "title": "맵싹 맛김치 10kg",
-   "category": "김치·반찬",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000351_thumb.jpg",
-   "price_from": 83600,
-   "options": [
-    {
-     "name": "10kg",
-     "price": 83600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13747995912",
-   "coupang_url": "https://www.coupang.com/vp/products/16456170599",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-05"
   },
   {
    "id": "13692296840",
@@ -7085,7 +7025,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13824040420",
-   "coupang_url": "https://www.coupang.com/vp/products/16414311101",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-21"
@@ -7110,7 +7050,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13824040434",
-   "coupang_url": "https://www.coupang.com/vp/products/16414311101",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-21"
@@ -7299,7 +7239,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13830787325",
-   "coupang_url": "https://www.coupang.com/vp/products/16426424350",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-25"
@@ -8538,39 +8478,6 @@
    "created_at": "2026-11-12"
   },
   {
-   "id": "13809502002",
-   "group_id": "G10005532",
-   "title": "흰다리 새우 [급냉]",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10005532_thumb.jpg",
-   "price_from": 26400,
-   "options": [
-    {
-     "name": "1kg (30미내외)",
-     "price": 26400,
-     "soldout": false
-    },
-    {
-     "name": "2kg (1kg×2박스)",
-     "price": 46900,
-     "soldout": false
-    },
-    {
-     "name": "3kg (1kg×3박스)",
-     "price": 67400,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13871145370",
-   "coupang_url": "https://www.coupang.com/vp/products/16450616346",
-   "season_kind": "시즌",
-   "peak_months": [
-    10,
-    11
-   ],
-   "created_at": "2026-11-13"
-  },
-  {
    "id": "13816442573",
    "group_id": "G10005553",
    "title": "흑토마토(쿠마토) 로얄과 2kg",
@@ -8654,6 +8561,36 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-11-16"
+  },
+  {
+   "id": "13820061865",
+   "group_id": "G10002454",
+   "title": "프리미엄 설향딸기",
+   "category": "과일",
+   "image": "https://t4n9332.github.io/witak-images/images/G10002454_v2_43c27b11cea9_thumb.jpg",
+   "price_from": 27400,
+   "options": [
+    {
+     "name": "500g (12~24과)",
+     "price": 27400,
+     "soldout": false
+    },
+    {
+     "name": "1kg (24~48과)",
+     "price": 51800,
+     "soldout": false
+    }
+   ],
+   "naver_url": "https://smartstore.naver.com/3000company/products/13881802284",
+   "coupang_url": "https://www.coupang.com/vp/products/16461573343",
+   "season_kind": "시즌",
+   "peak_months": [
+    12,
+    1,
+    2,
+    3
+   ],
+   "created_at": "2026-11-18"
   }
  ]
 }
