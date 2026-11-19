@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-18T17:17+09:00",
+ "generated_at": "2026-11-19T17:17+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -4329,7 +4329,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778546257",
-   "coupang_url": "https://www.coupang.com/vp/products/16410700791",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     11,
@@ -4448,7 +4448,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778564003",
-   "coupang_url": "https://www.coupang.com/vp/products/16410701482",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -5257,7 +5257,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778692390",
-   "coupang_url": "https://www.coupang.com/vp/products/16411907154",
+   "coupang_url": "",
    "season_kind": "시즌",
    "peak_months": [
     11,
@@ -6802,7 +6802,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13824039454",
-   "coupang_url": "https://www.coupang.com/vp/products/16398448998",
+   "coupang_url": "",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-21"
@@ -7025,7 +7025,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13824040420",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16414311101",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-21"
@@ -7050,7 +7050,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13824040434",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16414311101",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-21"
@@ -7239,7 +7239,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13830787325",
-   "coupang_url": "",
+   "coupang_url": "https://www.coupang.com/vp/products/16426424350",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-25"
@@ -8563,34 +8563,49 @@
    "created_at": "2026-11-16"
   },
   {
-   "id": "13820061865",
-   "group_id": "G10002454",
-   "title": "프리미엄 설향딸기",
-   "category": "과일",
-   "image": "https://t4n9332.github.io/witak-images/images/G10002454_v2_43c27b11cea9_thumb.jpg",
-   "price_from": 27400,
+   "id": "13821516625",
+   "group_id": "G10005570",
+   "title": "시나노골드 중과 가정용 [가정용] 2kg·3kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005570_v2_c3fc8d4a869b_thumb.jpg",
+   "price_from": 12400,
    "options": [
     {
-     "name": "500g (12~24과)",
-     "price": 27400,
+     "name": "2kg · 9과 내외",
+     "price": 12400,
      "soldout": false
     },
     {
-     "name": "1kg (24~48과)",
-     "price": 51800,
+     "name": "3kg · 13과 내외",
+     "price": 16100,
      "soldout": false
     }
    ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13881802284",
-   "coupang_url": "https://www.coupang.com/vp/products/16461573343",
-   "season_kind": "시즌",
-   "peak_months": [
-    12,
-    1,
-    2,
-    3
+   "naver_url": "https://smartstore.naver.com/3000company/products/13883267968",
+   "coupang_url": "https://www.coupang.com/vp/products/16463195242",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-19"
+  },
+  {
+   "id": "13821516648",
+   "group_id": "G10005570",
+   "title": "시나노골드 중과 가정용 [가정용] 10kg",
+   "category": "기타",
+   "image": "https://t4n9332.github.io/witak-images/images/G10005570_v2_c3fc8d4a869b_thumb.jpg",
+   "price_from": 40000,
+   "options": [
+    {
+     "name": "10kg · 42과 내외",
+     "price": 40000,
+     "soldout": false
+    }
    ],
-   "created_at": "2026-11-18"
+   "naver_url": "https://smartstore.naver.com/3000company/products/13883267991",
+   "coupang_url": "https://www.coupang.com/vp/products/16463195242",
+   "season_kind": "상시",
+   "peak_months": [],
+   "created_at": "2026-11-19"
   }
  ]
 }
