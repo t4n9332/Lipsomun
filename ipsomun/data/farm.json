@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-19T17:17+09:00",
+ "generated_at": "2026-11-20T17:17+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -8443,39 +8443,6 @@
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-11-11"
-  },
-  {
-   "id": "13808081731",
-   "group_id": "G10004928",
-   "title": "흰다리 새우 [생물]",
-   "category": "수산물",
-   "image": "https://t4n9332.github.io/witak-images/images/G10004928_thumb.jpg",
-   "price_from": 25100,
-   "options": [
-    {
-     "name": "1kg (30미내외)",
-     "price": 25100,
-     "soldout": false
-    },
-    {
-     "name": "2kg (1kg×2박스)",
-     "price": 44300,
-     "soldout": false
-    },
-    {
-     "name": "3kg (1kg×3박스)",
-     "price": 63600,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13869709769",
-   "coupang_url": "https://www.coupang.com/vp/products/16450618184",
-   "season_kind": "시즌",
-   "peak_months": [
-    10,
-    11
-   ],
-   "created_at": "2026-11-12"
   },
   {
    "id": "13816442573",
