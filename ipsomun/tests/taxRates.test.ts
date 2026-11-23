@@ -88,3 +88,12 @@ test("시급 → 월급·주휴수당 (2026 최저임금)", async () => {
   assert.equal(payFromHourly(10_000, 4, 5).belowMinimum, true);
   assert.equal(payFromHourly(10_700, 8, 5).monthly, 2_236_300); // 2027 고시 월 환산액
 });
+
+test("자녀세액공제 하한 나이: 2025 귀속 8세 → 매년 +1 → 2030 귀속부터 13세", async () => {
+  const { childCreditMinAge } = await import("../lib/taxRates.ts");
+  assert.equal(childCreditMinAge(2025), 8);
+  assert.equal(childCreditMinAge(2026), 9);
+  assert.equal(childCreditMinAge(2027), 10);
+  assert.equal(childCreditMinAge(2030), 13);
+  assert.equal(childCreditMinAge(2035), 13);
+});

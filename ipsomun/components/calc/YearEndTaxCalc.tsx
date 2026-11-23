@@ -5,6 +5,8 @@ import {
   earnedIncomeDeduction,
   earnedIncomeTaxCredit,
   childTaxCredit,
+  childCreditMinAge,
+  FILING_YEAR,
   progressiveTax,
   pensionCreditRate,
   PENSION_CREDIT,
@@ -42,7 +44,7 @@ export default function YearEndTaxCalc() {
   // 기본값: 총급여 5천만원·부양가족 1명의 간이세액표 원천징수 연간 합계 근사치
   const [paidTax, setPaidTax] = useState(260); // 만원, 기납부세액(소득세+지방소득세 합)
   const [dependents, setDependents] = useState(1); // 본인 포함 부양가족 수
-  const [children, setChildren] = useState(0); // 8~20세 자녀 수
+  const [children, setChildren] = useState(0); // 자녀세액공제 대상 자녀 수 (하한 나이는 귀속연도마다 다름)
   const [creditCard, setCreditCard] = useState(1500); // 만원, 연 신용카드 등 사용액
   const [pensionIrp, setPensionIrp] = useState(300); // 만원, 연금저축+IRP 합산 납입액
   // 추가 공제 (만원, 해당 없으면 0)
@@ -160,7 +162,7 @@ export default function YearEndTaxCalc() {
             onChange={(e) => setDependents(+e.target.value)}
           />
         </Field>
-        <Field label="8~20세 자녀 수" unit="명">
+        <Field label={`${childCreditMinAge(FILING_YEAR)}~20세 자녀 수 (${FILING_YEAR}년 귀속)`} unit="명">
           <input
             type="number" value={children} min={0} step={1}
             onChange={(e) => setChildren(+e.target.value)}

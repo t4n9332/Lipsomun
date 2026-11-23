@@ -7,7 +7,7 @@ import {
   siblingCalculators,
   type Calc,
 } from "@/lib/calculators";
-import { INSURANCE, UNEMPLOYMENT } from "@/lib/taxRates";
+import { INSURANCE, UNEMPLOYMENT, FILING_YEAR, childCreditMinAge } from "@/lib/taxRates";
 import { jsonLdString } from "@/lib/util";
 
 const SITE = process.env.SITE_URL || "https://lipsomun.co.kr";
@@ -549,11 +549,13 @@ function YearEndTaxGuide() {
 
       <h3>인적공제와 자녀세액공제는 다른 항목이다</h3>
       <p>
-        부양가족 1명당 <b>150만원씩 소득에서 빼주는 것</b>(인적공제)과, 8~20세
+        부양가족 1명당 <b>150만원씩 소득에서 빼주는 것</b>(인적공제)과, 일정 나이 이상
         자녀 수에 따라 <b>세금 자체를 깎아주는 것</b>(자녀세액공제)은 별개로
-        중복 적용된다. 자녀가 어리면 인적공제만 받고, 8세를 넘는 순간부터
-        세액공제까지 추가로 붙는다 — 아이가 초등학교에 들어가는 해에 환급액이
-        한 번 더 뛰는 이유다.
+        중복 적용된다. 자녀가 어리면 인적공제만 받다가 하한 나이를 넘는 해부터
+        세액공제가 추가로 붙는다. 그 하한 나이가 아동수당 확대에 맞춰{" "}
+        <b>2025년 귀속 8세 → 2026년 귀속 9세</b>로 올랐고 매년 한 살씩 올라 2030년
+        귀속부터는 13세 이상이다. 작년에 받던 자녀세액공제가 올해 빠졌다면 이 때문일 수 있다
+        (대신 아동수당을 더 오래 받는다). 올해 기준은 {FILING_YEAR}년 귀속 {childCreditMinAge(FILING_YEAR)}세 이상.
       </p>
 
       <h3>연금저축·IRP는 환급 계산에서 제일 손대기 쉬운 변수다</h3>

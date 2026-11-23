@@ -8,6 +8,7 @@ import {
   earnedIncomeDeduction,
   earnedIncomeTaxCredit,
   childTaxCredit,
+  childCreditMinAge,
   LOCAL_TAX_RATE,
   won,
 } from "@/lib/taxRates";
@@ -29,7 +30,7 @@ export default function SalaryNetCalc() {
   const [annual, setAnnual] = useState(5000); // 만원
   const [taxFreeMonthly, setTaxFreeMonthly] = useState(20); // 만원 (식대 등)
   const [family, setFamily] = useState(1); // 본인 포함 부양가족
-  const [children, setChildren] = useState(0); // 8~20세 자녀
+  const [children, setChildren] = useState(0); // 자녀세액공제 대상 자녀
 
   const r = useMemo(() => {
     const annualWon = annual * 10_000;
@@ -99,7 +100,7 @@ export default function SalaryNetCalc() {
             onChange={(e) => setFamily(+e.target.value)}
           />
         </Field>
-        <Field label="자녀 (8~20세)" unit="명">
+        <Field label={`자녀 (${childCreditMinAge(RATE_YEAR)}~20세)`} unit="명">
           <input
             type="number" value={children} min={0} max={10} step={1}
             onChange={(e) => setChildren(+e.target.value)}

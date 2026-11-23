@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import {
   progressiveTax,
   childTaxCredit,
+  childCreditMinAge,
+  FILING_YEAR,
   noranUmbrellaCap,
   WITHHOLDING_FREELANCE,
   STANDARD_TAX_CREDIT_NO_EARNED,
@@ -113,7 +115,7 @@ export default function GlobalIncomeTaxCalc() {
             onChange={(e) => setDependents(+e.target.value)}
           />
         </Field>
-        <Field label="8~20세 자녀 수" unit="명">
+        <Field label={`${childCreditMinAge(FILING_YEAR)}~20세 자녀 수 (${FILING_YEAR}년 귀속)`} unit="명">
           <input
             type="number" value={children} min={0} step={1}
             onChange={(e) => setChildren(+e.target.value)}

@@ -109,7 +109,21 @@ export function earnedIncomeTaxCredit(calculatedTax: number, gross: number) {
   return Math.min(raw, cap);
 }
 
-/** 자녀세액공제 (8세 이상 20세 이하) */
+/**
+ * 자녀세액공제 대상 하한 나이 — 아동수당 지급 연령 확대에 맞춰 2025 귀속 8세에서 매년 1세씩 올라
+ * 2026 귀속 9세, 2027 귀속 10세 … 2030 귀속부터 13세 이상 (소득세법 부칙, 2026-11-24 KB·세무 자료 2곳 대조).
+ */
+export function childCreditMinAge(attributionYear: number) {
+  return Math.min(13, Math.max(8, 8 + (attributionYear - 2025)));
+}
+
+/** 연말정산(1~2월)·종합소득세 신고(5월)는 작년 귀속분 — 상반기엔 작년, 하반기엔 올해를 계산 대상 연도로 본다 */
+export const FILING_YEAR = (() => {
+  const d = new Date(Date.now() + 9 * 3600 * 1000);
+  return d.getUTCMonth() < 6 ? d.getUTCFullYear() - 1 : d.getUTCFullYear();
+})();
+
+/** 자녀세액공제 (하한 나이는 childCreditMinAge, 20세 이하) — 금액은 2025 귀속부터 그대로 */
 export function childTaxCredit(children: number) {
   if (children <= 0) return 0;
   if (children === 1) return 250_000;
