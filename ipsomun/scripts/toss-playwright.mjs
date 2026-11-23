@@ -32,6 +32,7 @@ import { existsSync, readFileSync, writeFileSync, unlinkSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { siteCategoryFor } from "./lib-category.mjs";
+import { writeReloginShortcut, removeReloginShortcut, showToast } from "./lib-local-alert.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROFILE_DIR = path.join(__dirname, ".toss-profile");
@@ -207,7 +208,9 @@ const LOGIN_REALERT_MS = 24 * 60 * 60 * 1000;
  * 그래서 끊겨 있는 동안 24시간에 한 번, 며칠째인지를 붙여 다시 보낸다.
  */
 async function alertLoginExpired(reason = "") {
-  if (!existsSync(CONFIG_PATH)) return;
+  // 바탕화면 재로그인 파일은 회차마다 다시 쓴다(사용자가 지웠어도 끊겨 있는 동안은 돌아오게) — 소리 없는 경로라 소음이 아니다.
+  const shortcutOk = writeReloginShortcut(reason);
+
   const prev = readLoginAlertMarker();
   const now = Date.now();
   if (prev) {
@@ -215,45 +218,62 @@ async function alertLoginExpired(reason = "") {
     // Date.parse가 NaN이면 비교가 false가 되어 영영 안 보내게 되므로, 그때는 보내는 쪽으로 기운다
     if (Number.isFinite(since) && since < LOGIN_REALERT_MS) return;
   }
+  const when = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
+  const firstAt = prev ? Date.parse(prev.first) : now;
+  const days = Number.isFinite(firstAt) ? Math.floor((now - firstAt) / 86400000) + 1 : 1;
+  const repeat = Boolean(prev) && days > 1;
+  const head = repeat
+    ? `토스 쉐어링크 세션이 ${days}일째 만료 상태입니다 (${when} 회차).`
+    : `토스 쉐어링크 세션이 만료됐습니다 (${when} 회차).`;
+
+  // 1) 텔레그램(운영자 개인 대화). 실패하면 이유를 로그에 남긴다 — 예전엔 삼켜서 6일간 몰랐다(2026-11-19~24).
+  let telegramOk = false;
   try {
+    if (!existsSync(CONFIG_PATH)) throw new Error(".toss-config.json 없음");
     const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
-    const when = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
     const why = reason ? `\n원인: ${String(reason).split("\n")[0].slice(0, 120)}` : "";
-    const firstAt = prev ? Date.parse(prev.first) : now;
-    const days = Number.isFinite(firstAt) ? Math.floor((now - firstAt) / 86400000) + 1 : 1;
-    const repeat = Boolean(prev) && days > 1;
-    const head = repeat
-      ? `토스 쉐어링크 세션이 ${days}일째 만료 상태입니다 (${when} 회차).`
-      : `토스 쉐어링크 세션이 만료됐습니다 (${when} 회차).`;
     const extra = repeat
-      ? "\n이 기간 동안 새 비교 상품이 들어오지 않아 블로그 새 글도 나가지 않습니다."
+      ? "\n이 기간 동안 토스 가격 갱신·새 비교 상품 등록이 멈춥니다(사이트의 쿠팡 쪽은 정상)."
       : "";
     await siteApi(config, "POST", "/api/admin/alert", {
       text:
         `${head}${why}\n` +
-        "로컬에서 node scripts/toss-login.mjs 실행 후 재로그인하면 곧바로 보충 회차가 1회 돕니다. " +
-        "재로그인 전까지 2시간마다 오는 회차는 전부 실패합니다." +
+        "PC 바탕화면의 '토스 다시 로그인 (더블클릭)' 을 실행해 로그인하면 곧바로 보충 회차가 1회 돕니다." +
         extra,
     });
-    writeFileSync(
-      LOGIN_ALERT_MARKER,
-      JSON.stringify({
-        first: prev ? prev.first : new Date(now).toISOString(),
-        last: new Date(now).toISOString(),
-        count: (prev?.count || 0) + 1,
-      })
-    );
-  } catch {
-    // 알림 발송 실패는 원래 오류(로그인 만료)를 가리지 않도록 무시한다.
-    // 마커를 쓰지 않았으므로 다음 회차에 다시 시도한다.
+    telegramOk = true;
+  } catch (e) {
+    console.error(`[알림] 텔레그램 경고 실패 → PC 알림으로 대신함: ${String(e?.message || e).slice(0, 160)}`);
   }
+
+  // 2) PC 알림(토스트) — 텔레그램이 안 나갔을 때만. 둘 다 나가면 같은 말을 두 번 듣게 된다.
+  const toastOk = telegramOk ? false : showToast(head, "바탕화면 '토스 다시 로그인 (더블클릭)'을 실행하세요.");
+
+  // 어느 한 경로라도 전달됐으면 24시간 동안 다시 알리지 않는다. 전부 실패면 다음 회차에 재시도.
+  if (telegramOk || toastOk || shortcutOk) {
+    try {
+      writeFileSync(
+        LOGIN_ALERT_MARKER,
+        JSON.stringify({
+          first: prev ? prev.first : new Date(now).toISOString(),
+          last: new Date(now).toISOString(),
+          count: (prev?.count || 0) + 1,
+          via: [telegramOk && "telegram", toastOk && "toast", shortcutOk && "desktop"].filter(Boolean),
+        })
+      );
+    } catch {}
+  }
+  console.error(
+    `[알림] 세션 만료 알림: 텔레그램=${telegramOk ? "보냄" : "실패"} PC알림=${toastOk ? "보냄" : "안 보냄"} 바탕화면=${shortcutOk ? "있음" : "실패"}`
+  );
 }
 
-/** 정상 회차(카탈로그 건강 검사 통과)에서만 '복구'로 보고 마커를 지운다 */
+/** 정상 회차(카탈로그 건강 검사 통과)에서만 '복구'로 보고 마커·바탕화면 재로그인 파일을 지운다 */
 function clearLoginAlertMarker() {
   try {
     if (existsSync(LOGIN_ALERT_MARKER)) unlinkSync(LOGIN_ALERT_MARKER);
   } catch {}
+  removeReloginShortcut();
 }
 
 /** 세션 만료 계열 오류 표시 — 상위 핸들러가 텔레그램 알림 여부를 이걸로 판단한다 */

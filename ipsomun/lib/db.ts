@@ -194,6 +194,15 @@ CREATE TABLE IF NOT EXISTS click_sources (
   clicks INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, source, platform)
 );
+-- /go 클릭이 어디서 눌렸는지(상세 페이지·목록 카드·외부·출처 없음). 목록 카드 '구매' 버튼은 상세 조회 없이
+-- 클릭이 쌓여 카테고리 클릭률이 100%를 넘었다 — 상세 클릭률과 봇 의심 비중을 따로 보기 위함 (2026-11-24)
+CREATE TABLE IF NOT EXISTS click_origins (
+  day DATE NOT NULL,
+  origin TEXT NOT NULL,
+  platform TEXT NOT NULL,
+  clicks INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (day, origin, platform)
+);
 -- 편의점 상품 → 쿠팡 검색 제휴 딥링크 캐시 (같은 검색어는 API 를 다시 부르지 않는다)
 CREATE TABLE IF NOT EXISTS cvs_coupang_links (
   q TEXT PRIMARY KEY,
@@ -522,6 +531,35 @@ export async function trackClickSource(source: string, platform: string): Promis
      ON CONFLICT (day, source, platform) DO UPDATE SET clicks = click_sources.clicks + 1`,
     [kstToday(), source.slice(0, 40), platform.slice(0, 20)]
   );
+}
+
+/** 클릭 위치(상세·목록 카드·외부·출처 없음)별 /go 클릭 집계 */
+export async function trackClickOrigin(origin: string, platform: string): Promise<void> {
+  await q(
+    `INSERT INTO click_origins (day, origin, platform, clicks) VALUES ($1::date, $2, $3, 1)
+     ON CONFLICT (day, origin, platform) DO UPDATE SET clicks = click_origins.clicks + 1`,
+    [kstToday(), origin.slice(0, 40), platform.slice(0, 20)]
+  );
+}
+
+export interface OriginStat {
+  origin: string;
+  clicks: number;
+  toss: number;
+  coupang: number;
+}
+
+/** 최근 N일 클릭 위치별 집계 (관리자 대시보드) */
+export async function adminOriginStats(days = 30): Promise<OriginStat[]> {
+  const rows = await q(
+    `SELECT origin, SUM(clicks)::int AS clicks,
+            COALESCE(SUM(clicks) FILTER (WHERE platform = 'toss'), 0)::int AS toss,
+            COALESCE(SUM(clicks) FILTER (WHERE platform = 'coupang'), 0)::int AS coupang
+     FROM click_origins WHERE day >= ($1::date - ($2 || ' days')::interval)
+     GROUP BY origin ORDER BY clicks DESC`,
+    [kstToday(), String(days)]
+  );
+  return rows.map((r) => ({ origin: r.origin, clicks: r.clicks, toss: r.toss, coupang: r.coupang }));
 }
 
 export interface SourceStat {

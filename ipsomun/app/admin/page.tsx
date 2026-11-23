@@ -7,6 +7,7 @@ import {
   adminTopProducts,
   adminPlatformStats,
   adminSourceStats,
+  adminOriginStats,
 } from "@/lib/db";
 import { isAdmin } from "@/lib/auth";
 import { platformName, platformColor } from "@/lib/util";
@@ -21,14 +22,39 @@ export const metadata = { title: "관리자" };
 export default async function AdminPage() {
   if (!(await isAdmin())) redirect("/admin/login");
 
-  const [products, stats, catStats, topProducts, platformStats, sourceStats] = await Promise.all([
+  const [products, stats, catStats, topProducts, platformStats, sourceStats, originStats] = await Promise.all([
     adminListProducts(2000),
     adminStats(),
     adminCategoryStats(),
     adminTopProducts(10),
     adminPlatformStats().catch(() => []),
     adminSourceStats(30).catch(() => []),
+    adminOriginStats(30).catch(() => []),
   ]);
+  const LIST_LABEL: Record<string, string> = {
+    home: "홈",
+    deals: "오늘의 딜",
+    compare: "가격비교",
+    ranking: "랭킹",
+    category: "카테고리",
+    search: "검색",
+    favorites: "찜",
+    pick: "기획전",
+    blog: "리포트",
+  };
+  const originLabel = (o: string) =>
+    o === "detail"
+      ? "상품 상세에서"
+      : o === "external"
+        ? "외부에서 바로(/r 공유 링크 등)"
+        : o === "none"
+          ? "출처 없음(봇·본인 의심)"
+          : o.startsWith("list:")
+            ? `목록 카드 — ${LIST_LABEL[o.slice(5)] || o.slice(5)}`
+            : o;
+  const originTotal = originStats.reduce((s, r) => s + r.clicks, 0);
+  const detailClicks = originStats.find((r) => r.origin === "detail")?.clicks ?? 0;
+  const suspectClicks = originStats.find((r) => r.origin === "none")?.clicks ?? 0;
   const SOURCE_LABEL: Record<string, string> = {
     direct: "직접 방문·기타",
     telegram: "텔레그램",
@@ -163,6 +189,43 @@ export default async function AdminPage() {
         </p>
       </div>
 
+      <div className="admin-card">
+        <h2>🧭 클릭 위치 (최근 30일)</h2>
+        {originStats.length === 0 ? (
+          <div className="empty">
+            2026-11-24부터 집계합니다. 상세 페이지·목록 카드·외부 링크 중 어디서 눌렸는지 쌓이면 여기 표시됩니다.
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>눌린 곳</th>
+                <th>클릭</th>
+                <th>토스</th>
+                <th>쿠팡</th>
+                <th>비중</th>
+              </tr>
+            </thead>
+            <tbody>
+              {originStats.map((r) => (
+                <tr key={r.origin}>
+                  <td><b style={{ fontSize: 13 }}>{originLabel(r.origin)}</b></td>
+                  <td><b>{r.clicks.toLocaleString()}</b></td>
+                  <td>{r.toss.toLocaleString()}</td>
+                  <td>{r.coupang.toLocaleString()}</td>
+                  <td>{originTotal > 0 ? ((r.clicks / originTotal) * 100).toFixed(1) + "%" : "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <p style={{ fontSize: 12, color: "var(--ink-faint)", margin: "10px 0 0" }}>
+          {originTotal > 0 &&
+            `상세에서 누른 비율 ${((detailClicks / originTotal) * 100).toFixed(0)}% · 출처 없음 ${((suspectClicks / originTotal) * 100).toFixed(0)}%. `}
+          출처 없음이 많으면 봇이나 본인 클릭이 섞인 것이니 그만큼 빼고 판단하세요.
+        </p>
+      </div>
+
       <div className="dash-2col">
         <div className="admin-card">
           <h2>📊 카테고리별 성과</h2>
@@ -193,7 +256,8 @@ export default async function AdminPage() {
             </table>
           )}
           <p style={{ fontSize: 12, color: "var(--ink-faint)", margin: "10px 0 0" }}>
-            클릭이 잘 나오는 카테고리에 제품을 더 등록하는 게 유리해요.
+            클릭이 잘 나오는 카테고리에 제품을 더 등록하는 게 유리해요. 목록 카드의 구매 버튼은
+            상세 조회 없이 클릭되므로 클릭률이 100%를 넘을 수 있습니다(위 &lsquo;클릭 위치&rsquo; 참고).
           </p>
         </div>
 
