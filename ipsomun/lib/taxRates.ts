@@ -8,20 +8,57 @@
  * ⚠️ 갱신 시점: 매년 1월(보험요율·세율), 매년 7월(국민연금 기준소득월액 상·하한).
  */
 
-export const RATE_YEAR = 2026;
+/**
+ * 연도별 요율표. 다음 해 값이 고시되면 미리 넣어 두고, 한국시간 1월 1일에 저절로 넘어간다
+ * (계산기는 브라우저에서 이 파일을 다시 평가하므로 재배포 없이도 바뀐다).
+ * 2026-11-24 대조: 2026 값 전부 확인, 2027 값은 아래 출처대로 확정분만 반영.
+ */
+interface YearRates {
+  pension: number;
+  health: number;
+  longTermCareOnHealth: number;
+  minWageHourly: number;
+}
+const YEARLY: Record<2026 | 2027, YearRates> = {
+  2026: {
+    /** 국민연금 9.5%의 근로자 절반 */
+    pension: 0.0475,
+    /** 건강보험 7.19%의 근로자 절반 */
+    health: 0.03595,
+    /** 장기요양: 소득 대비 0.9448% ÷ 7.19% */
+    longTermCareOnHealth: 0.1314,
+    minWageHourly: 10_320,
+  },
+  2027: {
+    /** 국민연금 10%(2025.3 개정법: 2033년 13%까지 매년 0.5%p) */
+    pension: 0.05,
+    /** 2027 건강보험료율 7.19% 동결 (2026-09-08 건정심) */
+    health: 0.03595,
+    /** 2027 장기요양 13.90% (소득 대비 0.9994%, 2026-10-30 장기요양위원회) */
+    longTermCareOnHealth: 0.139,
+    /** 2027 최저임금 (2026-08-05 고시) */
+    minWageHourly: 10_700,
+  },
+};
+
+const KST_YEAR = new Date(Date.now() + 9 * 3600 * 1000).getUTCFullYear();
+export const RATE_YEAR: keyof typeof YEARLY = KST_YEAR >= 2027 ? 2027 : 2026;
+const Y = YEARLY[RATE_YEAR];
 
 /** 근로자 본인 부담분만. 사업주 부담은 실수령액과 무관해서 넣지 않는다. */
 export const INSURANCE = {
-  /** 국민연금 4.75% (2026년 9.5%를 사업주와 절반씩. 2033년까지 매년 0.5%p 인상) */
-  pension: 0.0475,
-  /** 기준소득월액 상한 — 이 금액을 넘는 소득에는 더 붙지 않는다 (2026.7~2027.6) */
+  /** 국민연금 (2033년까지 매년 0.5%p 인상) */
+  pension: Y.pension,
+  /** 기준소득월액 상한 — 이 금액을 넘는 소득에는 더 붙지 않는다 (2026.7~2027.6, 매년 7월 갱신) */
   pensionCapMonthly: 6_590_000,
   pensionFloorMonthly: 410_000,
-  /** 건강보험 3.595% (2026년 7.19%의 근로자 부담분) */
-  health: 0.03595,
+  health: Y.health,
   /** 장기요양보험은 소득이 아니라 '건강보험료'에 곱한다 — 자주 틀리는 부분 */
-  longTermCareOnHealth: 0.1314, // 2026년: 소득 대비 0.9448% ÷ 7.19%
-  /** 고용보험 실업급여분 0.9% */
+  longTermCareOnHealth: Y.longTermCareOnHealth,
+  /**
+   * 고용보험 실업급여분 0.9%. 2027년 1.0%(총 1.8→2.0%) 인상안이 국회 논의 중(2026-11 기준 미확정)
+   * — 확정되면 YEARLY 로 옮길 것.
+   */
   employment: 0.009,
 };
 
@@ -109,7 +146,7 @@ export const won = (n: number) =>
 /* ---------- 최저임금 · 실업급여 · 통상임금 ---------- */
 
 /** 매년 8월 고시, 다음 해 1월 적용. 갱신 시점 주의. */
-export const MIN_WAGE_HOURLY = 10_320; // 2026년
+export const MIN_WAGE_HOURLY = Y.minWageHourly; // YEARLY 표에서 (2026 10,320원 · 2027 10,700원)
 
 /**
  * 통상임금 계산의 월 소정근로시간.
@@ -122,7 +159,11 @@ export const MONTHLY_WORK_HOURS = 209;
 export const UNEMPLOYMENT = {
   /** 평균임금의 60% */
   rate: 0.6,
-  /** 1일 상한액 — 2019~2025년 66,000원, 2026.1.1 이후 이직자부터 68,100원 */
+  /**
+   * 1일 상한액 — 2019~2025년 66,000원, 2026.1.1 이후 이직자부터 68,100원.
+   * 2027년엔 하한(10,700×80%×8=68,480원)이 상한을 넘는다 → 현행 시행령대로면 하한이 적용돼 사실상 모두 하한액.
+   * '상한=하한×103%'·주 6일 지급 개편안이 국회 논의 중(2026-11 미확정) — 확정되면 여기와 UnemploymentCalc 를 고칠 것.
+   */
   dailyCap: 68_100,
   /** 1일 하한액 = 최저임금 × 80% × 1일 소정근로 8시간 */
   dailyFloor: Math.round(MIN_WAGE_HOURLY * 0.8 * 8),

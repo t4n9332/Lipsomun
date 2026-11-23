@@ -355,9 +355,18 @@ function UnemploymentGuide() {
         구직급여일액은 평균임금의 60%인데, 위로는 상한액에서 잘리고 아래로는
         최저임금의 80%(1일 8시간 기준)로 받쳐준다. 상한은 2019년부터 66,000원에
         묶여 있다가, 최저임금을 따라 오른 하한이 이를 넘어서자 2026년 이직자부터 하루{" "}
-        {UNEMPLOYMENT.dailyCap.toLocaleString("ko-KR")}원으로 올랐다. 하한(
-        {UNEMPLOYMENT.dailyFloor.toLocaleString("ko-KR")}원)과 거의 붙어 있어서{" "}
-        <b>월급이 얼마든 하루 6만원대 중후반에서 크게 벗어나지 않는다.</b>
+        {UNEMPLOYMENT.dailyCap.toLocaleString("ko-KR")}원으로 올랐다.{" "}
+        {UNEMPLOYMENT.dailyFloor >= UNEMPLOYMENT.dailyCap ? (
+          <>
+            그런데 올해는 최저임금 인상으로 하한({UNEMPLOYMENT.dailyFloor.toLocaleString("ko-KR")}원)이 상한을
+            넘어서 <b>사실상 누구나 하한액을 받는다.</b> 상한을 하한에 연동하는 개편안이 논의 중이라 금액이 바뀔 수 있다.
+          </>
+        ) : (
+          <>
+            하한({UNEMPLOYMENT.dailyFloor.toLocaleString("ko-KR")}원)과 거의 붙어 있어서{" "}
+            <b>월급이 얼마든 하루 6만원대 중후반에서 크게 벗어나지 않는다.</b>
+          </>
+        )}
       </p>
 
       <h3>받을 수 있는지부터가 관문이다</h3>

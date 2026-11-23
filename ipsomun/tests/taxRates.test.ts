@@ -4,24 +4,37 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   INSURANCE,
+  MIN_WAGE_HOURLY,
+  RATE_YEAR,
   UNEMPLOYMENT,
   childTaxCredit,
   progressiveTax,
   earnedIncomeDeduction,
 } from "../lib/taxRates.ts";
 
-test("2026 4대보험 근로자 부담 요율", () => {
-  assert.equal(INSURANCE.pension, 0.0475);
-  assert.equal(INSURANCE.health, 0.03595);
-  assert.equal(INSURANCE.longTermCareOnHealth, 0.1314);
+// 한국시간 1월 1일에 요율표가 저절로 넘어간다(lib/taxRates.ts YEARLY) — 그해 값을 확인한다
+const EXPECT = {
+  2026: { pension: 0.0475, health: 0.03595, ltc: 0.1314, minWage: 10_320 },
+  2027: { pension: 0.05, health: 0.03595, ltc: 0.139, minWage: 10_700 },
+};
+
+test(`${RATE_YEAR} 4대보험 근로자 부담 요율·최저임금`, () => {
+  const e = EXPECT[RATE_YEAR];
+  assert.equal(INSURANCE.pension, e.pension);
+  assert.equal(INSURANCE.health, e.health);
+  assert.equal(INSURANCE.longTermCareOnHealth, e.ltc);
   assert.equal(INSURANCE.employment, 0.009);
+  assert.equal(MIN_WAGE_HOURLY, e.minWage);
 });
 
-test("실업급여 하한이 상한을 넘지 않는다", () => {
-  assert.ok(
-    UNEMPLOYMENT.dailyFloor <= UNEMPLOYMENT.dailyCap,
-    `하한 ${UNEMPLOYMENT.dailyFloor} > 상한 ${UNEMPLOYMENT.dailyCap} — 상한 갱신 필요`,
-  );
+// 2027년엔 하한(68,480)이 상한(68,100)을 넘는다. 현행 시행령은 그때 하한액을 주므로 계산기(상한으로 자른 뒤
+// 하한으로 올림)가 맞다. 예전엔 '하한 ≤ 상한'을 강제했는데, 그러면 1월 1일부터 CI 가 매일 빨개진다.
+// 상한 연동 개편안이 확정되면 UNEMPLOYMENT 와 이 테스트를 함께 고칠 것.
+test("실업급여 일액: 상한으로 자르고 하한으로 받친다 (하한>상한이면 하한)", () => {
+  const daily = (raw: number) => Math.max(Math.min(raw, UNEMPLOYMENT.dailyCap), UNEMPLOYMENT.dailyFloor);
+  assert.equal(daily(1_000_000), Math.max(UNEMPLOYMENT.dailyCap, UNEMPLOYMENT.dailyFloor));
+  assert.equal(daily(1), UNEMPLOYMENT.dailyFloor);
+  assert.equal(UNEMPLOYMENT.dailyFloor, Math.round(MIN_WAGE_HOURLY * 0.8 * 8));
 });
 
 test("자녀세액공제: 25만 / 55만 / 셋째부터 40만씩", () => {
@@ -73,4 +86,5 @@ test("시급 → 월급·주휴수당 (2026 최저임금)", async () => {
   assert.equal(weeklyHolidayHours(14), 0); // 주 15시간 미만은 주휴 없음
   assert.equal(weeklyHolidayHours(20), 4); // 비례
   assert.equal(payFromHourly(10_000, 4, 5).belowMinimum, true);
+  assert.equal(payFromHourly(10_700, 8, 5).monthly, 2_236_300); // 2027 고시 월 환산액
 });

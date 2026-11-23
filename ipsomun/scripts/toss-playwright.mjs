@@ -33,7 +33,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { siteCategoryFor } from "./lib-category.mjs";
 import { writeReloginShortcut, removeReloginShortcut, showToast } from "./lib-local-alert.mjs";
-import { tryAutoLogin, hasCred } from "./lib-toss-cred.mjs";
+import { tryAutoLogin, hasCred, recoverHalfSession, markHalfRecovery } from "./lib-toss-cred.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROFILE_DIR = path.join(__dirname, ".toss-profile");
@@ -610,7 +610,15 @@ async function crawlCatalog(page) {
 
   // 베스트 랭킹 섹션·탭을 API 로 끝까지 읽어 카탈로그를 넓힌다(2026-11-14 상품 조회 화면 폐지 대응).
   // 총계 '정답지'는 이 회차에 API 가 돌려준 발급 가능 상품 수다.
-  const cur = await fetchCurationCatalog(page);
+  let cur = await fetchCurationCatalog(page);
+  // 시험용: TOSS_SIMULATE_HALF=1 이면 첫 수집만 '반쯤 끊김'(API 0개)으로 흉내 내 복구 경로를 확인한다
+  if (process.env.TOSS_SIMULATE_HALF === "1" && !crawlCatalog.simulated) {
+    crawlCatalog.simulated = true;
+    console.log("  [시험] 반쯤 끊김 흉내 — 이번 수집을 0개로 처리");
+    cur = { ok: false, items: [] };
+    catalog.length = 0;
+    seen.clear();
+  }
   let added = 0;
   for (const it of cur.items) {
     if (seen.has(it.title)) continue;
@@ -722,7 +730,29 @@ async function runMatch(config, page, opts = {}) {
     catalog = await crawlCatalog(page);
   }
   console.log(`카탈로그 상품 총 ${catalog.length}개\n`);
-  assertCatalogHealthy(catalog);
+  try {
+    assertCatalogHealthy(catalog);
+  } catch (e) {
+    // '반쯤 끊김'(대시보드는 뜨는데 카탈로그 API 0개) → 쿠키를 버리고 저장 계정으로 재로그인 후 한 번 더 수집.
+    // 하루 1회 제한(lib-toss-cred.mjs) — 원인이 토스 API 변경이면 재로그인을 반복해도 소용없다.
+    if (!e?.sessionExpired || opts.catalog) throw e;
+    const rec = await recoverHalfSession(page, {
+      onVerify: () => showToast("토스 로그인 확인 요청", "휴대폰 토스 앱에서 로그인 확인을 눌러 주세요 (3분 기다립니다)."),
+    });
+    console.log(`[반쯤 끊김 복구] ${rec.why}`);
+    if (!rec.ok) throw e;
+    console.log("\n재로그인 후 카탈로그를 다시 수집하는 중...");
+    catalog = await crawlCatalog(page);
+    console.log(`카탈로그 상품 총 ${catalog.length}개\n`);
+    try {
+      assertCatalogHealthy(catalog);
+      markHalfRecovery("재로그인 후 재수집 정상");
+    } catch (e2) {
+      markHalfRecovery("재로그인은 됐는데 여전히 0개 — 토스 화면·API 변경 의심");
+      e2.message += "\n       (재로그인 후에도 같음 — 세션보다 토스 화면·API 변경을 의심하세요)";
+      throw e2;
+    }
+  }
   clearLoginAlertMarker(); // 여기까지 왔으면 세션이 진짜 살아 있다 — 다음 만료 때 다시 알릴 수 있게
   if (targets.length === 0) {
     console.log("매칭할 상품이 없습니다.");
@@ -987,6 +1017,102 @@ async function runDiscover(config, page, catalog, products, maxSearches = 5) {
   return created;
 }
 
+/* ---------- 자동 모드 3단계: 토스 전용 인기상품 소량 등록 (2026-11-24) ---------- */
+
+/**
+ * 11월 개편 뒤 토스 카탈로그(500여 개)와 사이트 쿠팡 상품이 거의 겹치지 않아(매칭 0, 역매칭 0)
+ * 가격비교 신규 등록이 멈췄다. 토스 수수료(~10%)가 쿠팡(~3%)보다 높으므로, 쿠팡 짝이 없어도
+ * 검증된 인기상품만 토스 링크 하나로 올린다.
+ *
+ * 얇은 페이지가 쌓이지 않게 보수적으로:
+ *   - 자동(--auto) 회차에서만, 회차당 TOSS_ONLY_PER_RUN 개 (하루 2회차 → 최대 4개)
+ *   - 평점 4.5 이상·리뷰 200개 이상·5천~20만원, 사이트에 비슷한 제목이 없을 것
+ *   - 이번 회차 역매칭이 이미 다룬 상품은 제외(같은 상품 이중 등록 방지)
+ *   - 발급 링크를 실제 상품명으로 검증한 것만 등록. 실패한 후보는 7일 쉰다.
+ * 리뷰가 없는 상품 페이지는 사이트가 noindex 로 둔다(리뷰 게이팅) — 색인 품질에는 영향 없음.
+ */
+const TOSS_ONLY_PER_RUN = Number(process.env.TOSS_ONLY_PER_RUN ?? 2);
+const TOSS_ONLY_TRIED_PATH = path.join(__dirname, ".toss-only-tried.json");
+const TOSS_ONLY_RETRY_DAYS = 7;
+// 전환이 검증된 섹션을 먼저 (HIGH_CONVERSION = 토스가 알려주는 구매 전환 상위)
+const TOSS_ONLY_SECTION_BOOST = { HIGH_CONVERSION: 1.5, BEST_SELLING: 1.3, MOST_ISSUED: 1.2 };
+
+async function runTossOnly(config, page, catalog, products, max = TOSS_ONLY_PER_RUN) {
+  if (max <= 0) return 0;
+  let tried = {};
+  try {
+    tried = JSON.parse(readFileSync(TOSS_ONLY_TRIED_PATH, "utf8"));
+  } catch {}
+  let discoverTried = {};
+  try {
+    discoverTried = JSON.parse(readFileSync(TRIED_PATH, "utf8"));
+  } catch {}
+  const cutoff = Date.now() - TOSS_ONLY_RETRY_DAYS * 24 * 3600 * 1000;
+
+  const score = (c) =>
+    Math.log10((c.ratingCount ?? 0) + 10) *
+    Math.min(c.price ?? 0, DISCOVER_PRICE_CAP) *
+    (TOSS_ONLY_SECTION_BOOST[c.sectionCode] || 1);
+  const cands = catalog
+    .filter((c) => c.price != null && c.price >= 5_000 && c.price <= DISCOVER_MAX_PRICE)
+    .filter((c) => (c.rating ?? 0) >= 4.5 && (c.ratingCount ?? 0) >= 200)
+    .filter((c) => !(tried[c.title] > cutoff))
+    .filter((c) => !(discoverTried[c.title] >= RUN_STARTED_AT)) // 이번 회차 역매칭이 다룬 상품
+    .filter((c) => !products.some((p) => similarity(p.title, c.title) >= 0.6))
+    .sort((a, b) => score(b) - score(a));
+
+  console.log(`\n[토스 전용] 조건 맞는 인기상품 ${cands.length}개 중 최대 ${max}개 등록`);
+  let created = 0;
+  for (const c of cands) {
+    if (created >= max) break;
+    tried[c.title] = Date.now();
+    try {
+      const rows = await openCatalogPage(page, c);
+      const row = rows.find((r) => r.title === c.title);
+      const link = row ? await issueLinkByIndex(page, row.btnIndex) : null;
+      if (!link) {
+        console.log(`  ✘ [${c.title.slice(0, 34)}] 쉐어링크 발급 실패`);
+        continue;
+      }
+      const v = await verifyIssuedLink(link, c.title);
+      if (!v.ok) {
+        console.log(`  ✘ [${c.title.slice(0, 34)}] 링크 검증 실패 — 실제 상품: ${v.actual?.slice(0, 35) ?? "확인 불가"}`);
+        continue;
+      }
+      await siteApi(config, "POST", "/api/admin/products", [
+        {
+          title: c.title,
+          imageUrl: c.imageUrl || "",
+          price: c.price,
+          category: siteCategoryFor(c.filterCategory, c.title),
+          isDeal: false,
+          isPublished: true,
+          source: "toss-only",
+          description: "토스쇼핑 인기 상품",
+          rating: c.rating,
+          ratingCount: c.ratingCount,
+          links: [{ platform: "toss", url: link, price: c.price }],
+        },
+      ]);
+      created++;
+      console.log(
+        `  ✔ 토스 전용 등록: ${c.title.slice(0, 34)} — ${c.price.toLocaleString("ko-KR")}원 ⭐${c.rating}(${c.ratingCount}) [${c.sectionName}]`
+      );
+      await page.waitForTimeout(800);
+    } catch (e) {
+      console.log(`  ✘ [${c.title.slice(0, 30)}] ${e.message}`);
+    }
+  }
+  try {
+    writeFileSync(
+      TOSS_ONLY_TRIED_PATH,
+      JSON.stringify(Object.fromEntries(Object.entries(tried).filter(([, ts]) => ts > cutoff)), null, 2)
+    );
+  } catch {}
+  console.log(`[토스 전용] ${created}개 등록`);
+  return created;
+}
+
 /* ---------- 쿠팡 가격 재확인 ---------- */
 
 /**
@@ -1229,6 +1355,7 @@ function runMode() {
   if (process.argv.includes("--auto")) return "auto";
   if (process.argv.includes("--match-only")) return "match-only";
   if (process.argv.includes("--crawl-test")) return "crawl-test";
+  if (process.argv.includes("--toss-only")) return "toss-only";
   return "interactive";
 }
 
@@ -1272,6 +1399,8 @@ async function main() {
   const crawlTest = process.argv.includes("--crawl-test");
   const auto = process.argv.includes("--auto");
   const matchOnly = process.argv.includes("--match-only");
+  // 토스 전용 등록만 (블로그·텔레그램 없음): node scripts/toss-playwright.mjs --toss-only [개수]
+  const tossOnlyCli = process.argv.includes("--toss-only");
 
   if (auto && !existsSync(CONFIG_PATH)) {
     console.error(
@@ -1281,7 +1410,7 @@ async function main() {
   }
 
   const context = await chromium.launchPersistentContext(PROFILE_DIR, {
-    headless: crawlTest || auto || matchOnly, // 테스트·자동 모드는 헤드리스, 대화형은 창 표시
+    headless: crawlTest || auto || matchOnly || tossOnlyCli, // 테스트·자동 모드는 헤드리스, 대화형은 창 표시
     viewport: { width: 1280, height: 900 },
     args: ["--lang=ko-KR"],
     permissions: ["clipboard-read", "clipboard-write"],
@@ -1291,12 +1420,24 @@ async function main() {
   try {
     // 회차 헤더는 로그인 확인보다 먼저 — 로그인 실패 회차가 헤더도 없이 '오류:' 한 줄만
     // 남아 언제 어떤 회차가 죽었는지 grep으로 잡히지 않았다.
-    if (crawlTest || auto || matchOnly) {
-      const label = auto ? "자동 실행" : matchOnly ? "매칭 전용 실행" : "카탈로그 수집 테스트";
+    if (crawlTest || auto || matchOnly || tossOnlyCli) {
+      const label = auto ? "자동 실행" : matchOnly ? "매칭 전용 실행" : tossOnlyCli ? "토스 전용 등록" : "카탈로그 수집 테스트";
       console.log(`\n[${label}] ${new Date().toLocaleString("ko-KR")}`);
     }
     // 실패 시 알림·마커 처리는 main().then 거부 핸들러에서 (반쯤 만료된 경우까지 한 곳에서)
     await ensureLoggedIn(page);
+
+    if (tossOnlyCli) {
+      const config = JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+      const n = Number(process.argv[process.argv.indexOf("--toss-only") + 1]);
+      const { products } = await siteApi(config, "GET", "/api/admin/products?limit=10000");
+      console.log("\n쉐어링크 어드민 카탈로그를 수집하는 중...");
+      const catalog = await crawlCatalog(page);
+      assertCatalogHealthy(catalog);
+      const created = await runTossOnly(config, page, catalog, products, Number.isFinite(n) && n > 0 ? n : TOSS_ONLY_PER_RUN);
+      printRunSummary("toss-only", null, created, 0);
+      return;
+    }
 
     if (crawlTest) {
       console.log("\n[카탈로그 수집 테스트]");
@@ -1345,6 +1486,7 @@ async function main() {
         r = await runMatch(config, page, { auto: true });
         if (r) {
           created = await runDiscover(config, page, r.catalog, r.products, DISCOVER_PER_RUN);
+          created += await runTossOnly(config, page, r.catalog, r.products);
           updated = await runPriceRefresh(config, r.catalog, r.products);
           updated += await runCoupangRecheck(config, r.products);
         }

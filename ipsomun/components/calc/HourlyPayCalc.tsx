@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { INSURANCE, MIN_WAGE_HOURLY, payFromHourly, won } from "@/lib/taxRates";
+import { INSURANCE, MIN_WAGE_HOURLY, RATE_YEAR, payFromHourly, won } from "@/lib/taxRates";
 import Field from "./Field";
 
 /**
@@ -100,7 +100,7 @@ export default function HourlyPayCalc() {
 
       {r.belowMinimum && (
         <p className="calc-hint">
-          ⚠️ 입력한 시급이 <b>2026년 최저임금 {won(MIN_WAGE_HOURLY)}</b>보다 낮습니다. 수습 3개월(1년 이상 계약)·
+          ⚠️ 입력한 시급이 <b>{RATE_YEAR}년 최저임금 {won(MIN_WAGE_HOURLY)}</b>보다 낮습니다. 수습 3개월(1년 이상 계약)·
           감시단속직 등 예외가 아니라면 최저임금법 위반입니다. 고용노동부 고객상담센터(국번 없이 1350)에 상담할 수 있어요.
         </p>
       )}

@@ -107,6 +107,36 @@ function record(result, extra = {}) {
   writeState({ ...prev, lastAttempt: new Date().toISOString(), lastResult: result, ...extra });
 }
 
+/* ---------- '반쯤 끊김' 복구 (대시보드는 뜨는데 카탈로그 API 가 0개) ---------- */
+
+const HALF_RECOVERY_GAP_MS = 24 * HOUR;
+
+/**
+ * 반쯤 끊긴 세션을 쿠키를 지우고 저장 계정으로 다시 로그인해 살린다. 하루 1회만.
+ * 카탈로그가 0개인 원인이 세션이 아니라 토스 화면·API 변경일 수도 있다(2026-11 개편 때 실제로 그랬다).
+ * 그 경우 회차마다 비밀번호 로그인을 반복하지 않게 24시간에 한 번으로 묶는다.
+ * @returns {Promise<{ ok: boolean, why: string }>}
+ */
+export async function recoverHalfSession(page, { onVerify } = {}) {
+  if (!hasCred()) return { ok: false, why: "자동 로그인 정보 없음" };
+  const st = readState();
+  if (st.halfRecoveryAt && Date.now() - Date.parse(st.halfRecoveryAt) < HALF_RECOVERY_GAP_MS) {
+    return { ok: false, why: `오늘 이미 복구 시도함(${st.halfRecoveryAt}, 결과: ${st.halfRecoveryResult || "?"}) — 토스 화면·API 변경 의심` };
+  }
+  writeState({ ...st, halfRecoveryAt: new Date().toISOString(), halfRecoveryResult: "시도 중" });
+  try {
+    await page.context().clearCookies(); // 이 프로필은 토스 전용 — 반쯤 죽은 토큰을 버리고 새로 받는다
+  } catch {}
+  const r = await tryAutoLogin(page, { onVerify });
+  markHalfRecovery(r.ok ? "재로그인 성공" : `재로그인 실패: ${r.why}`);
+  return { ok: r.ok, why: r.why };
+}
+
+/** 복구 뒤 재수집 결과까지 기록 — 재로그인은 됐는데 여전히 0개면 세션 문제가 아니다 */
+export function markHalfRecovery(result) {
+  writeState({ ...readState(), halfRecoveryResult: result });
+}
+
 /* ---------- 로그인 ---------- */
 
 async function onDashboard(page) {
