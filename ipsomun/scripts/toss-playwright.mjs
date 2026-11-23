@@ -33,6 +33,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { siteCategoryFor } from "./lib-category.mjs";
 import { writeReloginShortcut, removeReloginShortcut, showToast } from "./lib-local-alert.mjs";
+import { tryAutoLogin, hasCred } from "./lib-toss-cred.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROFILE_DIR = path.join(__dirname, ".toss-profile");
@@ -353,11 +354,23 @@ async function ensureLoggedIn(page) {
   await page.goto("https://sharelink.toss.im/home", { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(4000);
   const ok = await page.evaluate(() => document.body.innerText.includes("실적 대시보드"));
-  if (!ok) {
-    throw sessionError(
-      "쉐어링크 어드민 로그인이 안 되어 있습니다. 먼저 실행하세요:  node scripts/toss-login.mjs"
-    );
+  if (ok) return;
+
+  // 저장된 계정이 있으면 스스로 다시 로그인한다 (lib-toss-cred.mjs — 틀리면 멈추고, 추가 인증은 운영자 몫)
+  const auto = await tryAutoLogin(page, {
+    onVerify: () => showToast("토스 로그인 확인 요청", "휴대폰 토스 앱에서 로그인 확인을 눌러 주세요 (3분 기다립니다)."),
+  });
+  console.log(`[자동 로그인] ${auto.why}`);
+  if (auto.ok) {
+    await page.goto("https://sharelink.toss.im/home", { waitUntil: "domcontentloaded" });
+    await page.waitForTimeout(4000);
+    if (await page.evaluate(() => document.body.innerText.includes("실적 대시보드"))) return;
   }
+  throw sessionError(
+    hasCred()
+      ? `쉐어링크 어드민 로그인이 안 되어 있습니다 (자동 로그인: ${auto.why})`
+      : "쉐어링크 어드민 로그인이 안 되어 있습니다. 먼저 실행하세요:  node scripts/toss-login.mjs"
+  );
 }
 
 /**

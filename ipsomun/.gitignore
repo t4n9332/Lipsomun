@@ -18,6 +18,9 @@ scripts/.indexnow-submitted.json
 scripts/.catalog-health.json
 # 토스 세션 만료 텔레그램 알림 중복 방지 마커
 scripts/.toss-login-alert-sent
+# 토스 자동 로그인: 계정 ID + DPAPI 암호화 비밀번호(이 PC·이 Windows 계정에서만 풀림)와 시도 기록 — 절대 커밋 금지
+scripts/.toss-cred.json
+scripts/.toss-autologin.json
 # 리뷰 없는 상품 목록 (생성물 — 매번 다시 뽑는다)
 scripts/.no-review.json
 # 리뷰 대상 추출 스냅샷 (관리자 API에서 매번 새로 뽑는다 — 커밋하면 금방 낡는다)
