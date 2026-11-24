@@ -27,8 +27,15 @@ if (!app) {
   const appId = (await rl.question("Threads 앱 ID: ")).trim();
   rl.close();
   const appSecret = await askHidden("Threads 앱 시크릿(* 로 표시): ");
-  if (!appId || !appSecret) {
-    console.log("✘ 비어 있어 저장하지 않았습니다.");
+  // 2026-11-24 실제 사고: 앱 ID 칸에 이메일, 시크릿 칸에 계정 비밀번호를 넣었다 → 형식을 검사해 아예 저장하지 않는다
+  if (!/^\d{10,20}$/.test(appId)) {
+    console.log("✘ Threads 앱 ID 는 숫자만 10~20자리입니다(이메일·이름이 아님). 저장하지 않았습니다.");
+    console.log("  위치: 앱 대시보드 → 사용 사례 → Threads API 액세스 '맞춤 설정' → 설정 → 'Threads 앱 ID'");
+    process.exit(1);
+  }
+  if (!/^[0-9a-f]{32}$/i.test(appSecret)) {
+    console.log("✘ Threads 앱 시크릿은 영문·숫자 32자리입니다. 페이스북·스레드 비밀번호가 아닙니다. 저장하지 않았습니다.");
+    console.log("  위치: 같은 설정 화면의 'Threads 앱 시크릿' 옆 '표시' → 복사");
     process.exit(1);
   }
   saveApp(appId, appSecret);
