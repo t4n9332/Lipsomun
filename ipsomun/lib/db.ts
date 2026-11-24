@@ -460,7 +460,8 @@ export async function getGiftSetProducts(limit = 40): Promise<Product[]> {
   const rows = await q(
     `SELECT * FROM products
      WHERE is_published
-       AND title ~* '(선물세트|선물 세트|선물용|명절|한우세트|과일세트|참치세트|햄세트|홍삼|기프트)'
+       AND (title ~* '(선물세트|선물 세트|선물용|명절|한우세트|과일세트|참치세트|햄세트|견과세트|홍삼|기프트)'
+            OR source = 'seol-gift') -- 명절용으로 골라 등록한 상품(제목에 '선물'이 없어도)
        AND category <> '육아'
        AND title !~* '(턱받이|출산|백일|돌잔치|신생아)'
      ORDER BY clicks DESC, views DESC, updated_at DESC LIMIT $1`,
