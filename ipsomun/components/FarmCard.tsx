@@ -28,12 +28,17 @@ export interface FarmItem {
   created_at: string;
 }
 
-export default function FarmCard({ p }: { p: FarmItem }) {
-  const buy = p.naver_url || p.coupang_url;
+/**
+ * @param from 어디에 놓인 카드인지 — 네이버 스토어 이동을 /farm/go 경유로 집계한다(관리자 '클릭 위치').
+ *   farm(산지직송 코너) · xsell(제휴 상품 상세의 교차 노출) · cat(카테고리 배너)
+ */
+export default function FarmCard({ p, from = "farm" }: { p: FarmItem; from?: "farm" | "xsell" | "cat" }) {
+  const naver = p.naver_url ? `/farm/go/${encodeURIComponent(p.id)}?from=${from}` : "";
+  const buy = naver || p.coupang_url;
   return (
     <article className="card farm-card">
       {p.category && <span className="badge farm">{p.category}</span>}
-      <a href={buy} target="_blank" rel="noopener" className="thumb">
+      <a href={buy} target="_blank" rel="nofollow noopener" className="thumb">
         {p.image ? (
           <Image
             src={imgUrl(p.image, 400)}
@@ -63,7 +68,7 @@ export default function FarmCard({ p }: { p: FarmItem }) {
         </div>
         <div className="farm-btns">
           {p.naver_url && (
-            <a className="btn farm-naver" href={p.naver_url} target="_blank" rel="noopener">
+            <a className="btn farm-naver" href={naver} target="_blank" rel="nofollow noopener">
               네이버 스토어에서 구매
             </a>
           )}

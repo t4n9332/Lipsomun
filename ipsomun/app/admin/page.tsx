@@ -49,6 +49,12 @@ export default async function AdminPage() {
         ? "외부에서 바로(/r 공유 링크 등)"
         : o === "none"
           ? "출처 없음(봇·본인 의심)"
+          : o === "farm:xsell"
+            ? "🌾 산지직송 — 상품 상세 교차 노출"
+            : o === "farm:cat"
+              ? "🌾 산지직송 — 식품 카테고리 배너"
+              : o === "farm:farm"
+                ? "🌾 산지직송 — 산지직송 코너"
           : o.startsWith("list:")
             ? `목록 카드 — ${LIST_LABEL[o.slice(5)] || o.slice(5)}`
             : o;

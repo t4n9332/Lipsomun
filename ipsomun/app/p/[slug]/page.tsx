@@ -23,6 +23,7 @@ import PushSubscribeButton from "@/components/PushSubscribeButton";
 import Stars from "@/components/Stars";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
 import ViewTracker from "@/components/ViewTracker";
+import { FarmCrossSell } from "@/components/FarmCrossSell";
 
 // 방문마다 서버 렌더 + DB 조회를 하면 TTFB가 1초를 넘는다. 10분 캐시로 CDN이
 // 바로 응답하게 하고, 가격이 바뀌면 다음 재생성 때 반영된다.
@@ -352,6 +353,9 @@ export default async function ProductPage({
           )}
         </div>
       )}
+
+      {/* 같은 품목의 산지직송(운영자 직판, 마진이 제휴 수수료보다 크다) — 맞는 상품이 없으면 그리지 않는다 */}
+      <FarmCrossSell product={{ title: product.title, category: product.category }} />
 
       {related.length > 0 && (
         <section className="section">

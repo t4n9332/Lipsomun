@@ -4,6 +4,7 @@ import { getByCategory, withLinks } from "@/lib/db";
 import { CATEGORIES, jsonLdString } from "@/lib/util";
 import ProductCard from "@/components/ProductCard";
 import ListInsight from "@/components/ListInsight";
+import { FarmSeasonalStrip } from "@/components/FarmCrossSell";
 
 export const revalidate = 600; // 카테고리 목록
 
@@ -75,6 +76,7 @@ export default async function CategoryPage({
         <span className="sub">입소문이 엄선한 인기 제품 랭킹</span>
       </div>
       <ListInsight items={items} label={`${category} 인기 상품`} />
+      {category === "식품" && <FarmSeasonalStrip />}
       {items.length === 0 ? (
         <div className="empty">이 카테고리에는 아직 제품이 없습니다.</div>
       ) : (
