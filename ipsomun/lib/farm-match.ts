@@ -226,3 +226,22 @@ export function farmSeasonal(
     })
     .slice(0, limit);
 }
+
+/**
+ * 명절 선물용 산지직송(/seollal) — 제목에 선물·보자기·가방포장이 있는 상품만.
+ * 크기만 다른 같은 계열(영광굴비 오가세트 20~25cm 여러 개)은 가장 싼 것 하나만 남겨 페이지를 짧게 한다.
+ */
+export function farmGiftItems(farmItems: FarmItemLite[]): FarmItemLite[] {
+  const gifts = farmItems
+    .filter((i) => available(i) && /선물|보자기|가방포장/.test(i.title))
+    .sort((a, b) => a.price_from - b.price_from);
+  const seen = new Set<string>();
+  return gifts.filter((i) => {
+    const key = baseKey(i.title.replace(/\(1\+1\)\s*/, "1+1 ").replace(/\d+\s*-\s*\d+\s*cm/gi, ""));
+    const g = i.group_id || i.id;
+    if (seen.has(key) || seen.has(g)) return false;
+    seen.add(key);
+    seen.add(g);
+    return true;
+  });
+}

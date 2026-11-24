@@ -83,3 +83,14 @@ test("실데이터 오매칭 회귀: 띄어쓰기·가공식품·고기 종류",
   assert.equal(farmPicksFor({ title: "환타 제로 오렌지 탄산음료", category: "식품" }, MEAT, { month: 11 }).items.length, 0);
   assert.equal(farmPicksFor({ title: "갈아만든배", category: "식품" }, MEAT, { month: 11 }).items.length, 0);
 });
+
+test("설 선물: 선물·보자기·가방포장만, 크기만 다른 굴비 세트는 가장 싼 것 하나", async () => {
+  const { farmGiftItems } = await import("../lib/farm-match.ts");
+  const G: FarmItemLite[] = [
+    item({ id: "k1", group_id: "K1", title: "영광굴비 오가세트 24-25cm  보자기포장", price_from: 346400 }),
+    item({ id: "k2", group_id: "K2", title: "영광굴비 오가세트 20-21cm  보자기포장", price_from: 127500 }),
+    item({ id: "h1", title: "++한우선물세트", price_from: 120100 }),
+    item({ id: "e1", title: "민물장어 +(소스 초생강 2세트)", price_from: 48200 }),
+  ];
+  assert.deepEqual(farmGiftItems(G).map((i) => i.id), ["h1", "k2"]);
+});

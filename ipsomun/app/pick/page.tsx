@@ -20,6 +20,10 @@ export default async function PickListPage() {
         <h1>🧺 기획전</h1>
         <span className="sub">주제별로 골라 담은 추천 모음</span>
       </div>
+      {/* 시즌 기획 페이지(코드로 만든 고정 페이지)는 DB 기획전 목록에 없으니 여기서 잇는다 */}
+      <Link href="/seollal" className="seol-banner">
+        🎁 <b>2027 설 선물세트</b> — 예산별 한우·굴비·과일·곶감, 택배 마감·선물 한도까지 →
+      </Link>
       {picks.length === 0 ? (
         <div className="empty">첫 기획전을 준비하고 있어요. 곧 만나요!</div>
       ) : (

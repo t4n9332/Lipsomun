@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
  * 산지직송 상품 → 네이버 스마트스토어 이동 경유지 (2026-11-24).
  * 어디서 눌렸는지(from)를 click_origins 에 'farm:<from>' 으로 쌓아, 관리자 '클릭 위치' 표에서
  * 교차 노출(상품 상세·카테고리)이 실제로 스토어 방문을 만드는지 본다. 이동은 봇이어도 그대로 시킨다.
- *   from: xsell(상품 상세 교차 노출) · cat(카테고리 배너) · farm(산지직송 코너)
+ *   from: xsell(상품 상세 교차 노출) · cat(카테고리 배너) · farm(산지직송 코너) · seol(설 선물 페이지)
  */
-const FROM = new Set(["xsell", "cat", "farm"]);
+const FROM = new Set(["xsell", "cat", "farm", "seol"]);
 const DEDUPE_SEC = 3600;
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {

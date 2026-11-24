@@ -55,6 +55,8 @@ export default async function AdminPage() {
               ? "🌾 산지직송 — 식품 카테고리 배너"
               : o === "farm:farm"
                 ? "🌾 산지직송 — 산지직송 코너"
+                : o === "farm:seol"
+                  ? "🌾 산지직송 — 설 선물 페이지"
           : o.startsWith("list:")
             ? `목록 카드 — ${LIST_LABEL[o.slice(5)] || o.slice(5)}`
             : o;

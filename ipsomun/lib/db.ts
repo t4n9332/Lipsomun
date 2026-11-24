@@ -452,6 +452,23 @@ export async function searchProductsDb(
   return rows.map(rowToProduct);
 }
 
+/**
+ * 명절 선물세트 페이지(/seollal)용 — 제목에 선물 표시가 있는 공개 상품. 새로 들어온 선물세트가 저절로 붙는다.
+ * 아기용품(출산 선물 등)은 명절 선물이 아니라 뺀다.
+ */
+export async function getGiftSetProducts(limit = 40): Promise<Product[]> {
+  const rows = await q(
+    `SELECT * FROM products
+     WHERE is_published
+       AND title ~* '(선물세트|선물 세트|선물용|명절|한우세트|과일세트|참치세트|햄세트|홍삼|기프트)'
+       AND category <> '육아'
+       AND title !~* '(턱받이|출산|백일|돌잔치|신생아)'
+     ORDER BY clicks DESC, views DESC, updated_at DESC LIMIT $1`,
+    [limit]
+  );
+  return rows.map(rowToProduct);
+}
+
 /** 검색 자동완성 제안 (제목 위주, 클릭수 순) */
 export async function suggestTitles(query: string, limit = 8): Promise<string[]> {
   if (!query) return [];

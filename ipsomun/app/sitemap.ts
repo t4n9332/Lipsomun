@@ -55,6 +55,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/ranking`, lastModified: today, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/pick`, lastModified: today, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/farm`, lastModified: today, changeFrequency: "daily", priority: 0.8 },
+    // 명절 선물 — 설(1~2월 검색 시즌) 전에 색인되도록 미리 연다
+    { url: `${base}/seollal`, lastModified: today, changeFrequency: "weekly", priority: 0.8 },
     // 편의점 행사는 매월 1일 갱신
     { url: `${base}/cvs`, lastModified: CVS_UPDATED, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/cvs/patch`, lastModified: CVS_UPDATED, changeFrequency: "monthly", priority: 0.8 },

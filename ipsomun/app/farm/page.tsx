@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import farm from "@/data/farm.json";
 import FarmCard, { type FarmItem } from "@/components/FarmCard";
 import FarmTabs from "@/components/FarmTabs";
@@ -50,6 +51,7 @@ export default function FarmPage() {
         <div className="farm-sub">
           <span>총 {items.length}개 상품</span>
           {updated && <span>· {updated} 기준</span>}
+          <Link href="/seollal">🎁 설 선물세트 모아 보기</Link>
           {farm.store?.naver_url && (
             <a href={farm.store.naver_url} target="_blank" rel="noopener">
               스토어 전체보기 →
