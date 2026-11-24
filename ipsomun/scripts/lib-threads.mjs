@@ -19,8 +19,8 @@ const AUTH = "https://threads.net/oauth/authorize";
 export const SCOPES = [
   "threads_basic",             // 필수
   "threads_content_publish",   // 게시
-  "threads_manage_replies",    // 첫 댓글(쿠팡 링크)
-  "threads_read_replies",
+  "threads_manage_replies",    // 첫 댓글(비교 링크)
+  // threads_read_replies 는 쓰지 않는다 — 앱에 추가하지 않은 권한을 요청하면 승인 단계에서 막힌다(2026-11-24)
 ];
 
 /** 사용자가 승인할 인가 URL */
