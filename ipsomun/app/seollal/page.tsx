@@ -38,9 +38,25 @@ const BUDGETS: { label: string; note: string; min: number; max: number }[] = [
   { label: "10만원 이상", note: "격식을 갖춘 명절 선물", min: 100_000, max: Infinity },
 ];
 
+/** 제휴 선물세트를 종류별로 — 한 줄로 30개 넘게 늘어놓으면 고르기 어렵다. 어디에도 안 걸리면 '그 밖의 선물'. */
+const PARTNER_GROUPS: { label: string; note: string; test: (p: { title: string; category: string }) => boolean }[] = [
+  { label: "한과·견과", note: "어르신 선물로 무난한 전통 간식", test: (p) => /한과|유과|약과|정과|견과|너트|넛츠/.test(p.title) },
+  { label: "식용유·통조림", note: "오래 두고 쓰는 실속 선물", test: (p) => /식용유|카놀라|포도씨유|해바라기씨유|올리브유|참기름|스팸|참치|햄|조미료|청정원/.test(p.title) },
+  { label: "건강", note: "홍삼·건강식품", test: (p) => /홍삼|인삼|건강|비타민/.test(p.title) },
+  { label: "생활·뷰티", note: "비누·바디·디퓨저 등", test: (p) => /생활용품|뷰티|홈인테리어/.test(p.category) },
+];
+
 export default async function SeollalPage() {
   const gifts = farmGiftItems(farm.items as FarmItem[]);
-  const partner = await withLinks(await getGiftSetProducts(24)).catch(() => []);
+  const partner = await withLinks(await getGiftSetProducts(48)).catch(() => []);
+  const used = new Set<string>();
+  const partnerGroups = [...PARTNER_GROUPS, { label: "그 밖의 선물", note: "", test: () => true }]
+    .map((g) => {
+      const list = partner.filter((p) => !used.has(p.id) && g.test(p)).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+      list.forEach((p) => used.add(p.id));
+      return { ...g, list };
+    })
+    .filter((g) => g.list.length);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -125,13 +141,20 @@ export default async function SeollalPage() {
         <section className="section">
           <div className="section-head">
             <h2>🎁 가공식품·생활 선물세트</h2>
-            <span className="sub">스팸·참치·조미료·홍삼 등 오래 두고 쓰는 선물</span>
+            <span className="sub">한과·견과·식용유·생활용품 등 오래 두고 쓰는 선물</span>
           </div>
-          <div className="grid">
-            {partner.map((p) => (
-              <ProductCard key={p.id} p={p} />
-            ))}
-          </div>
+          {partnerGroups.map((g) => (
+            <div key={g.label} className="seol-budget">
+              <h3>
+                {g.label} {g.note && <span>{g.note}</span>}
+              </h3>
+              <div className="grid">
+                {g.list.map((p) => (
+                  <ProductCard key={p.id} p={p} />
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
       )}
 
