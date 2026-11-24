@@ -13,6 +13,9 @@ next-env.d.ts
 scripts/toss-auto.log
 scripts/.discover-tried.json
 scripts/.toss-only-tried.json
+# 스레드 자동 게시: 앱 시크릿·액세스 토큰(DPAPI 암호화)과 게시 기록 — 절대 커밋 금지
+scripts/.threads-config.json
+scripts/.threads-posted.json
 scripts/.coupang-recheck.json
 scripts/.indexnow-submitted.json
 # 카탈로그 수집량 기준선 (회차마다 갱신되는 실행 상태)

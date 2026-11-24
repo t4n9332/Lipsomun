@@ -9,4 +9,5 @@ powershell -NoProfile -Command "$p='scripts\toss-auto.log'; if (Test-Path $p) { 
 node scripts\toss-playwright.mjs --auto >> "scripts\toss-auto.log" 2>&1
 node scripts\blog-draft.mjs >> "scripts\toss-auto.log" 2>&1
 node scripts\social-card.mjs >> "scripts\toss-auto.log" 2>&1
+node scripts\threads-post.mjs >> "scripts\toss-auto.log" 2>&1
 node scripts\indexnow.mjs >> "scripts\toss-auto.log" 2>&1
