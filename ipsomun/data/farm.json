@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-24T17:17+09:00",
+ "generated_at": "2026-11-25T17:17+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -1802,11 +1802,11 @@
    "title": "국내산 건홍합",
    "category": "건어물",
    "image": "https://t4n9332.github.io/witak-images/images/G10004895_thumb.jpg",
-   "price_from": 17600,
+   "price_from": 19100,
    "options": [
     {
      "name": "0.5kg",
-     "price": 17600,
+     "price": 19100,
      "soldout": false
     }
    ],
@@ -3053,7 +3053,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13778389590",
-   "coupang_url": "https://www.coupang.com/vp/products/16428087674",
+   "coupang_url": "https://www.coupang.com/vp/products/16474064972",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-09-28"
@@ -3478,11 +3478,11 @@
    "title": "육우 1+ 안심 (냉장)",
    "category": "기타",
    "image": "https://t4n9332.github.io/witak-images/images/G10000680_thumb.jpg",
-   "price_from": 22800,
+   "price_from": 23400,
    "options": [
     {
      "name": "0.15kg",
-     "price": 22800,
+     "price": 23400,
      "soldout": false
     }
    ],
@@ -4346,11 +4346,11 @@
    "title": "원양산 마른 오징어 (5미 중)",
    "category": "건어물",
    "image": "https://t4n9332.github.io/witak-images/images/G10004189_thumb.jpg",
-   "price_from": 23400,
+   "price_from": 23600,
    "options": [
     {
      "name": "0.2kg",
-     "price": 23400,
+     "price": 23600,
      "soldout": false
     }
    ],
@@ -5426,21 +5426,21 @@
    "title": "국내산 손깐생강 [100%박피]",
    "category": "채소",
    "image": "https://t4n9332.github.io/witak-images/images/G10002965_thumb.jpg",
-   "price_from": 23800,
+   "price_from": 26200,
    "options": [
     {
      "name": "1kg",
-     "price": 23800,
+     "price": 26200,
      "soldout": false
     },
     {
      "name": "2kg",
-     "price": 43500,
+     "price": 48200,
      "soldout": false
     },
     {
      "name": "3kg",
-     "price": 63100,
+     "price": 70200,
      "soldout": false
     }
    ],
@@ -5456,21 +5456,21 @@
    "title": "국내산 세척 생강 [특품]",
    "category": "채소",
    "image": "https://t4n9332.github.io/witak-images/images/G10002968_thumb.jpg",
-   "price_from": 13100,
+   "price_from": 14900,
    "options": [
     {
      "name": "1kg",
-     "price": 13100,
+     "price": 14900,
      "soldout": false
     },
     {
      "name": "2kg",
-     "price": 22100,
+     "price": 25700,
      "soldout": false
     },
     {
      "name": "3kg",
-     "price": 31000,
+     "price": 36400,
      "soldout": false
     }
    ],
@@ -5486,21 +5486,21 @@
    "title": "국내산 흙 생강 [특품]",
    "category": "채소",
    "image": "https://t4n9332.github.io/witak-images/images/G10002974_thumb.jpg",
-   "price_from": 12100,
+   "price_from": 14000,
    "options": [
     {
      "name": "1kg",
-     "price": 12100,
+     "price": 14000,
      "soldout": false
     },
     {
      "name": "2kg",
-     "price": 20300,
+     "price": 23800,
      "soldout": false
     },
     {
      "name": "3kg",
-     "price": 28400,
+     "price": 33600,
      "soldout": false
     }
    ],
@@ -5690,11 +5690,11 @@
    "title": "여수 석화(각굴) (4~5인분)",
    "category": "수산물",
    "image": "https://t4n9332.github.io/witak-images/images/G10002062_thumb.jpg",
-   "price_from": 28100,
+   "price_from": 29200,
    "options": [
     {
      "name": "10kg",
-     "price": 28100,
+     "price": 29200,
      "soldout": false
     }
    ],
@@ -6233,7 +6233,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13821366725",
-   "coupang_url": "https://www.coupang.com/vp/products/16428093986",
+   "coupang_url": "https://www.coupang.com/vp/products/16474065094",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
@@ -6253,7 +6253,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13821366777",
-   "coupang_url": "https://www.coupang.com/vp/products/16428093986",
+   "coupang_url": "https://www.coupang.com/vp/products/16474065094",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
@@ -6278,7 +6278,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13821376551",
-   "coupang_url": "https://www.coupang.com/vp/products/16428095343",
+   "coupang_url": "https://www.coupang.com/vp/products/16474065284",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
@@ -6298,7 +6298,7 @@
     }
    ],
    "naver_url": "https://smartstore.naver.com/3000company/products/13821376594",
-   "coupang_url": "https://www.coupang.com/vp/products/16428095343",
+   "coupang_url": "https://www.coupang.com/vp/products/16474065284",
    "season_kind": "상시",
    "peak_months": [],
    "created_at": "2026-10-19"
@@ -7018,11 +7018,11 @@
    "title": "통영 생굴(깐굴)",
    "category": "수산물",
    "image": "https://t4n9332.github.io/witak-images/images/G10002008_thumb.jpg",
-   "price_from": 18200,
+   "price_from": 20600,
    "options": [
     {
      "name": "1kg",
-     "price": 18200,
+     "price": 20600,
      "soldout": false
     }
    ],
@@ -7122,21 +7122,21 @@
    "title": "국내산 세척 생강 [알뜰]",
    "category": "채소",
    "image": "https://shop-phinf.pstatic.net/20261025_261/1792869638247CQ1mv_JPEG/10225727410316204_1254004788.jpg",
-   "price_from": 12100,
+   "price_from": 14000,
    "options": [
     {
      "name": "1kg",
-     "price": 12100,
+     "price": 14000,
      "soldout": false
     },
     {
      "name": "2kg",
-     "price": 20300,
+     "price": 23800,
      "soldout": false
     },
     {
      "name": "3kg",
-     "price": 28400,
+     "price": 33600,
      "soldout": false
     }
    ],
@@ -7197,21 +7197,21 @@
    "title": "국내산 흙 생강 [알뜰]",
    "category": "채소",
    "image": "https://shop-phinf.pstatic.net/20261026_258/1792996764407i4CtB_JPEG/59182591848232961_1261695287.jpg",
-   "price_from": 11200,
+   "price_from": 12900,
    "options": [
     {
      "name": "1kg × 1개",
-     "price": 11200,
+     "price": 12900,
      "soldout": false
     },
     {
      "name": "2kg × 1개",
-     "price": 18400,
+     "price": 21700,
      "soldout": false
     },
     {
      "name": "3kg × 1개",
-     "price": 25700,
+     "price": 30700,
      "soldout": false
     }
    ],
@@ -8123,11 +8123,11 @@
    "title": "제주 감귤 (랜덤과 2S-M) 실중량 [실중량 2.5kg]",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10005506_thumb.jpg",
-   "price_from": 9300,
+   "price_from": 11700,
    "options": [
     {
      "name": "3kg (실중량)",
-     "price": 9300,
+     "price": 11700,
      "soldout": false
     }
    ],
