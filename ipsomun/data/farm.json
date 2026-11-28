@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-27T17:17+09:00",
+ "generated_at": "2026-11-28T17:17+09:00",
  "store": {
   "name": "백납",
   "naver_url": "https://smartstore.naver.com/3000company"
@@ -2190,36 +2190,6 @@
    "created_at": "2026-09-04"
   },
   {
-   "id": "13685156254",
-   "group_id": "G10000617",
-   "title": "전라도 열무 김치",
-   "category": "김치·반찬",
-   "image": "https://t4n9332.github.io/witak-images/images/G10000617_thumb.jpg",
-   "price_from": 15100,
-   "options": [
-    {
-     "name": "1kg",
-     "price": 15100,
-     "soldout": false
-    },
-    {
-     "name": "3kg",
-     "price": 29300,
-     "soldout": false
-    },
-    {
-     "name": "5kg",
-     "price": 43700,
-     "soldout": false
-    }
-   ],
-   "naver_url": "https://smartstore.naver.com/3000company/products/13745817947",
-   "coupang_url": "",
-   "season_kind": "상시",
-   "peak_months": [],
-   "created_at": "2026-09-04"
-  },
-  {
    "id": "13685159034",
    "group_id": "G10000510",
    "title": "전라도 부추 김치",
@@ -4326,11 +4296,11 @@
    "title": "크림슨 포도 2kg",
    "category": "과일",
    "image": "https://t4n9332.github.io/witak-images/images/G10003225_thumb.jpg",
-   "price_from": 24300,
+   "price_from": 26400,
    "options": [
     {
      "name": "2kg",
-     "price": 24300,
+     "price": 26400,
      "soldout": false
     }
    ],
